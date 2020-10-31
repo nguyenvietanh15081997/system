@@ -8,7 +8,7 @@
 #include "../GatewayManager/GateInterface.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
-static mraa_uart_context	vrts_UARTContext;
+mraa_uart_context	vrts_UARTContext;
 static unsigned char 		vruc_GWIF_InUARTData;
 static TS_GWIF_IncomingData	*vrts_GWIF_IncomeMessage;
 static unsigned char		vrsc_GWIF_TempBuffer[TEMPBUFF_LENGTH] = {0};
@@ -18,8 +18,35 @@ static bool					vrb_GWIF_UpdateLate = false;
 static bool					vrb_GWIF_CheckNow = false;
 static bool					vrb_GWIF_RestartMessage = true;
 
+
+
+uint8_t OUTMESSAGE_MACSelect[9]    = {0xE9, 0xFF, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+uint8_t OUTMESSAGE_GetPro[3] 	   = {0xE9, 0xFF, 0x0C};
+uint8_t OUTMESSAGE_Provision[28]   = {0};
+uint8_t OUTMESSAGE_BindingALl[22]  = {0xe9, 0xff, 0x0b, 0x00, 0x00, 0x00, 0x60, 0x96, 0x47, 0x71, 0x73, 0x4f, 0xbd, 0x76, 0xe3, 0xb4, 0x05, 0x19, 0xd1, 0xd9, 0x4a, 0x48};
+
+
+//flag mode
+uint8_t flag_mode         = 1;
+
+
+//flag for control
 uint8_t flag_selectnode1=0;
 uint8_t flag_selectnode2=0;
+
+
+//flag for provision
+uint8_t flag_selectmac     = 0;
+uint8_t flag_getpro_info   = 0;
+uint8_t flag_getpro_element= 0;
+uint8_t flag_provision     = 0;
+uint8_t flag_mac           = 1;
+uint8_t flag_scan          = 1;
+uint8_t flag_done          = 1;
+unsigned int timeout=0;
+
+
+
 /*
  * Khoi tao chuong trinh giao tiep vooi Gateway bao gom:
  * - Khoi tao UART
@@ -44,7 +71,8 @@ void GWIF_Init (void){
  */
 void GWIF_WriteMessage (void){
 	if(pthread_mutex_trylock(&vrpth_SHAREMESS_Send2GatewayLock) == 0){
-		if(vrb_SHAREMESS_Send2GatewayAvailabe == true){
+		if(vrb_SHAREMESS_Send2GatewayAvailabe == true)
+		{
 			vrb_SHAREMESS_Send2GatewayAvailabe = false;
 			mraa_uart_write(vrts_UARTContext, (const char *)vrsc_SHAREMESS_Send2GatewayMessage, vrui_SHAREMESS_Send2GatewayLength);
 			//printf("Put to Gateway\n");
@@ -155,7 +183,7 @@ void GWIF_CheckData (void){
  * TODO: Thuc hien boc ban tin theo cac nhom lenh tuong ung, hoan thien chuan xu ly ban tin den
  */
 void GWIF_ProcessData (void){
-	//unsigned int vrui_Count;
+	unsigned int vrui_Count;
 
 	if(vrb_GWIF_CheckNow){
 		vrb_GWIF_CheckNow = false;
@@ -167,25 +195,78 @@ void GWIF_ProcessData (void){
 //			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
 //		}
 //		printf("\n");
-		if(vrts_GWIF_IncomeMessage->Message[0] == 0x81){
 
-			if((vrts_GWIF_IncomeMessage->Message[5]== 0x82) && (vrts_GWIF_IncomeMessage->Message[6]== 0x4e)){
-				printf ("%x %x :%x%x\n",vrts_GWIF_IncomeMessage->Message[1],vrts_GWIF_IncomeMessage->Message[2],vrts_GWIF_IncomeMessage->Message[7],vrts_GWIF_IncomeMessage->Message[8]);
-			}
+		//process for control
+		if(flag_mode==0){
+			if((vrts_GWIF_IncomeMessage->Message[0] == 0x81) && (flag_mode==0)){
 
-			if((vrts_GWIF_IncomeMessage->Message[5]== 0x80) && (vrts_GWIF_IncomeMessage->Message[6]== 0x2a)){
-				flag_selectnode1=1;
-				while(vrui_GWIF_LengthMeassge>13){
-					printf ("%x ",vrts_GWIF_IncomeMessage->Message[vrui_GWIF_LengthMeassge-3]);
-					vrui_GWIF_LengthMeassge=vrui_GWIF_LengthMeassge-2;
+				if((vrts_GWIF_IncomeMessage->Message[5]== 0x82) && (vrts_GWIF_IncomeMessage->Message[6]== 0x4e)){
+					printf ("%x %x :%x%x\n",vrts_GWIF_IncomeMessage->Message[1],vrts_GWIF_IncomeMessage->Message[2],vrts_GWIF_IncomeMessage->Message[7],vrts_GWIF_IncomeMessage->Message[8]);
 				}
-			}
 
-			if((vrts_GWIF_IncomeMessage->Message[5]== 0x82) && (vrts_GWIF_IncomeMessage->Message[6]== 0x45)){
-				flag_selectnode2=1;
+				if((vrts_GWIF_IncomeMessage->Message[5]== 0x80) && (vrts_GWIF_IncomeMessage->Message[6]== 0x2a)){
+					flag_selectnode1=1;
+					while(vrui_GWIF_LengthMeassge>13){
+						printf ("%x ",vrts_GWIF_IncomeMessage->Message[vrui_GWIF_LengthMeassge-3]);
+						vrui_GWIF_LengthMeassge=vrui_GWIF_LengthMeassge-2;
+					}
+				}
+
+				if((vrts_GWIF_IncomeMessage->Message[5]== 0x82) && (vrts_GWIF_IncomeMessage->Message[6]== 0x45)){
+					flag_selectnode2=1;
+				}
 			}
 		}
 
+
+		//process for provision
+		if(flag_mode==1){
+			if(vrts_GWIF_IncomeMessage->Message[0] == 0x88 ){
+				int i;
+				for(i=0; i<6; i++)
+				{
+					OUTMESSAGE_MACSelect[i+3]=vrts_GWIF_IncomeMessage->Message[i+1];
+				}
+				flag_selectmac=1;
+			}
+
+			if(vrts_GWIF_IncomeMessage->Message[0] == 0x8b ){
+
+				OUTMESSAGE_Provision[0]=0xE9;
+				OUTMESSAGE_Provision[1]=0xFF;
+				OUTMESSAGE_Provision[2]=0x0a;
+				int i;
+				//unicast_address = (vrts_GWIF_IncomeMessage->Message[25]) | (vrts_GWIF_IncomeMessage->Message[26]<<8);
+				for (i=0;i<25;i++)
+				{
+					OUTMESSAGE_Provision[i+3]=vrts_GWIF_IncomeMessage->Message[i+2];
+				}
+	//			OUTMESSAGE_Provision[26]=(unicast_address-1);
+	//			OUTMESSAGE_Provision[27]=(unicast_address-1)>>8;
+				flag_getpro_info=1;
+			}
+
+			if(vrts_GWIF_IncomeMessage->Message[0] == 0x8c)
+			{
+				flag_getpro_element=1;
+			}
+
+			if(vrts_GWIF_IncomeMessage->Message[0] == 0x89 && vrts_GWIF_IncomeMessage->Message[1] == 0x01)
+			{
+				flag_provision =1;
+			}
+
+			if(vrts_GWIF_IncomeMessage->Message[0] == 0x8a && vrts_GWIF_IncomeMessage->Message[1] == 0x01)
+			{
+				//flag_mac=1;
+				flag_scan=1;
+			}
+			if(vrts_GWIF_IncomeMessage->Message[0] == 0x82)
+			{
+				flag_done=1;
+				flag_mac=1;
+			}
+		}
 	}
 }
 

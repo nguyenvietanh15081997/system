@@ -50,8 +50,31 @@ typedef struct IncomingData{
 } TS_GWIF_IncomingData;
 
 
+//flag mode
+extern uint8_t flag_mode;
+
+
+//flag for provision
+extern uint8_t flag_selectmac;
+extern uint8_t flag_getpro_info;
+extern uint8_t flag_getpro_element;
+extern uint8_t flag_provision;
+extern uint8_t flag_mac;
+extern uint8_t flag_scan;
+extern uint8_t flag_done;
+extern unsigned int timeout;
+
+
+//flag control
 extern uint8_t flag_selectnode1;
 extern uint8_t flag_selectnode2;
+extern mraa_uart_context	vrts_UARTContext;
+
+
+extern uint8_t  OUTMESSAGE_MACSelect[9] ;
+extern uint8_t  OUTMESSAGE_GetPro[3] ;
+extern uint8_t  OUTMESSAGE_BindingALl[22];
+extern uint8_t  OUTMESSAGE_Provision[28];
 
 void GWIF_Init (void);
 void GWIF_WriteMessage (void);
