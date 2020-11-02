@@ -28,7 +28,7 @@ char mode2[]="selectnode";
 char mode3[]="control";
 char mode4[]="addgroup";
 char mode5[]="deletegroup";
-char mode6[]="kichout";
+char mode6[]="kickout";
 char mode7[]="provision";
 char Help[] ="help";
 
@@ -68,7 +68,7 @@ void Selectnode()
  */
 void *TestSendThread (void *vargp){
 while(1){
-	gets(selectmode);
+	printf ("->");gets(selectmode);
 	if (strcmp(selectmode, mode1) == 0)
 	{
 		flag_mode=0;
@@ -196,7 +196,7 @@ while(1){
 	    printf("%s: Control device in group\n",mode3);
 	    printf("%s: Add node into group\n",mode4);
 	    printf("%s: Delete node out group\n",mode5);
-	    printf("%s: Kich out node get out mesh\n",mode6);
+	    printf("%s: Kick out node get out mesh\n",mode6);
 	    //puts(Help);
 	}
 	//else puts("Not support");
