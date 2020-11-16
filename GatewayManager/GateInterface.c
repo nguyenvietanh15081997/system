@@ -6,7 +6,6 @@
  */
 
 #include "../GatewayManager/GateInterface.h"
-#include "../GatewayManager/OpCode.h"
 
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
@@ -20,11 +19,15 @@ static bool					vrb_GWIF_UpdateLate = false;
 static bool					vrb_GWIF_CheckNow = false;
 static bool					vrb_GWIF_RestartMessage = true;
 
+
+
+
+uint8_t OUTMESSAGE_ScanStop[3]     = {0xE9, 0xFF, 0x01};
+uint8_t OUTMESSAGE_ScanStart[3]    = {0xE9, 0xFF, 0x00};
 uint8_t OUTMESSAGE_MACSelect[9]    = {0xE9, 0xFF, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 uint8_t OUTMESSAGE_GetPro[3] 	   = {0xE9, 0xFF, 0x0C};
 uint8_t OUTMESSAGE_Provision[28]   = {0};
 uint8_t OUTMESSAGE_BindingALl[22]  = {0xe9, 0xff, 0x0b, 0x00, 0x00, 0x00, 0x60, 0x96, 0x47, 0x71, 0x73, 0x4f, 0xbd, 0x76, 0xe3, 0xb4, 0x05, 0x19, 0xd1, 0xd9, 0x4a, 0x48};
-//static uint16_t unicast_address;
 
 
 bool flag_selectmac     = false;
@@ -34,7 +37,7 @@ bool flag_provision     = false;
 bool flag_mac           = true;
 bool flag_check_select_mac  = false;
 bool flag_done          = true;
-unsigned int timeout=0;
+unsigned int Timeout_CheckDataBuffer=0;
 
 
 /*
@@ -92,7 +95,7 @@ void GWIF_CheckData (void){
 
 	// Neu co du lieu trong Buffer
 	if(vrts_ringbuffer_Data.count >= 1){
-		timeout=0;
+		Timeout_CheckDataBuffer=0;
 		if(vrb_GWIF_UpdateLate == false){
 
 			// Doc du lieu vao Buffer roi chuyen du lieu di tiep
@@ -110,16 +113,9 @@ void GWIF_CheckData (void){
 				vrui_GWIF_LengthMeassge = (vrts_GWIF_IncomeMessage->Length[0]) | (vrts_GWIF_IncomeMessage->Length[1]<<8);
 			}
 
-//			printf("Checking...\n");
-//			printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
-//			printf("\tTSCRIPT:%2x\n",vrts_GWIF_IncomeMessage->Opcode);
-//			printf("\n");
-
-
-
 			if((vrui_GWIF_LengthMeassge) >= MESSAGE_HEADLENGTH){
-				if(	(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_MESH_RX)  || \
-					(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_MESH_RX_NW)  || \
+				if(	(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_MESH_RX)          || \
+					(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_MESH_RX_NW)       || \
 					(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_GATEWAY_DIR_RSP)  || \
 					(vrts_GWIF_IncomeMessage->Opcode == HCI_GATEWAY_CMD_SAR_MSG)  || \
 					(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_CMD_VC_DEBUG) ){
@@ -166,7 +162,7 @@ void GWIF_CheckData (void){
 	}
 	else
 	{
-		timeout++;
+		Timeout_CheckDataBuffer++;
 	}
 
 }
@@ -182,7 +178,6 @@ void GWIF_ProcessData (void){
 	if(vrb_GWIF_CheckNow){
 		vrb_GWIF_CheckNow = false;
 
-
 		/*Display data*/
 		printf("A coming message:\n");
 		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
@@ -192,53 +187,52 @@ void GWIF_ProcessData (void){
 			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
 		}
 		printf("\n");
-        /**/
+        /*............*/
 
 /*Process data to provision*/
-		if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_UPDATE_MAC) && (flag_check_select_mac == true)){  //scan
-			for(i=0; i<6; i++)
-			{
-				OUTMESSAGE_MACSelect[i+3]=vrts_GWIF_IncomeMessage->Message[i+1];
+			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_UPDATE_MAC) && (flag_check_select_mac == true)){  //scan
+				for(i=0; i<6; i++)
+				{
+					OUTMESSAGE_MACSelect[i+3]=vrts_GWIF_IncomeMessage->Message[i+1];
+				}
+
+				flag_selectmac=true;
+				flag_check_select_mac= false;
 			}
 
-			flag_selectmac=true;
-			flag_check_select_mac= false;
-		}
+			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_PRO_STS_RSP){
 
-		if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_PRO_STS_RSP){
-
-			OUTMESSAGE_Provision[0]=HCI_CMD_GATEWAY_CTL;    //0xE9
-			OUTMESSAGE_Provision[1]=HCI_CMD_GATEWAY_CTL>>8; //0xFF;
-			OUTMESSAGE_Provision[2]=HCI_GATEWAY_CMD_SET_NODE_PARA;
-			//unicast_address = (vrts_GWIF_IncomeMessage->Message[25]) | (vrts_GWIF_IncomeMessage->Message[26]<<8);
-			for (i=0;i<25;i++)
-			{
-				OUTMESSAGE_Provision[i+3]=vrts_GWIF_IncomeMessage->Message[i+2];
+				OUTMESSAGE_Provision[0]=HCI_CMD_GATEWAY_CTL;    //0xE9
+				OUTMESSAGE_Provision[1]=HCI_CMD_GATEWAY_CTL>>8; //0xFF;
+				OUTMESSAGE_Provision[2]=HCI_GATEWAY_CMD_SET_NODE_PARA;
+				//unicast_address = (vrts_GWIF_IncomeMessage->Message[25]) | (vrts_GWIF_IncomeMessage->Message[26]<<8);
+				for (i=0;i<25;i++)
+				{
+					OUTMESSAGE_Provision[i+3]=vrts_GWIF_IncomeMessage->Message[i+2];
+				}
+				flag_getpro_info=true;
 			}
-			flag_getpro_info=true;
-		}
 
-		if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_SEND_ELE_CNT)
-		{
-			flag_getpro_element=true;
-		}
+			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_SEND_ELE_CNT)
+			{
+				flag_getpro_element=true;
+			}
 
-		if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_PROVISION_EVT && vrts_GWIF_IncomeMessage->Message[1] == HCI_GATEWAY_CMD_PROVISION_SUSCESS)
-		{
-			flag_provision =true;
-		}
+			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_PROVISION_EVT && vrts_GWIF_IncomeMessage->Message[1] == HCI_GATEWAY_CMD_PROVISION_SUSCESS)
+			{
+				flag_provision =true;
+			}
 
-		if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_KEY_BIND_EVT && vrts_GWIF_IncomeMessage->Message[1] == HCI_GATEWAY_CMD_BIND_SUSCESS)
-		{
-			//printf("suscess!");
-		}
-		if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_KEY_BIND_RSP)
-		{
-			flag_done=true;
-			flag_mac=true;
-		}
-/**/
-
+			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_KEY_BIND_EVT && vrts_GWIF_IncomeMessage->Message[1] == HCI_GATEWAY_CMD_BIND_SUSCESS)
+			{
+				printf("suscess!\n");
+			}
+			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_KEY_BIND_RSP)
+			{
+				flag_done=true;
+				flag_mac=true;
+			}
+/*...........................................*/
 
 
 	}

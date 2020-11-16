@@ -5,6 +5,10 @@
 extern "C" {
 #endif
 
+#include "../GatewayManager/ShareMessage.h"
+
+//mode
+
 
 // rsp cmd part 
 #define HCI_GATEWAY_RSP_UNICAST	   		0x80
@@ -36,7 +40,7 @@ extern "C" {
 #define HCI_GATEWAY_CMD_DEL_VC_NODE_INFO    0x11
 #define HCI_GATEWAY_CMD_SEND_VC_NODE_INFO	0x12
 
-
+//TSCRIPT
 #define TSCRIPT_MESH_RX 			0x80
 #define TSCRIPT_MESH_RX_NW 			0x90
 #define TSCRIPT_GATEWAY_DIR_RSP 	0x91
@@ -44,11 +48,12 @@ extern "C" {
 #define TSCRIPT_CMD_VC_DEBUG 		0xfa
 
 
+//flag provision
 #define HCI_GATEWAY_CMD_PROVISION_SUSCESS 0x01
 #define HCI_GATEWAY_CMD_BIND_SUSCESS      0x01
 #define HCI_GATEWAY_CMD_BIND_DONE         0x00
 
-
+// user
 #define HCI_CMD_USER_START			0xFF00
 #define HCI_CMD_USER				HCI_CMD_USER_START
 #define	HCI_CMD_USER_END			0xFF7F
@@ -63,8 +68,7 @@ extern "C" {
 #define	HCI_CMD_BULK_SET_PAR2USB	0xFFA8
 #define	HCI_CMD_SET_VC_PAR			0xFFAA
 		
-		
-		//
+//
 #define	HCI_CMD_KMA_DONGLE_SET_MAC  			0xFFE0
 #define	HCI_CMD_KMA_DONGLE_SPP_TEST_DATA		0xFFE1
 #define	HCI_CMD_KMA_DONGLE_SPP_TEST_STATUS  	0xFFE2
@@ -74,11 +78,17 @@ extern "C" {
 #define	HCI_CMD_GATEWAY_CTL			0xFFE9
 #define	HCI_CMD_GATEWAY_OTA			0xFFEA
 #define	HCI_CMD_MESH_OTA			0xFFEB
-		
-		
-		//
 #define	HCI_CMD_PROVISION			0xFEA0
 
+// opcode of button
+#define BUTTON_GATEWAY_CMD          0xA082
+#define BUTTON_GATEWAY_RSP          0xA182
+
+
+extern bool MODE_PROVISION;
+extern bool MODE_MQTT;
+extern bool MODE_BUTTON;
+extern bool MODE_CONTROL;
 
 #ifdef __cplusplus
 }

@@ -24,6 +24,7 @@ extern "C" {
 
 #include "../GatewayManager/RingBuffer.h"
 #include "../GatewayManager/ShareMessage.h"
+#include "../GatewayManager/OpCode.h"
 
 
 #define RINGBUFFER_LEN 		(2048)
@@ -51,12 +52,15 @@ typedef struct IncomingData{
 } TS_GWIF_IncomingData;
 
 
+//CMD for provision
+extern uint8_t OUTMESSAGE_ScanStop[3];
+extern uint8_t OUTMESSAGE_ScanStart[3];
 extern uint8_t  OUTMESSAGE_MACSelect[9] ;
 extern uint8_t  OUTMESSAGE_GetPro[3] ;
 extern uint8_t  OUTMESSAGE_BindingALl[22];
 extern uint8_t  OUTMESSAGE_Provision[28];
 
-
+//flag of provision
 extern bool flag_selectmac;
 extern bool flag_getpro_info;
 extern bool flag_getpro_element;
@@ -65,7 +69,10 @@ extern bool flag_mac;
 extern bool flag_check_select_mac;
 extern bool flag_done;
 
-extern unsigned int timeout;
+// timeout check data in buffer
+extern unsigned int Timeout_CheckDataBuffer;
+
+
 
 void GWIF_Init (void);
 void GWIF_WriteMessage (void);
