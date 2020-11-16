@@ -35,7 +35,7 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 		puts("ON");
 		MODE_PROVISION=true;
 		pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
-		pthread_join(vrts_System_TestSend, NULL);
+		//pthread_join(vrts_System_TestSend, NULL);
 	}
 	if(strcmp(msg, off)==0)
 	{
@@ -43,6 +43,13 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 		MODE_PROVISION=false;
 		pthread_cancel(tmp);
 		controlmessage(3, OUTMESSAGE_ScanStop);
+		flag_selectmac     = false;
+		flag_getpro_info   = false;
+		flag_getpro_element= false;
+		flag_provision     = false;
+		flag_mac           = true;
+		flag_check_select_mac  = false;
+		flag_done          = true;
 	}
 
 	//printf("message '%.*s' for topic '%s'\n", message->payloadlen, msg, message->topic);

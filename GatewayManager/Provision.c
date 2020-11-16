@@ -15,7 +15,7 @@ void controlmessage(uint16_t lengthmessage,uint8_t *Message)
 void *ProvisionThread (void *argv )
 {
 	tmp = pthread_self();
-	while(0){
+	while(MODE_PROVISION){
 		if((flag_done == true) || (Timeout_CheckDataBuffer == 32000))
 		{
 			flag_done = false;

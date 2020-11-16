@@ -34,7 +34,7 @@ extern "C" {
 #define mqtt_password 		"JCCSw9dYngMF"
 
 
-mosquitto_message *message1;
+
 
 extern int run;
 
