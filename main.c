@@ -30,10 +30,10 @@ int main(void) {
 	flag_done=true;
 	//pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
     pthread_create(&vrts_System_ThreadGWIF, NULL, GWINF_Thread, NULL);
-    pthread_create(&vrts_System_MQTT,   NULL,   MQTT_Thread,    NULL);
+   // pthread_create(&vrts_System_MQTT,   NULL,   MQTT_Thread,    NULL);
 	pthread_join(vrts_System_ThreadGWIF, NULL);
 	//pthread_join(vrts_System_TestSend, NULL);
-    pthread_join(vrts_System_MQTT,NULL);
+   // pthread_join(vrts_System_MQTT,NULL);
 	while(1){
 	}
 	return EXIT_SUCCESS;

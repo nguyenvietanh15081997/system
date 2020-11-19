@@ -6,7 +6,8 @@
  */
 
 #include "../GatewayManager/GateInterface.h"
-
+#include "../GatewayManager/ButtonManager.h"
+#include "../GatewayManager/SensorLight.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -19,15 +20,11 @@ static bool					vrb_GWIF_UpdateLate = false;
 static bool					vrb_GWIF_CheckNow = false;
 static bool					vrb_GWIF_RestartMessage = true;
 
+uint16_t  Value_Lux;
+uint16_t Lux_Register;
+uint16_t SENSOR_GATEWAY_RSP    = 0x0152;
 
 
-
-uint8_t OUTMESSAGE_ScanStop[3]     = {0xE9, 0xFF, 0x01};
-uint8_t OUTMESSAGE_ScanStart[3]    = {0xE9, 0xFF, 0x00};
-uint8_t OUTMESSAGE_MACSelect[9]    = {0xE9, 0xFF, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-uint8_t OUTMESSAGE_GetPro[3] 	   = {0xE9, 0xFF, 0x0C};
-uint8_t OUTMESSAGE_Provision[28]   = {0};
-uint8_t OUTMESSAGE_BindingALl[22]  = {0xe9, 0xff, 0x0b, 0x00, 0x00, 0x00, 0x60, 0x96, 0x47, 0x71, 0x73, 0x4f, 0xbd, 0x76, 0xe3, 0xb4, 0x05, 0x19, 0xd1, 0xd9, 0x4a, 0x48};
 
 
 bool flag_selectmac     = false;
@@ -37,6 +34,9 @@ bool flag_provision     = false;
 bool flag_mac           = true;
 bool flag_check_select_mac  = false;
 bool flag_done          = true;
+
+
+
 unsigned int Timeout_CheckDataBuffer=0;
 
 
@@ -189,6 +189,7 @@ void GWIF_ProcessData (void){
 		printf("\n");
         /*............*/
 
+
 /*Process data to provision*/
 			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_UPDATE_MAC) && (flag_check_select_mac == true)){  //scan
 				for(i=0; i<6; i++)
@@ -234,6 +235,33 @@ void GWIF_ProcessData (void){
 			}
 /*...........................................*/
 
+/*Button*/
+
+/*			if(vrts_GWIF_IncomeMessage->Message[0] == 0x81 && vrts_GWIF_IncomeMessage->Message[5] == 0x82 && vrts_GWIF_IncomeMessage->Message[6] == 0xa1)
+			{
+				if(vrts_GWIF_IncomeMessage->Message[13] == 0x11)
+					flag_button1=true;
+				if(vrts_GWIF_IncomeMessage->Message[13] == 0x21)
+					flag_button2=true;
+				if(vrts_GWIF_IncomeMessage->Message[13] == 0x31)
+					flag_button3=true;
+				if(vrts_GWIF_IncomeMessage->Message[13] == 0x41)
+					flag_button4=true;
+				if(vrts_GWIF_IncomeMessage->Message[13] == 0x51)
+					flag_button5=true;
+			}
+*/
+/*...........................................*/
+
+/*Sensor_light*/
+			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE) && \
+			   (vrts_GWIF_IncomeMessage->Message[5] == (SENSOR_GATEWAY_RSP & 0xff)) && \
+			   (vrts_GWIF_IncomeMessage->Message[6] == ((SENSOR_GATEWAY_RSP >>8) & 0xff)))
+			{
+				puts(">> sensor message");
+				Value_Lux = (vrts_GWIF_IncomeMessage->Message[10]) | (vrts_GWIF_IncomeMessage->Message[11]<<8);
+				printf ("Lux= %d\n",Value_Lux);
+			}
 
 	}
 }

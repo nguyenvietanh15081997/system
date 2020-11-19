@@ -81,14 +81,21 @@ extern "C" {
 #define	HCI_CMD_PROVISION			0xFEA0
 
 // opcode of button
-#define BUTTON_GATEWAY_CMD          0xA082
-#define BUTTON_GATEWAY_RSP          0xA182
+
 
 
 extern bool MODE_PROVISION;
 extern bool MODE_MQTT;
 extern bool MODE_BUTTON;
 extern bool MODE_CONTROL;
+
+//message control
+extern uint8_t OUTMESSAGE_ScanStop[3];
+extern uint8_t OUTMESSAGE_ScanStart[3];
+extern uint8_t OUTMESSAGE_MACSelect[9];
+extern uint8_t OUTMESSAGE_GetPro[3];
+extern uint8_t OUTMESSAGE_Provision[28];
+extern uint8_t OUTMESSAGE_BindingALl[22];
 
 #ifdef __cplusplus
 }

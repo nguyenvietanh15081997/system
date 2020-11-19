@@ -52,13 +52,8 @@ typedef struct IncomingData{
 } TS_GWIF_IncomingData;
 
 
-//CMD for provision
-extern uint8_t OUTMESSAGE_ScanStop[3];
-extern uint8_t OUTMESSAGE_ScanStart[3];
-extern uint8_t  OUTMESSAGE_MACSelect[9] ;
-extern uint8_t  OUTMESSAGE_GetPro[3] ;
-extern uint8_t  OUTMESSAGE_BindingALl[22];
-extern uint8_t  OUTMESSAGE_Provision[28];
+
+
 
 //flag of provision
 extern bool flag_selectmac;
@@ -68,6 +63,9 @@ extern bool flag_provision;
 extern bool flag_mac;
 extern bool flag_check_select_mac;
 extern bool flag_done;
+
+
+
 
 // timeout check data in buffer
 extern unsigned int Timeout_CheckDataBuffer;
