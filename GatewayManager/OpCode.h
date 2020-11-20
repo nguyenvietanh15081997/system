@@ -80,7 +80,24 @@ extern "C" {
 #define	HCI_CMD_MESH_OTA			0xFFEB
 #define	HCI_CMD_PROVISION			0xFEA0
 
-// opcode of button
+// function for device
+#define SIG_MD_LIGHTNESS_S              0x1300
+#define SIG_MD_LIGHTNESS_SETUP_S        0x1301
+#define SIG_MD_LIGHTNESS_C              0x1302
+#define SIG_MD_LIGHT_CTL_S              0x1303
+#define SIG_MD_LIGHT_CTL_SETUP_S        0x1304
+#define SIG_MD_LIGHT_CTL_C              0x1305
+#define SIG_MD_LIGHT_CTL_TEMP_S         0x1306
+#define SIG_MD_LIGHT_HSL_S              0x1307
+#define SIG_MD_LIGHT_HSL_SETUP_S        0x1308
+#define SIG_MD_LIGHT_HSL_C              0x1309
+#define SIG_MD_LIGHT_HSL_HUE_S          0x130A
+#define SIG_MD_LIGHT_HSL_SAT_S          0x130B
+#define SIG_MD_LIGHT_XYL_S              0x130C
+#define SIG_MD_LIGHT_XYL_SETUP_S        0x130D
+#define SIG_MD_LIGHT_XYL_C              0x130E
+#define SIG_MD_LIGHT_LC_S              	0x130F
+#define SIG_MD_LIGHT_LC_SETUP_S        	0x1310
 
 
 

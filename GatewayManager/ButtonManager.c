@@ -1,5 +1,6 @@
 #include "../GatewayManager/ButtonManager.h"
 
+bool flag_button0 = false;
 bool flag_button1 = false;
 bool flag_button2 = false;
 bool flag_button3 = false;
@@ -8,9 +9,12 @@ bool flag_button5 = false;
 
 bool IsButtonPress(unsigned int button)
 {
-	bool i;
+	bool i= false;
 	switch (button)
 	{
+	case 0:
+		i = flag_button0;
+		break;
 	case 1:
 		i = flag_button1;
 		break;
@@ -31,6 +35,10 @@ bool IsButtonPress(unsigned int button)
 }
 void ProcessButton()
 {
+	if(IsButtonPress(0)){
+		flag_button0= false;
+		//function of button
+	}
 	if(IsButtonPress(1)){
 		flag_button1 = false;
 	}

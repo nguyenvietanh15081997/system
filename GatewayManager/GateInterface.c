@@ -234,35 +234,42 @@ void GWIF_ProcessData (void){
 				flag_mac=true;
 			}
 /*...........................................*/
+			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE)
+			{
 
 /*Button*/
+				if((vrts_GWIF_IncomeMessage->Message[5] == (BUTTON_GATEWAY_RSP & 0xFF)) && (vrts_GWIF_IncomeMessage->Message[6] == ((BUTTON_GATEWAY_RSP >>8) & 0xFF)))
+				{
+					if(vrts_GWIF_IncomeMessage->Message[13] == Button0Press){
+						flag_button0 = true;
+					}
+					else if(vrts_GWIF_IncomeMessage->Message[13] == Button1Press){
+						flag_button1 = true;
+					}
+					else if(vrts_GWIF_IncomeMessage->Message[13] == Button2Press){
+						flag_button2 = true;
+					}
+					else if(vrts_GWIF_IncomeMessage->Message[13] == Button3Press){
+						flag_button3 = true;
+					}
+					else if(vrts_GWIF_IncomeMessage->Message[13] == Button4Press){
+						flag_button4 = true;
+					}
+					else if(vrts_GWIF_IncomeMessage->Message[13] == Button5Press){
+						flag_button5 = true;
+					}
+				}
+/*...........*/
 
-/*			if(vrts_GWIF_IncomeMessage->Message[0] == 0x81 && vrts_GWIF_IncomeMessage->Message[5] == 0x82 && vrts_GWIF_IncomeMessage->Message[6] == 0xa1)
-			{
-				if(vrts_GWIF_IncomeMessage->Message[13] == 0x11)
-					flag_button1=true;
-				if(vrts_GWIF_IncomeMessage->Message[13] == 0x21)
-					flag_button2=true;
-				if(vrts_GWIF_IncomeMessage->Message[13] == 0x31)
-					flag_button3=true;
-				if(vrts_GWIF_IncomeMessage->Message[13] == 0x41)
-					flag_button4=true;
-				if(vrts_GWIF_IncomeMessage->Message[13] == 0x51)
-					flag_button5=true;
+/*SensorLight*/
+				if((vrts_GWIF_IncomeMessage->Message[5] == (SENSOR_GATEWAY_RSP & 0xff)) && (vrts_GWIF_IncomeMessage->Message[6] == ((SENSOR_GATEWAY_RSP >>8) & 0xff))){
+					puts(">> sensor message");
+					Value_Lux = (vrts_GWIF_IncomeMessage->Message[10]) | (vrts_GWIF_IncomeMessage->Message[11]<<8);
+					printf ("Lux= %d\n",Value_Lux);
+				}
+
+/*...........*/
 			}
-*/
-/*...........................................*/
-
-/*Sensor_light*/
-			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE) && \
-			   (vrts_GWIF_IncomeMessage->Message[5] == (SENSOR_GATEWAY_RSP & 0xff)) && \
-			   (vrts_GWIF_IncomeMessage->Message[6] == ((SENSOR_GATEWAY_RSP >>8) & 0xff)))
-			{
-				puts(">> sensor message");
-				Value_Lux = (vrts_GWIF_IncomeMessage->Message[10]) | (vrts_GWIF_IncomeMessage->Message[11]<<8);
-				printf ("Lux= %d\n",Value_Lux);
-			}
-
 	}
 }
 
