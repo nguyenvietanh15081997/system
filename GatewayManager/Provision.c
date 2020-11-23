@@ -2,7 +2,10 @@
 #include "../GatewayManager/Provision.h"
 pthread_t tmp;
 
-void controlmessage(uint16_t lengthmessage,uint8_t *Message)
+uint8_t ONMES[14]  = {0xe8, 0xff, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0x01, 0xc0, 0x82, 0x02, 0x01, 0x00};
+uint8_t OFFMES[14] = {0xe8, 0xff, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0x01, 0xc0, 0x82, 0x02, 0x00, 0x00};
+
+void ControlMessage(uint16_t lengthmessage,uint8_t *Message)
 {
 	pthread_mutex_lock(&vrpth_SHAREMESS_Send2GatewayLock);
 	vrb_SHAREMESS_Send2GatewayAvailabe = true;
@@ -14,14 +17,14 @@ void controlmessage(uint16_t lengthmessage,uint8_t *Message)
 
 void *ProvisionThread (void *argv )
 {
-	tmp = pthread_self();
+/*	tmp = pthread_self();
 	while(MODE_PROVISION){
 		if((flag_done == true) || (Timeout_CheckDataBuffer == 32000))
 		{
 			flag_done = false;
 			Timeout_CheckDataBuffer=0;
 			sleep(1);
-			controlmessage(3, OUTMESSAGE_ScanStart);
+			ControlMessage(3, OUTMESSAGE_ScanStart);
 			printf ("scan\n");
 			flag_check_select_mac= true;
 		}
@@ -30,11 +33,11 @@ void *ProvisionThread (void *argv )
 		{
 			flag_selectmac=false;
 			flag_mac=false;
-			controlmessage(9, OUTMESSAGE_MACSelect);
+			ControlMessage(9, OUTMESSAGE_MACSelect);
 			printf("selectmac\n");
 			sleep(2);
 
-			controlmessage(3, OUTMESSAGE_GetPro);
+			ControlMessage(3, OUTMESSAGE_GetPro);
 			printf ("getpro\n");
 			sleep(1);
 		}
@@ -42,7 +45,7 @@ void *ProvisionThread (void *argv )
 		{
 			flag_getpro_info = false;
 			flag_getpro_element = false;
-			controlmessage(28, OUTMESSAGE_Provision);
+			ControlMessage(28, OUTMESSAGE_Provision);
 			printf ("provision\n");
 		}
 
@@ -50,9 +53,22 @@ void *ProvisionThread (void *argv )
 		{
 			flag_provision=false;
 			sleep(1);
-			controlmessage(22, OUTMESSAGE_BindingALl);
+			ControlMessage(22, OUTMESSAGE_BindingALl);
 			printf ("binding all\n");
 		}
+	}*/
+
+while(1){
+	if(flagLux == 1){
+		ControlMessage(14, ONMES);
+		puts("on");
+		sleep(2);
 	}
+	else if(flagLux == 2){
+		ControlMessage(14, OFFMES);
+		puts("off");
+		sleep(2);
+	}
+}
 	return NULL;
 }

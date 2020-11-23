@@ -13,7 +13,7 @@ extern "C" {
 #include <math.h>
 #include <unistd.h>
 
-extern  uint16_t SENSOR_GATEWAY_RSP   ;
+#define SENSOR_GATEWAY_RSP 0x0152
 
 extern bool flag_sensor_rsp;
 extern unsigned int lux;

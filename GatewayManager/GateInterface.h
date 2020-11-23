@@ -64,7 +64,7 @@ extern bool flag_mac;
 extern bool flag_check_select_mac;
 extern bool flag_done;
 
-
+extern uint8_t flagLux;
 
 
 // timeout check data in buffer

@@ -42,7 +42,7 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 		puts("OFF");
 		MODE_PROVISION=false;
 		pthread_cancel(tmp);
-		controlmessage(3, OUTMESSAGE_ScanStop);
+		ControlMessage(3, OUTMESSAGE_ScanStop);
 		flag_selectmac     = false;
 		flag_getpro_info   = false;
 		flag_getpro_element= false;

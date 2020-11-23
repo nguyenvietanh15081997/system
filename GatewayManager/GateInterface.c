@@ -22,7 +22,7 @@ static bool					vrb_GWIF_RestartMessage = true;
 
 uint16_t  Value_Lux;
 uint16_t Lux_Register;
-uint16_t SENSOR_GATEWAY_RSP    = 0x0152;
+uint8_t flagLux = 0;
 
 
 
@@ -51,7 +51,6 @@ void GWIF_Init (void){
 	mraa_uart_set_baudrate(vrts_UARTContext, UART_BAUDRATE);
 	mraa_uart_set_mode(vrts_UARTContext, UART_LENGTHDATA, MRAA_UART_PARITY_NONE, 1);
 	mraa_uart_set_flowcontrol(vrts_UARTContext, 0, 0);
-
 	// Dua con tro du lieu ve mang du lieu nhan ve
 	vrts_GWIF_IncomeMessage = (TS_GWIF_IncomingData *)vrsc_GWIF_TempBuffer;
 }
@@ -179,14 +178,14 @@ void GWIF_ProcessData (void){
 		vrb_GWIF_CheckNow = false;
 
 		/*Display data*/
-		printf("A coming message:\n");
-		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
-		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
-		printf("\tMessage:");
-		for (vrui_Count = 0; vrui_Count < vrui_GWIF_LengthMeassge-1; vrui_Count++){
-			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
-		}
-		printf("\n");
+//		printf("A coming message:\n");
+//		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
+//		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
+//		printf("\tMessage:");
+//		for (vrui_Count = 0; vrui_Count < vrui_GWIF_LengthMeassge-1; vrui_Count++){
+//			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
+//		}
+//		printf("\n");
         /*............*/
 
 
@@ -266,6 +265,14 @@ void GWIF_ProcessData (void){
 					puts(">> sensor message");
 					Value_Lux = (vrts_GWIF_IncomeMessage->Message[10]) | (vrts_GWIF_IncomeMessage->Message[11]<<8);
 					printf ("Lux= %d\n",Value_Lux);
+					if(Value_Lux <= 500){
+						flagLux = 1;
+						//puts("false");
+					}
+					else{
+						flagLux = 2;
+						//puts("true");
+					}
 				}
 
 /*...........*/

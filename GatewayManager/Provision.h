@@ -10,7 +10,7 @@ extern "C" {
 
 extern pthread_t tmp ;
 
-void controlmessage(uint16_t lengthmessage,uint8_t *Message);
+void ControlMessage(uint16_t lengthmessage,uint8_t *Message);
 void *ProvisionThread (void *argv );
 
 #ifdef __cplusplus

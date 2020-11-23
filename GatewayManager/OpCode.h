@@ -100,6 +100,146 @@ extern "C" {
 #define SIG_MD_LIGHT_LC_SETUP_S        	0x1310
 
 
+//
+#define APPKEY_DEL		                0x0080
+#define APPKEY_GET		                0x0180
+#define APPKEY_LIST		                0x0280
+#define APPKEY_STATUS		            0x0380
+
+// attenttion timer
+#define HEALTH_ATTENTION_GET			0x0480
+#define HEALTH_ATTENTION_SET			0x0580
+#define HEALTH_ATTENTION_SET_NOACK		0x0680
+#define HEALTH_ATTENTION_STATUS			0x0780
+
+#define COMPOSITION_DATA_GET		    0x0880
+#define CFG_BEACON_GET		            0x0980
+#define CFG_BEACON_SET		            0x0A80
+#define CFG_BEACON_STATUS		        0x0B80
+#define CFG_DEFAULT_TTL_GET		        0x0C80
+#define CFG_DEFAULT_TTL_SET		        0x0D80
+#define CFG_DEFAULT_TTL_STATUS		    0x0E80
+#define CFG_FRIEND_GET		            0x0F80
+#define CFG_FRIEND_SET		            0x1080
+#define CFG_FRIEND_STATUS		        0x1180
+#define CFG_GATT_PROXY_GET		        0x1280
+#define CFG_GATT_PROXY_SET		        0x1380
+#define CFG_GATT_PROXY_STATUS		    0x1480
+#define CFG_KEY_REFRESH_PHASE_GET	    0x1580
+#define CFG_KEY_REFRESH_PHASE_SET		0x1680
+#define CFG_KEY_REFRESH_PHASE_STATUS    0x1780
+#define CFG_MODEL_PUB_GET               0x1880
+#define CFG_MODEL_PUB_STATUS		    0x1980
+#define CFG_MODEL_PUB_VIRTUAL_ADR_SET   0x1A80
+#define CFG_MODEL_SUB_ADD               0x1B80
+#define CFG_MODEL_SUB_DEL		        0x1C80
+#define CFG_MODEL_SUB_DEL_ALL		    0x1D80
+#define CFG_MODEL_SUB_OVER_WRITE        0x1E80
+#define CFG_MODEL_SUB_STATUS		    0x1F80
+#define CFG_MODEL_SUB_VIRTUAL_ADR_ADD   0x2080
+#define CFG_MODEL_SUB_VIRTUAL_ADR_DEL   0x2180
+#define CFG_MODEL_SUB_VIRTUAL_ADR_OVER_WRITE    0x2280
+#define CFG_NW_TRANSMIT_GET		        0x2380
+#define CFG_NW_TRANSMIT_SET		        0x2480
+#define CFG_NW_TRANSMIT_STATUS		    0x2580
+#define CFG_RELAY_GET		            0x2680
+#define CFG_RELAY_SET		            0x2780
+#define CFG_RELAY_STATUS		        0x2880
+#define CFG_SIG_MODEL_SUB_GET		    0x2980
+#define CFG_SIG_MODEL_SUB_LIST		    0x2A80
+#define CFG_VENDOR_MODEL_SUB_GET        0x2B80
+#define CFG_VENDOR_MODEL_SUB_LIST       0x2C80
+#define CFG_LPN_POLL_TIMEOUT_GET		0x2D80
+#define CFG_LPN_POLL_TIMEOUT_STATUS		0x2E80
+
+#define HEALTH_FAULT_CLEAR		        0x2F80
+#define HEALTH_FAULT_CLEAR_NOACK        0x3080
+#define HEALTH_FAULT_GET		        0x3180
+#define HEALTH_FAULT_TEST		        0x3280
+#define HEALTH_FAULT_TEST_NOACK         0x3380
+
+#define HEALTH_PERIOD_GET		        0x3480
+#define HEALTH_PERIOD_SET		        0x3580
+#define HEALTH_PERIOD_SET_NOACK         0x3680
+#define HEALTH_PERIOD_STATUS		    0x3780
+
+#define HEARTBEAT_PUB_GET		        0x3880
+#define HEARTBEAT_PUB_SET		        0x3980
+#define HEARTBEAT_SUB_GET				0x3A80
+#define HEARTBEAT_SUB_SET				0x3B80
+#define HEARTBEAT_SUB_STATUS			0x3C80
+
+#define MODE_APP_BIND		            0x3D80
+#define MODE_APP_STATUS		            0x3E80
+#define MODE_APP_UNBIND		            0x3F80
+#define NETKEY_ADD		                0x4080
+#define NETKEY_DEL		                0x4180
+#define NETKEY_GET		                0x4280
+#define NETKEY_LIST		                0x4380
+#define NETKEY_STATUS		            0x4480
+#define NETKEY_UPDATE		            0x4580
+#define NODE_ID_GET		                0x4680
+#define NODE_ID_SET		                0x4780
+#define NODE_ID_STATUS		            0x4880
+#define NODE_RESET		                0x4980
+#define NODE_RESET_STATUS		        0x4A80
+#define SIG_MODEL_APP_GET		        0x4B80
+#define SIG_MODEL_APP_LIST		        0x4C80
+#define VENDOR_MODEL_APP_GET		    0x4D80
+#define VENDOR_MODEL_APP_LIST		    0x4E80
+
+// generic
+#define G_ONOFF_GET		                0x0182
+#define G_ONOFF_SET		                0x0282
+#define G_ONOFF_SET_NOACK		        0x0382
+#define G_ONOFF_STATUS		            0x0482
+
+#define G_LEVEL_GET		                0x0582
+#define G_LEVEL_SET		                0x0682
+#define G_LEVEL_SET_NOACK		        0x0782
+#define G_LEVEL_STATUS		            0x0882
+#define G_DELTA_SET		                0x0982
+#define G_DELTA_SET_NOACK		        0x0A82
+#define G_MOVE_SET		                0x0B82
+#define G_MOVE_SET_NOACK		        0x0C82
+
+#define G_DEF_TRANS_TIME_GET		    0x0D82
+#define G_DEF_TRANS_TIME_SET		    0x0E82
+#define G_DEF_TRANS_TIME_SET_NOACK		0x0F82
+#define G_DEF_TRANS_TIME_STATUS		    0x1082
+
+#define G_ON_POWER_UP_GET		        0x1182
+#define G_ON_POWER_UP_STATUS		    0x1282
+#define G_ON_POWER_UP_SET		        0x1382
+#define G_ON_POWER_UP_SET_NOACK	        0x1482
+
+#define G_POWER_LEVEL_GET		        0x1582
+#define G_POWER_LEVEL_SET		        0x1682
+#define G_POWER_LEVEL_SET_NOACK		    0x1782
+#define G_POWER_LEVEL_STATUS		    0x1882
+#define G_POWER_LEVEL_LAST_GET		    0x1982
+#define G_POWER_LEVEL_LAST_STATUS		0x1A82
+#define G_POWER_DEF_GET		            0x1B82
+#define G_POWER_DEF_STATUS		        0x1C82
+#define G_POWER_LEVEL_RANGE_GET		    0x1D82
+#define G_POWER_LEVEL_RANGE_STATUS		0x1E82
+#define G_POWER_DEF_SET		            0x1F82
+#define G_POWER_DEF_SET_NOACK		    0x2082
+#define G_POWER_LEVEL_RANGE_SET		    0x2182
+#define G_POWER_LEVEL_RANGE_SET_NOACK	0x2282
+
+#define G_BATTERY_GET					0x2382
+#define G_BATTERY_STATUS				0x2482
+
+#define G_LOCATION_GLOBAL_GET			0x2582
+#define G_LOCATION_GLOBAL_STATUS		0x40
+#define G_LOCATION_LOCAL_GET			0x2682
+#define G_LOCATION_LOCAL_STATUS			0x2782
+#define G_LOCATION_GLOBAL_SET			0x41
+#define G_LOCATION_GLOBAL_SET_NOACK		0x42
+#define G_LOCATION_LOCAL_SET			0x2882
+#define G_LOCATION_LOCAL_SET_NOACK		0x2982
+//
 
 extern bool MODE_PROVISION;
 extern bool MODE_MQTT;
