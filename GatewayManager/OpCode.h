@@ -99,8 +99,8 @@ extern "C" {
 #define SIG_MD_LIGHT_LC_S              	0x130F
 #define SIG_MD_LIGHT_LC_SETUP_S        	0x1310
 
-#define SENSOR_POWER_TYPE  				0x0001
-#define REMOTE_MODULE_TYPE				0x0002
+#define POWER_TYPE  					0x0001
+#define REMOTE_MODULE_TYPE				0x0001
 #define LIGHT_SENSOR_MODULE_TYPE		0x0003
 #define PIR_SENSOR_MODULE_TYPE 			0x0004
 

@@ -164,14 +164,14 @@ void GWIF_ProcessData (void){
 		vrb_GWIF_CheckNow = false;
 
 		/*Display data*/
-		printf("A coming message:\n");
-		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
-		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
-		printf("\tMessage:");
-		for (vrui_Count = 0; vrui_Count < vrui_GWIF_LengthMeassge-1; vrui_Count++){
-			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
-		}
-		printf("\n");
+//		printf("A coming message:\n");
+//		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
+//		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
+//		printf("\tMessage:");
+//		for (vrui_Count = 0; vrui_Count < vrui_GWIF_LengthMeassge-1; vrui_Count++){
+//			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
+//		}
+//		printf("\n");
         /*............*/
 
 
@@ -223,24 +223,31 @@ void GWIF_ProcessData (void){
 			{
 
 /*Button*/
-				if((vrts_GWIF_IncomeMessage->Message[5] == (BUTTON_GATEWAY_RSP & 0xFF)) && (vrts_GWIF_IncomeMessage->Message[6] == ((BUTTON_GATEWAY_RSP >>8) & 0xFF)))
+				if((vrts_GWIF_IncomeMessage->Message[5] == (BUTTON_GATEWAY_RSP & 0xFF)) && \
+						(vrts_GWIF_IncomeMessage->Message[6] == ((REMOTE_MODULE_TYPE >>8) & 0xFF)) && \
+						(vrts_GWIF_IncomeMessage->Message[7] == (REMOTE_MODULE_TYPE & 0xFF)))
 				{
-					if(vrts_GWIF_IncomeMessage->Message[13] == Button0Press){
+					puts(">>button message");
+					if(vrts_GWIF_IncomeMessage->Message[8] == Button0Press){
 						flag_button0 = true;
+						puts("0 press");
+						ProcessButton();
 					}
-					else if(vrts_GWIF_IncomeMessage->Message[13] == Button1Press){
+					else if(vrts_GWIF_IncomeMessage->Message[8] == Button1Press){
 						flag_button1 = true;
+						puts("1 press");
+						ProcessButton();
 					}
-					else if(vrts_GWIF_IncomeMessage->Message[13] == Button2Press){
+					else if(vrts_GWIF_IncomeMessage->Message[8] == Button2Press){
 						flag_button2 = true;
 					}
-					else if(vrts_GWIF_IncomeMessage->Message[13] == Button3Press){
+					else if(vrts_GWIF_IncomeMessage->Message[8] == Button3Press){
 						flag_button3 = true;
 					}
-					else if(vrts_GWIF_IncomeMessage->Message[13] == Button4Press){
+					else if(vrts_GWIF_IncomeMessage->Message[8] == Button4Press){
 						flag_button4 = true;
 					}
-					else if(vrts_GWIF_IncomeMessage->Message[13] == Button5Press){
+					else if(vrts_GWIF_IncomeMessage->Message[8] == Button5Press){
 						flag_button5 = true;
 					}
 				}

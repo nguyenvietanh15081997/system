@@ -1,4 +1,8 @@
 #include "../GatewayManager/ButtonManager.h"
+#include "../GatewayManager/Provision.h"
+
+uint8_t ONMES1[14]  = {0xe8, 0xff, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0xff, 0xff, 0x82, 0x02, 0x01, 0x00};
+uint8_t OFFMES1[14] = {0xe8, 0xff, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0xff, 0xff, 0x82, 0x02, 0x00, 0x00};
 
 bool flag_button0 = false;
 bool flag_button1 = false;
@@ -35,12 +39,17 @@ bool IsButtonPress(unsigned int button)
 }
 void ProcessButton()
 {
-	if(IsButtonPress(0)){
+	if(flag_button0){
 		flag_button0= false;
-		//function of button
+		ControlMessage(14, OFFMES1);
+		puts("OFF");
+		sleep(2);
 	}
-	if(IsButtonPress(1)){
+	if(flag_button1){
 		flag_button1 = false;
+		ControlMessage(14, ONMES1);
+		puts("ON");
+		sleep(2);
 	}
 	if(IsButtonPress(2)){
 		flag_button2 = false;

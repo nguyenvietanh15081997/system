@@ -15,6 +15,7 @@ extern "C" {
 
 #define SENSOR_GATEWAY_RSP 0x0152
 
+
 extern bool flag_sensor_light_rsp;
 extern uint16_t  Value_Lux;
 
