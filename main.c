@@ -11,6 +11,7 @@
 #include "GatewayManager/GateInterface.h"
 #include "GatewayManager/Provision.h"
 #include "GatewayManager/MQTT.h"
+#include "GatewayManager/SensorLight.h"
 
 pthread_t vrts_System_ThreadGWIF;
 pthread_t vrts_System_TestSend;
@@ -35,6 +36,7 @@ int main(void) {
 	pthread_join(vrts_System_TestSend, NULL);
    // pthread_join(vrts_System_MQTT,NULL);
 	while(1){
+		//Process_Lux();
 	}
 	return EXIT_SUCCESS;
 }

@@ -80,7 +80,7 @@ extern "C" {
 #define	HCI_CMD_MESH_OTA			0xFFEB
 #define	HCI_CMD_PROVISION			0xFEA0
 
-// function for device
+// function for device and type device
 #define SIG_MD_LIGHTNESS_S              0x1300
 #define SIG_MD_LIGHTNESS_SETUP_S        0x1301
 #define SIG_MD_LIGHTNESS_C              0x1302
@@ -99,6 +99,10 @@ extern "C" {
 #define SIG_MD_LIGHT_LC_S              	0x130F
 #define SIG_MD_LIGHT_LC_SETUP_S        	0x1310
 
+#define SENSOR_POWER_TYPE  				0x0001
+#define REMOTE_MODULE_TYPE				0x0002
+#define LIGHT_SENSOR_MODULE_TYPE		0x0003
+#define PIR_SENSOR_MODULE_TYPE 			0x0004
 
 //
 #define APPKEY_DEL		                0x0080

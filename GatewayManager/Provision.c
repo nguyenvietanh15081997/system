@@ -1,9 +1,18 @@
 
 #include "../GatewayManager/Provision.h"
+
 pthread_t tmp;
 
-uint8_t ONMES[14]  = {0xe8, 0xff, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0x01, 0xc0, 0x82, 0x02, 0x01, 0x00};
-uint8_t OFFMES[14] = {0xe8, 0xff, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0x01, 0xc0, 0x82, 0x02, 0x00, 0x00};
+// timeout check data in buffer
+unsigned int Timeout_CheckDataBuffer = 0;
+
+bool flag_selectmac     	= false;
+bool flag_getpro_info   	= false;
+bool flag_getpro_element	= false;
+bool flag_provision     	= false;
+bool flag_mac           	= true;
+bool flag_check_select_mac  = false;
+bool flag_done          	= true;
 
 void ControlMessage(uint16_t lengthmessage,uint8_t *Message)
 {
@@ -17,7 +26,7 @@ void ControlMessage(uint16_t lengthmessage,uint8_t *Message)
 
 void *ProvisionThread (void *argv )
 {
-/*	tmp = pthread_self();
+	tmp = pthread_self();
 	while(MODE_PROVISION){
 		if((flag_done == true) || (Timeout_CheckDataBuffer == 32000))
 		{
@@ -56,8 +65,8 @@ void *ProvisionThread (void *argv )
 			ControlMessage(22, OUTMESSAGE_BindingALl);
 			printf ("binding all\n");
 		}
-	}*/
-
+	}
+/*
 while(1){
 	if(flagLux == 1){
 		ControlMessage(14, ONMES);
@@ -69,6 +78,6 @@ while(1){
 		puts("off");
 		sleep(2);
 	}
-}
+}*/
 	return NULL;
 }

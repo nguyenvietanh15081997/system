@@ -67,10 +67,6 @@ extern bool flag_done;
 extern uint8_t flagLux;
 
 
-// timeout check data in buffer
-extern unsigned int Timeout_CheckDataBuffer;
-
-
 
 void GWIF_Init (void);
 void GWIF_WriteMessage (void);

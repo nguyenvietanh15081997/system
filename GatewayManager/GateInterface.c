@@ -8,6 +8,7 @@
 #include "../GatewayManager/GateInterface.h"
 #include "../GatewayManager/ButtonManager.h"
 #include "../GatewayManager/SensorLight.h"
+#include "../GatewayManager/Provision.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -20,24 +21,9 @@ static bool					vrb_GWIF_UpdateLate = false;
 static bool					vrb_GWIF_CheckNow = false;
 static bool					vrb_GWIF_RestartMessage = true;
 
-uint16_t  Value_Lux;
-uint16_t Lux_Register;
-uint8_t flagLux = 0;
 
 
-
-
-bool flag_selectmac     = false;
-bool flag_getpro_info   = false;
-bool flag_getpro_element= false;
-bool flag_provision     = false;
-bool flag_mac           = true;
-bool flag_check_select_mac  = false;
-bool flag_done          = true;
-
-
-
-unsigned int Timeout_CheckDataBuffer=0;
+//unsigned int Timeout_CheckDataBuffer=0;
 
 
 /*
@@ -178,14 +164,14 @@ void GWIF_ProcessData (void){
 		vrb_GWIF_CheckNow = false;
 
 		/*Display data*/
-//		printf("A coming message:\n");
-//		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
-//		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
-//		printf("\tMessage:");
-//		for (vrui_Count = 0; vrui_Count < vrui_GWIF_LengthMeassge-1; vrui_Count++){
-//			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
-//		}
-//		printf("\n");
+		printf("A coming message:\n");
+		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
+		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
+		printf("\tMessage:");
+		for (vrui_Count = 0; vrui_Count < vrui_GWIF_LengthMeassge-1; vrui_Count++){
+			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
+		}
+		printf("\n");
         /*............*/
 
 
@@ -233,7 +219,7 @@ void GWIF_ProcessData (void){
 				flag_mac=true;
 			}
 /*...........................................*/
-			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE)
+			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE)// 91 81
 			{
 
 /*Button*/
@@ -264,15 +250,8 @@ void GWIF_ProcessData (void){
 				if((vrts_GWIF_IncomeMessage->Message[5] == (SENSOR_GATEWAY_RSP & 0xff)) && (vrts_GWIF_IncomeMessage->Message[6] == ((SENSOR_GATEWAY_RSP >>8) & 0xff))){
 					puts(">> sensor message");
 					Value_Lux = (vrts_GWIF_IncomeMessage->Message[10]) | (vrts_GWIF_IncomeMessage->Message[11]<<8);
-					printf ("Lux= %d\n",Value_Lux);
-					if(Value_Lux <= 500){
-						flagLux = 1;
-						//puts("false");
-					}
-					else{
-						flagLux = 2;
-						//puts("true");
-					}
+					flag_sensor_light_rsp = true;
+					Process_Lux();
 				}
 
 /*...........*/
