@@ -28,10 +28,10 @@ extern "C" {
 #include <mosquitto.h>
 
 
-#define mqtt_host 			"postman.cloudmqtt.com"
-#define mqtt_port 			13001
-#define mqtt_username 		"insklndl"
-#define mqtt_password 		"JCCSw9dYngMF"
+#define mqtt_host 			"soldier.cloudmqtt.com"//"postman.cloudmqtt.com"
+#define mqtt_port 			11875//13001
+#define mqtt_username 		"jpcvzwgj"//"insklndl"
+#define mqtt_password 		"2k756Wus2bJE"//"JCCSw9dYngMF"
 
 
 

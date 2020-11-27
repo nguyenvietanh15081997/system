@@ -14,11 +14,11 @@ typedef struct{
 	uint8_t retry_cnt; // num of send
 	uint8_t rsp_max;  // num of rsp
 	uint8_t adr_dst[2];    // adr
-	uint8_t OpCode[2];
+	uint8_t opCode[2];
 	uint8_t para[16];
 } cmdcontrol_t;
 
-cmdcontrol_t *vrts_MESSAGE_STRUCTURE;
+extern cmdcontrol_t *vrts_CMD_STRUCTURE;
 
 #define LIGHTOPCODE_UPDATE      0x0182
 #define LIGHTOPCODE_SELECT      0x6d82
@@ -65,7 +65,21 @@ cmdcontrol_t *vrts_MESSAGE_STRUCTURE;
 #define LIGHT_CTL_TEMP_RANGE_SET		0x6B82
 #define LIGHT_CTL_TEMP_RANGE_SET_NOACK	0x6C82
 //
+typedef enum{
+	null = 0x00,
+	ResetNode_typedef = 0x01,
+	Lightess_Get_typedef = 0x02,
+	AddGroup_typedef = 0x03,
+	DelGroup_typedef = 0x04,
+	ControlOnOff_typedef = 0x05
+} functionTypeDef;
 
+void ResetNode(uint16_t uniAdrReset);
+void Lightess_Get();
+void AddGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
+void DelGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
+void ControlOnOff(uint8_t uniAdrControlOnOff,uint8_t statuOnOff);
+void FunctionPre(uint16_t cmd,functionTypeDef Fun, uint8_t dodaibantin,uint16_t unicastAdr,uint8_t adrGroup, uint8_t parStatusOnOff);
 #ifdef __cplusplus
 }
 #endif

@@ -66,18 +66,5 @@ void *ProvisionThread (void *argv )
 			printf ("binding all\n");
 		}
 	}
-/*
-while(1){
-	if(flagLux == 1){
-		ControlMessage(14, ONMES);
-		puts("on");
-		sleep(2);
-	}
-	else if(flagLux == 2){
-		ControlMessage(14, OFFMES);
-		puts("off");
-		sleep(2);
-	}
-}*/
 	return NULL;
 }

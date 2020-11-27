@@ -9,6 +9,7 @@
 #include "../GatewayManager/ButtonManager.h"
 #include "../GatewayManager/SensorLight.h"
 #include "../GatewayManager/Provision.h"
+#include "../GatewayManager/Light.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -163,19 +164,24 @@ void GWIF_ProcessData (void){
 	if(vrb_GWIF_CheckNow){
 		vrb_GWIF_CheckNow = false;
 
-		/*Display data*/
-//		printf("A coming message:\n");
-//		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
-//		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
-//		printf("\tMessage:");
-//		for (vrui_Count = 0; vrui_Count < vrui_GWIF_LengthMeassge-1; vrui_Count++){
-//			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
-//		}
-//		printf("\n");
+/*
+ * TODO: Display data rsp
+ */
+		printf("A coming message:\n");
+		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
+		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
+		printf("\tMessage:");
+		for (vrui_Count = 0; vrui_Count < vrui_GWIF_LengthMeassge-1; vrui_Count++){
+			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
+		}
+		printf("\n");
         /*............*/
 
 
-/*Process data to provision*/
+/*
+ * TODO: process for provision
+ */
+
 			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_UPDATE_MAC) && (flag_check_select_mac == true)){  //scan
 				for(i=0; i<6; i++)
 				{
@@ -218,51 +224,43 @@ void GWIF_ProcessData (void){
 				flag_done=true;
 				flag_mac=true;
 			}
-/*...........................................*/
-			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE)// 91 81
-			{
+            /*...........................................*/
 
-/*Button*/
-				if((vrts_GWIF_IncomeMessage->Message[5] == (BUTTON_GATEWAY_RSP & 0xFF)) && \
-						(vrts_GWIF_IncomeMessage->Message[6] == ((REMOTE_MODULE_TYPE >>8) & 0xFF)) && \
-						(vrts_GWIF_IncomeMessage->Message[7] == (REMOTE_MODULE_TYPE & 0xFF)))
-				{
-					puts(">>button message");
-					if(vrts_GWIF_IncomeMessage->Message[8] == Button0Press){
-						flag_button0 = true;
-						puts("0 press");
-						ProcessButton();
+/*
+ * TODO: process for sensor(light, PIR, remote,...)
+ */
+			if(vrts_GWIF_IncomeMessage->Message[5] == (SENSOR_TYPE & 0xFF)){
+				if((vrts_GWIF_IncomeMessage->Message[6] == (REMOTE_MODULE_DC_TYPE & 0xFF)) && \
+				   (vrts_GWIF_IncomeMessage->Message[7] == (REMOTE_MODULE_DC_TYPE>>8) & 0xFF)){
+					puts(">>Remote DC");
+					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
+					if(IsRemoteSetup(vrts_Remote_Rsp, 1, 1, 0, 0)){
+						//add code at here
 					}
-					else if(vrts_GWIF_IncomeMessage->Message[8] == Button1Press){
-						flag_button1 = true;
-						puts("1 press");
-						ProcessButton();
-					}
-					else if(vrts_GWIF_IncomeMessage->Message[8] == Button2Press){
-						flag_button2 = true;
-					}
-					else if(vrts_GWIF_IncomeMessage->Message[8] == Button3Press){
-						flag_button3 = true;
-					}
-					else if(vrts_GWIF_IncomeMessage->Message[8] == Button4Press){
-						flag_button4 = true;
-					}
-					else if(vrts_GWIF_IncomeMessage->Message[8] == Button5Press){
-						flag_button5 = true;
-					}
+
+					//printf("Type:%2x\n",vrts_Remote_Rsp->typeDev);
 				}
-/*...........*/
-
-/*SensorLight*/
-				if((vrts_GWIF_IncomeMessage->Message[5] == (SENSOR_GATEWAY_RSP & 0xff)) && (vrts_GWIF_IncomeMessage->Message[6] == ((SENSOR_GATEWAY_RSP >>8) & 0xff))){
-					puts(">> sensor message");
-					Value_Lux = (vrts_GWIF_IncomeMessage->Message[10]) | (vrts_GWIF_IncomeMessage->Message[11]<<8);
-					flag_sensor_light_rsp = true;
-					Process_Lux();
+				else if ((vrts_GWIF_IncomeMessage->Message[6] == (REMOTE_MODULE_AC_TYPE & 0xFF)) && \
+				   (vrts_GWIF_IncomeMessage->Message[7] == ((REMOTE_MODULE_AC_TYPE>>8) & 0xFF))){
+					puts(">>Remote AC");
 				}
+				else if ((vrts_GWIF_IncomeMessage->Message[6] == (POWER_TYPE & 0xFF)) && \
+				   (vrts_GWIF_IncomeMessage->Message[7] == ((POWER_TYPE>>8) & 0xFF))){
+					puts(">>Power");
+				}
+				else if ((vrts_GWIF_IncomeMessage->Message[6] == (LIGHT_SENSOR_MODULE_TYPE & 0xFF)) && \
+				   (vrts_GWIF_IncomeMessage->Message[7] == ((LIGHT_SENSOR_MODULE_TYPE>>8) & 0xFF))){
+					puts(">>Light Sensor");
+					vrts_LighSensor_Rsp = (lightsensorRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
+					//ProcessLightSensor(vrts_LighSensor_Rsp);
+				}
+				else if ((vrts_GWIF_IncomeMessage->Message[6] = (PIR_SENSOR_MODULE_TYPE & 0xFF)) && \
+				   (vrts_GWIF_IncomeMessage->Message[7] = ((PIR_SENSOR_MODULE_TYPE>>8) & 0xFF))){
+					puts(">>PIR Sensor");
 
-/*...........*/
+				}
 			}
+            /*..........................*/
 	}
 }
 

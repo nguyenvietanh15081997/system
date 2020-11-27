@@ -26,7 +26,7 @@ void connect_callback(struct mosquitto *mosq, void *obj, int result)
 void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
 {
 	_Bool match = 0;
-	int msgled = message->payloadlen;
+	//int msgled = message->payloadlen;
 	char* msg = (char*)message->payload;
 	char on[3] = "on";
 	char off[4] = "off";
@@ -51,6 +51,9 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 		flag_check_select_mac  = false;
 		flag_done          = true;
 	}
+
+
+	//puts(msg);
 
 	//printf("message '%.*s' for topic '%s'\n", message->payloadlen, msg, message->topic);
 	mosquitto_topic_matches_sub("/devices/wb-adc/controls/+", message->topic, &match);
@@ -87,7 +90,7 @@ void * MQTT_Thread(void *argv)
 			rc = mosquitto_connect(mosq, mqtt_host, mqtt_port, 60);
 
 			mosquitto_subscribe(mosq, NULL, "Topic_Provision", 0);
-			int snd = mqtt_send(mosq, "vuhongtu");
+			int snd = mqtt_send(mosq, "Rang Dong");
 			if(snd != 0) printf("mqtt_send error=%i\n", snd);
 			sleep(10);
 

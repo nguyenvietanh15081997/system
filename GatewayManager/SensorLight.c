@@ -1,37 +1,44 @@
 #include "../GatewayManager/SensorLight.h"
 #include "../GatewayManager/Provision.h"
+#include "../GatewayManager/Light.h"
 
-bool flag_sensor_light_rsp = false;
-uint16_t  Value_Lux = 0;
+lightsensorRsp * vrts_LighSensor_Rsp;
+//bool flag_sensor_light_rsp = false;
+uint16_t  value_Lux = 0;
+static uint16_t luxReg;
 
 uint8_t ONMES[14]  = {0xe8, 0xff, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0xff, 0xff, 0x82, 0x02, 0x01, 0x00};
 uint8_t OFFMES[14] = {0xe8, 0xff, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0xff, 0xff, 0x82, 0x02, 0x00, 0x00};
 
-// use function when config transmit register value lux
-float Sensor_Lux(uint16_t rsp_lux)
+/*
+ * use function when config transmit register value lux
+ * TODO: fix error don't use pow in this function
+ */
+unsigned int CalculateLux(unsigned int rsp_lux)
 {
-	uint16_t Lux_MSB;
-	uint8_t Lux_LSB;
-	float Lux_Value;
-	Lux_MSB = rsp_lux | 0x0fff;
-	Lux_LSB = (rsp_lux>>12) | 0x0f;
-	Lux_Value = 0.01 * pow(2,Lux_LSB) * Lux_MSB;
-	return Lux_Value;
+	unsigned int lux_LSB = 0;
+	unsigned char lux_MSB = 0;
+	unsigned int lux_Value = 0;
+	unsigned int pow = 1;
+	unsigned char i;
+	lux_LSB = rsp_lux & 0x0FFF;
+	lux_MSB = ((rsp_lux>>12) & 0x0F);
+	//Lux_Value = 0.01 * pow(2,Lux_MSB) * Lux_LSB; //don't use
+	for(i=0;i<lux_MSB;i++){
+		pow=pow*2;
+	}
+	lux_Value=0.01 * pow * lux_LSB;
+	return lux_Value;
 }
-void Process_Lux()
+void ProcessLightSensor(lightsensorRsp *rsp)
 {
-	puts("ok");
-	if(flag_sensor_light_rsp){
-		flag_sensor_light_rsp = false;
-		if(Value_Lux < 500){
-			ControlMessage(14, ONMES);
-			puts("On");
-			sleep(2);
-		}
-		else {
-			ControlMessage(14, OFFMES);
-			puts("Off");
-			sleep(2);
-		}
+	luxReg=rsp->luxValue[1] | (rsp->luxValue[0]<<8);
+	value_Lux = CalculateLux(luxReg);
+	printf ("Lux= %d\n",value_Lux);
+	if(value_Lux<500){
+		FunctionPre(LIGHTOPCODE_ONOFF,ControlOnOff_typedef, 14,0xffff,0, 1);
+	}
+	else {
+		FunctionPre(LIGHTOPCODE_ONOFF,ControlOnOff_typedef, 14,0xffff,0, 0);
 	}
 }
