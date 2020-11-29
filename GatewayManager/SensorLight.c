@@ -36,9 +36,10 @@ void ProcessLightSensor(lightsensorRsp *rsp)
 	value_Lux = CalculateLux(luxReg);
 	printf ("Lux= %d\n",value_Lux);
 	if(value_Lux<500){
-		FunctionPre(LIGHTOPCODE_ONOFF,ControlOnOff_typedef, 14,0xffff,0, 1);
+		//FunctionPer(uint16_t cmd,functionTypeDef Fun, uint16_t unicastAdr,uint8_t adrGroup, uint8_t parStatusOnOff,uint8_t dodaibantin);
+		//FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,0xffff,0, 1,14);
 	}
 	else {
-		FunctionPre(LIGHTOPCODE_ONOFF,ControlOnOff_typedef, 14,0xffff,0, 0);
+		//FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,0xffff,0, 0,14);
 	}
 }

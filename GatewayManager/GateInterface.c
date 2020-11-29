@@ -252,7 +252,7 @@ void GWIF_ProcessData (void){
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((LIGHT_SENSOR_MODULE_TYPE>>8) & 0xFF))){
 					puts(">>Light Sensor");
 					vrts_LighSensor_Rsp = (lightsensorRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
-					//ProcessLightSensor(vrts_LighSensor_Rsp);
+					ProcessLightSensor(vrts_LighSensor_Rsp);
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] = (PIR_SENSOR_MODULE_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] = ((PIR_SENSOR_MODULE_TYPE>>8) & 0xFF))){

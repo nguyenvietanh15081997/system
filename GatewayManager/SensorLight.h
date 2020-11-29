@@ -28,7 +28,7 @@ extern lightsensorRsp * vrts_LighSensor_Rsp;
 
 
 //extern bool flag_sensor_light_rsp;
-extern uint16_t  Value_Lux;
+extern uint16_t  value_Lux;
 
 unsigned int CalculateLux(unsigned int rsp_lux);
 void ProcessLightSensor(lightsensorRsp *rsp);

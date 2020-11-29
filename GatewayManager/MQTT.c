@@ -9,6 +9,7 @@
 #include "../GatewayManager/MQTT.h"
 #include "../GatewayManager/OpCode.h"
 #include "../GatewayManager/Provision.h"
+#include "../GatewayManager/Light.h"
 
 pthread_t vrts_System_TestSend;
 
@@ -30,16 +31,18 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 	char* msg = (char*)message->payload;
 	char on[3] = "on";
 	char off[4] = "off";
-	if(strcmp(msg, on)==0)
-	{
-		puts("ON");
+	char scan[5] = "scan";
+	char stop[5] = "stop";
+	char timepoll3s[7] = "poll5s";
+	char timepoll1s[8] = "poll1s";
+
+	if(strcmp(msg, scan)==0){
+		puts("Provision start");
 		MODE_PROVISION=true;
 		pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
-		//pthread_join(vrts_System_TestSend, NULL);
 	}
-	if(strcmp(msg, off)==0)
-	{
-		puts("OFF");
+	if(strcmp(msg, stop)==0){
+		puts("Provision stop");
 		MODE_PROVISION=false;
 		pthread_cancel(tmp);
 		ControlMessage(3, OUTMESSAGE_ScanStop);
@@ -51,7 +54,22 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 		flag_check_select_mac  = false;
 		flag_done          = true;
 	}
-
+	if(strcmp(msg, on) == 0){
+		puts("On");
+		FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,0xffff,0, 1, 0, 14);
+	}
+	if(strcmp(msg,off) == 0){
+		puts("Off");
+		FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,0xffff,0, 0, 0, 14);
+	}
+	if(strcmp(msg,timepoll3s) == 0){
+		puts("poll 5s");
+		FunctionPer(HCI_CMD_GATEWAY_CMD, SetTimePoll_typedef, 0x0013, 0, 0, 5000,15);
+	}
+	if(strcmp(msg,timepoll1s) == 0){
+		puts("poll 1s");
+		FunctionPer(HCI_CMD_GATEWAY_CMD, SetTimePoll_typedef, 0x0013, 0, 0, 1000,15);
+	}
 
 	//puts(msg);
 
@@ -89,7 +107,7 @@ void * MQTT_Thread(void *argv)
 			abc = mosquitto_username_pw_set(mosq, mqtt_username, mqtt_password);
 			rc = mosquitto_connect(mosq, mqtt_host, mqtt_port, 60);
 
-			mosquitto_subscribe(mosq, NULL, "Topic_Provision", 0);
+			mosquitto_subscribe(mosq, NULL, "Topic_RangDong", 0);
 			int snd = mqtt_send(mosq, "Rang Dong");
 			if(snd != 0) printf("mqtt_send error=%i\n", snd);
 			sleep(10);

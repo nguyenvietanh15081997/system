@@ -18,7 +18,7 @@ typedef struct{
 	uint8_t para[16];
 } cmdcontrol_t;
 
-extern cmdcontrol_t *vrts_CMD_STRUCTURE;
+extern cmdcontrol_t vrts_CMD_STRUCTURE;
 
 #define LIGHTOPCODE_UPDATE      0x0182
 #define LIGHTOPCODE_SELECT      0x6d82
@@ -71,15 +71,17 @@ typedef enum{
 	Lightess_Get_typedef = 0x02,
 	AddGroup_typedef = 0x03,
 	DelGroup_typedef = 0x04,
-	ControlOnOff_typedef = 0x05
+	ControlOnOff_typedef = 0x05,
+	SetTimePoll_typedef = 0x06
 } functionTypeDef;
 
 void ResetNode(uint16_t uniAdrReset);
 void Lightess_Get();
 void AddGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
 void DelGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
-void ControlOnOff(uint8_t uniAdrControlOnOff,uint8_t statuOnOff);
-void FunctionPre(uint16_t cmd,functionTypeDef Fun, uint8_t dodaibantin,uint16_t unicastAdr,uint8_t adrGroup, uint8_t parStatusOnOff);
+void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff);
+void SetTimePoll(uint16_t uniAdrSensor, uint16_t timePoll);
+void FunctionPer(uint16_t cmd,functionTypeDef Func, uint16_t unicastAdr,uint8_t adrGroup, uint8_t parStatusOnOff, uint16_t parTimePoll, uint8_t cmdLenght);
 #ifdef __cplusplus
 }
 #endif
