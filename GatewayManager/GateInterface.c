@@ -10,6 +10,7 @@
 #include "../GatewayManager/SensorLight.h"
 #include "../GatewayManager/Provision.h"
 #include "../GatewayManager/Light.h"
+#include "../GatewayManager/Battery.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -237,8 +238,6 @@ void GWIF_ProcessData (void){
 					if(IsRemoteSetup(vrts_Remote_Rsp, 1, 1, 0, 0)){
 						//add code at here
 					}
-
-					//printf("Type:%2x\n",vrts_Remote_Rsp->typeDev);
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (REMOTE_MODULE_AC_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((REMOTE_MODULE_AC_TYPE>>8) & 0xFF))){
@@ -247,6 +246,8 @@ void GWIF_ProcessData (void){
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (POWER_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((POWER_TYPE>>8) & 0xFF))){
 					puts(">>Power");
+					vrts_Battery_Rsp = (batteryRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
+					ProcessBat(vrts_Battery_Rsp);
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (LIGHT_SENSOR_MODULE_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((LIGHT_SENSOR_MODULE_TYPE>>8) & 0xFF))){

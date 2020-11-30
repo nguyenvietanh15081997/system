@@ -13,16 +13,17 @@ extern "C" {
 #include <math.h>
 #include <unistd.h>
 
-typedef struct batteryRsp 
+typedef struct batteryRsp
 {
 	uint8_t  typeDev[2];
-	uint8_t  valueBat[2];
+	uint8_t  batValue[2];
 	uint8_t  future[4];
-} batteryRsp;
+}batteryRsp;
+extern batteryRsp * vrts_Battery_Rsp;
 
-uint16_t value_Bat = 0;
 
-void ProcessBat();
+void ProcessBat(batteryRsp *batRsp);
+
 #ifdef __cplusplus
 }
 #endif

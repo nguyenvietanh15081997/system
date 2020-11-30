@@ -107,7 +107,7 @@ void * MQTT_Thread(void *argv)
 			abc = mosquitto_username_pw_set(mosq, mqtt_username, mqtt_password);
 			rc = mosquitto_connect(mosq, mqtt_host, mqtt_port, 60);
 
-			mosquitto_subscribe(mosq, NULL, "Topic_RangDong", 0);
+			mosquitto_subscribe(mosq, NULL, "RD", 0);
 			int snd = mqtt_send(mosq, "Rang Dong");
 			if(snd != 0) printf("mqtt_send error=%i\n", snd);
 			sleep(10);
