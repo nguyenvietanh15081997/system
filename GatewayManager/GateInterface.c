@@ -262,6 +262,28 @@ void GWIF_ProcessData (void){
 				}
 			}
             /*..........................*/
+/*
+ * TODO: process of light
+ */
+			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE){
+				uint16_t valueOpcode;
+				valueOpcode = (vrts_GWIF_IncomeMessage->Message[5] | (vrts_GWIF_IncomeMessage->Message[6]<<8));
+				switch (valueOpcode){
+				case G_ONOFF_STATUS:
+					// process status onofff
+					break;
+				case LIGHT_CTL_TEMP_STATUS:
+					// process status cct
+					break;
+				case LIGHTNESS_STATUS:
+					//process status dim
+					break;
+				case LIGHT_HSL_STATUS:
+					//status HSL
+					break;
+				}
+			}
+
 	}
 }
 

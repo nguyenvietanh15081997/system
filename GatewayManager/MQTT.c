@@ -10,6 +10,7 @@
 #include "../GatewayManager/OpCode.h"
 #include "../GatewayManager/Provision.h"
 #include "../GatewayManager/Light.h"
+#include "../GatewayManager/JsonProcess.h"
 
 pthread_t vrts_System_TestSend;
 
@@ -23,25 +24,17 @@ void connect_callback(struct mosquitto *mosq, void *obj, int result)
 {
 	printf("connect callback, rc=%d\n", result);
 }
-
-void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
+/*
+ * TODO: check json string and process
+ */
+void CheckTopic(char *topicJson, uint16_t adr, uint16_t par)
 {
-	_Bool match = 0;
-	//int msgled = message->payloadlen;
-	char* msg = (char*)message->payload;
-	char on[3] = "on";
-	char off[4] = "off";
-	char scan[5] = "scan";
-	char stop[5] = "stop";
-	char timepoll3s[7] = "poll5s";
-	char timepoll1s[8] = "poll1s";
-
-	if(strcmp(msg, scan)==0){
+	if(strcmp(topicJson,TP_PROVISION_START)==0){
 		puts("Provision start");
 		MODE_PROVISION=true;
 		pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
 	}
-	if(strcmp(msg, stop)==0){
+	else if(strcmp(topicJson,TP_PROVISION_STOP)==0){
 		puts("Provision stop");
 		MODE_PROVISION=false;
 		pthread_cancel(tmp);
@@ -54,35 +47,58 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 		flag_check_select_mac  = false;
 		flag_done          = true;
 	}
-	if(strcmp(msg, on) == 0){
-		puts("On");
-		FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,0xffff,0, 1, 0, 14);
+	else if(strcmp(topicJson,TP_CONTROL_ONOFF)==0){
+		if(par){
+			puts("On");
+			FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,adr,NULL8, par, NULL16, NULL16, NULL16, NULL16, 14);
+		}
+		else if(!par){
+			puts("Off");
+			FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,adr,NULL8, par, NULL16, NULL16, NULL16, NULL16, 14);
+		}
 	}
-	if(strcmp(msg,off) == 0){
-		puts("Off");
-		FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,0xffff,0, 0, 0, 14);
+	else if(strcmp(topicJson,TP_CONTROL_CCT)==0){
+		FunctionPer(HCI_CMD_GATEWAY_CMD, CCT_Set_typedef, adr, NULL8, NULL8, NULL16,par, NULL16, NULL16, 17);
 	}
-	if(strcmp(msg,timepoll3s) == 0){
-		puts("poll 5s");
-		FunctionPer(HCI_CMD_GATEWAY_CMD, SetTimePoll_typedef, 0x0013, 0, 0, 5000,15);
+	else if(strcmp(topicJson,TP_CONTROL_DIM)==0){
+		FunctionPer(HCI_CMD_GATEWAY_CMD, Lightness_Set_typedef, adr, NULL8, NULL8, par, NULL16, NULL16, NULL16, 14);
 	}
-	if(strcmp(msg,timepoll1s) == 0){
-		puts("poll 1s");
-		FunctionPer(HCI_CMD_GATEWAY_CMD, SetTimePoll_typedef, 0x0013, 0, 0, 1000,15);
+	else if(strcmp(topicJson,TP_CONTROL_UPDATE) ==0){
+		FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, 12);
 	}
+}
+//void FunctionPer(uint16_t cmd,\
+//				functionTypeDef Func,\
+//				uint16_t unicastAdr,\
+//				uint8_t adrGroup,\
+//				uint8_t parStatusOnOff,\
+//				uint16_t parLightness,\
+//				uint16_t parCCT,\
+//				uint16_t parSenceId,\
+//				uint16_t parTimePoll,\
+//				uint8_t cmdLenght);
 
-	//puts(msg);
+void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
+{
+	_Bool match = 0;
+	struct json_obj* jobj;
+	char* msg = (char*)message->payload;
+	jobj = json_tokener_parse(msg);
+	Json_Parse(jobj);
+	CheckTopic(message->topic,valueJsonRec[0],valueJsonRec[1]);
 
-	//printf("message '%.*s' for topic '%s'\n", message->payloadlen, msg, message->topic);
-	mosquitto_topic_matches_sub("/devices/wb-adc/controls/+", message->topic, &match);
-	if (match) {
-		printf("got message for ADC topic\n");
-	}
+
+
+
+//	mosquitto_topic_matches_sub("/devices/wb-adc/controls/+", message->topic, &match);
+//	if (match) {
+//		printf("got message for ADC topic\n");
+//	}
 }
 
 int mqtt_send(struct mosquitto *mosq, char *msg)
 {
-	mosquitto_publish(mosq, NULL, "/testtopic", strlen(msg), msg, 0, 0);
+	mosquitto_publish(mosq, NULL, "RD/STATUS/ONOFF", strlen(msg), msg, 0, 0);
 	return 0;
 }
 void * MQTT_Thread(void *argv)
@@ -107,8 +123,10 @@ void * MQTT_Thread(void *argv)
 			abc = mosquitto_username_pw_set(mosq, mqtt_username, mqtt_password);
 			rc = mosquitto_connect(mosq, mqtt_host, mqtt_port, 60);
 
-			mosquitto_subscribe(mosq, NULL, "RD", 0);
-			int snd = mqtt_send(mosq, "Rang Dong");
+			mosquitto_subscribe(mosq,NULL, "RD/PROVISION/+",0);
+			mosquitto_subscribe(mosq,NULL, "RD/CONTROL/+",0);
+
+			int snd = mqtt_send(mosq, "Rang Dong Anh Hung Va Co Bac Ho");
 			if(snd != 0) printf("mqtt_send error=%i\n", snd);
 			sleep(10);
 

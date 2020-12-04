@@ -19,16 +19,20 @@ typedef struct{
 } cmdcontrol_t;
 
 extern cmdcontrol_t vrts_CMD_STRUCTURE;
+#define NULL8    0x00
+#define NULL16   0x0000
 
 #define LIGHTOPCODE_UPDATE      0x0182
 #define LIGHTOPCODE_SELECT      0x6d82
 #define LIGHTOPCODE_ONOFF       0x0282
-#define LIGHTOPCODE_HSL		    0x7782
 #define LIGHTOPCODE_DIM         0x4d82
 #define LIGHTOPCODE_SENCE_SET   0x4382
 #define LIGHTOPCODE_SENCE_GET   0x4382
 #define LIGHTOPCODE_SENCE_DEL   0x9e82
 
+//status
+#define LIGHTOPCODE_STATUS_ON   0x01
+#define LIGHTOPCODE_STATUS_OFF  0x00
 //
 #define LIGHTNESS_GET		        	0x4B82
 #define LIGHTNESS_SET		        	0x4C82
@@ -64,24 +68,41 @@ extern cmdcontrol_t vrts_CMD_STRUCTURE;
 #define LIGHT_CTL_DEFULT_SET_NOACK		0x6A82
 #define LIGHT_CTL_TEMP_RANGE_SET		0x6B82
 #define LIGHT_CTL_TEMP_RANGE_SET_NOACK	0x6C82
+
+#define LIGHT_HSL_STATUS                0x7882
 //
 typedef enum{
 	null = 0x00,
 	ResetNode_typedef = 0x01,
-	Lightess_Get_typedef = 0x02,
+	Lightness_Get_typedef = 0x02,
 	AddGroup_typedef = 0x03,
 	DelGroup_typedef = 0x04,
 	ControlOnOff_typedef = 0x05,
-	SetTimePoll_typedef = 0x06
+	SetTimePoll_typedef = 0x06,
+	UpdateLight_typedef = 0x07,
+	CCT_Set_typedef = 0x08,
+	Lightness_Set_typedef = 0x09
 } functionTypeDef;
 
 void ResetNode(uint16_t uniAdrReset);
-void Lightess_Get();
+void Lightness_Get();
+void Lightness_Set(uint16_t uniAdrSetDim, uint16_t valueLightness);
+void CCT_Set(uint16_t uniAdrSetCCT, uint16_t valueCCT);
 void AddGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
 void DelGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
 void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff);
+void UpdateLight();
 void SetTimePoll(uint16_t uniAdrSensor, uint16_t timePoll);
-void FunctionPer(uint16_t cmd,functionTypeDef Func, uint16_t unicastAdr,uint8_t adrGroup, uint8_t parStatusOnOff, uint16_t parTimePoll, uint8_t cmdLenght);
+void FunctionPer(uint16_t cmd,\
+				functionTypeDef Func,\
+				uint16_t unicastAdr,\
+				uint8_t adrGroup,\
+				uint8_t parStatusOnOff,\
+				uint16_t parLightness,\
+				uint16_t parCCT,\
+				uint16_t parSenceId,\
+				uint16_t parTimePoll,\
+				uint8_t cmdLenght);
 #ifdef __cplusplus
 }
 #endif
