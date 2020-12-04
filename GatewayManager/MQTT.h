@@ -44,6 +44,7 @@ extern "C" {
 #define TP_CONTROL_DELSENCE   	"RD/CONTROL/DELSENCE"
 #define TP_CONTROL_RESETNODE   	"RD/CONTROL/RESETNODE"
 
+#define TP_STATUS_UPDATE    "RD/STATUS/UPDATE"
 #define TP_STATUS_ONOFF   	"RD/STATUS/ONOFF"
 #define TP_STATUS_CCT   	"RD/STATUS/CCT"
 #define TP_STATUS_DIM   	"RD/STATUS/DIM"
@@ -57,6 +58,7 @@ extern int run;
 
 extern bool flag_on_all;
 extern bool flag_off_all;
+extern struct mosquitto *mosq;
 
 void handle_signal(int s);
 void connect_callback(struct mosquitto *mosq, void *obj, int result);

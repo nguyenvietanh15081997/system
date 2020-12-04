@@ -11,6 +11,7 @@
 #include "../GatewayManager/Provision.h"
 #include "../GatewayManager/Light.h"
 #include "../GatewayManager/Battery.h"
+#include "../GatewayManager/MQTT.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -266,11 +267,14 @@ void GWIF_ProcessData (void){
  * TODO: process of light
  */
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE){
-				uint16_t valueOpcode;
+				uint16_t valueOpcode,jsonadr,jsonvalue;
 				valueOpcode = (vrts_GWIF_IncomeMessage->Message[5] | (vrts_GWIF_IncomeMessage->Message[6]<<8));
 				switch (valueOpcode){
 				case G_ONOFF_STATUS:
-					// process status onofff
+					//uint16_t adr,value;
+					jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+					jsonvalue = vrts_GWIF_IncomeMessage->Message[7] & 0xFF;
+					CreatJson(TP_STATUS_ONOFF,TP_STATUS_UPDATE,"Adr","ONOFF",jsonadr,jsonvalue);
 					break;
 				case LIGHT_CTL_TEMP_STATUS:
 					// process status cct

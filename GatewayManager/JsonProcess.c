@@ -1,4 +1,5 @@
 #include "../GatewayManager/JsonProcess.h"
+#include "../GatewayManager/MQTT.h"
 
 
 uint16_t valueJsonRec[2];
@@ -28,12 +29,15 @@ void Json_Parse(json_object * jobj)
 	 }
 	 puts("done");
 }
-void CreatJson(struct json_object * topic,uint8_t * objectJson,uint8_t par1, uint8_t par2)
+void CreatJson(struct json_object * object,uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,uint16_t par1, uint16_t par2)
 {
 	char valueJsonSend[2];
-	sprintf(valueJsonSend,"%d%d",par1,par2);
-	topic = json_object_new_object();
-	json_object_object_add(topic, objectJson, json_object_new_string(valueJsonSend));
+	sprintf(valueJsonSend,"%d",par1);
+	object = json_object_new_object();
+	json_object_object_add(object, objectJsonAdr, json_object_new_string(valueJsonSend));
+	sprintf(valueJsonSend,"%d",par2);
+	json_object_object_add(object, objectJsonValue, json_object_new_string(valueJsonSend));
 	char *rsp;
-	rsp = json_object_to_json_string(topic);
+	rsp = json_object_to_json_string(object);
+	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
 }

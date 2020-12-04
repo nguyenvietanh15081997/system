@@ -13,7 +13,7 @@
 #include "../GatewayManager/JsonProcess.h"
 
 pthread_t vrts_System_TestSend;
-
+struct mosquitto *mosq;
 int run = 1;
 void handle_signal(int s)
 {
@@ -104,7 +104,7 @@ int mqtt_send(struct mosquitto *mosq, char *msg)
 void * MQTT_Thread(void *argv)
 {
 		char clientid[24];
-		struct mosquitto *mosq;
+		//struct mosquitto *mosq;
 		int rc = 0;
 		int abc = 0;
 
