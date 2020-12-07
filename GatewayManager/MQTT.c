@@ -57,14 +57,31 @@ void CheckTopic(char *topicJson, uint16_t adr, uint16_t par)
 			FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,adr,NULL8, par, NULL16, NULL16, NULL16, NULL16, 14);
 		}
 	}
-	else if(strcmp(topicJson,TP_CONTROL_CCT)==0){
+	else if(strcmp(topicJson,TP_CONTROL_CCT) == 0){
 		FunctionPer(HCI_CMD_GATEWAY_CMD, CCT_Set_typedef, adr, NULL8, NULL8, NULL16,par, NULL16, NULL16, 17);
 	}
-	else if(strcmp(topicJson,TP_CONTROL_DIM)==0){
+	else if(strcmp(topicJson,TP_CONTROL_DIM) == 0){
 		FunctionPer(HCI_CMD_GATEWAY_CMD, Lightness_Set_typedef, adr, NULL8, NULL8, par, NULL16, NULL16, NULL16, 14);
 	}
-	else if(strcmp(topicJson,TP_CONTROL_UPDATE) ==0){
+	else if(strcmp(topicJson,TP_CONTROL_UPDATE) == 0){
 		FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, 12);
+	}
+	else if(strcmp(topicJson,TP_CONTROL_ADDGROUP) == 0){
+		check_add_or_del_group= true;
+		FunctionPer(HCI_CMD_GATEWAY_CMD, AddGroup_typedef, adr, par, NULL8, NULL16, NULL16, NULL16, NULL16, 18);
+	}
+	else if(strcmp(topicJson,TP_CONTROL_DELGROUP) == 0){
+		check_add_or_del_group= false;
+		FunctionPer(HCI_CMD_GATEWAY_CMD, DelGroup_typedef, adr, par, NULL8, NULL16, NULL16, NULL16, NULL16, 18);
+	}
+	else if(strcmp(topicJson,TP_CONTROL_ADDSENCE) == 0){
+		FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr, NULL8, NULL8, NULL16, NULL16, par, NULL16, 14);
+	}
+	else if(strcmp(topicJson,TP_CONTROL_CALLSENCE) == 0){
+		FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, adr, NULL8, NULL8, NULL16, NULL16, par, NULL16, 17);
+	}
+	else if(strcmp(topicJson,TP_CONTROL_DELSENCE) == 0){
+		FunctionPer(HCI_CMD_GATEWAY_CMD, DelSence_typedef, adr, NULL8, NULL8, NULL16, NULL16, par, NULL16, 14);
 	}
 }
 //void FunctionPer(uint16_t cmd,\

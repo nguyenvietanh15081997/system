@@ -29,8 +29,9 @@ void Json_Parse(json_object * jobj)
 	 }
 	 puts("done");
 }
-void CreatJson(struct json_object * object,uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,uint16_t par1, uint16_t par2)
+void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,uint16_t par1, uint16_t par2)
 {
+	struct json_object * object;
 	char valueJsonSend[2];
 	sprintf(valueJsonSend,"%d",par1);
 	object = json_object_new_object();

@@ -253,6 +253,17 @@ extern "C" {
 #define G_LOCATION_GLOBAL_SET_NOACK		0x42
 #define G_LOCATION_LOCAL_SET			0x2882
 #define G_LOCATION_LOCAL_SET_NOACK		0x2982
+
+#define SCENE_GET		        		0x4182
+#define SCENE_RECALL		        	0x4282
+#define SCENE_RECALL_NOACK		        0x4382
+#define SCENE_STATUS		    		0x5E
+#define SCENE_REG_GET		        	0x4482
+#define SCENE_REG_STATUS		        0x4582
+#define SCENE_STORE		        		0x4682
+#define SCENE_STORE_NOACK		    	0x4782
+#define SCENE_DEL		        		0x9E82
+#define SCENE_DEL_NOACK		    		0x9F82
 //
 
 extern bool MODE_PROVISION;
@@ -267,6 +278,8 @@ extern uint8_t OUTMESSAGE_MACSelect[9];
 extern uint8_t OUTMESSAGE_GetPro[3];
 extern uint8_t OUTMESSAGE_Provision[28];
 extern uint8_t OUTMESSAGE_BindingALl[22];
+
+extern bool check_add_or_del_group;
 
 #ifdef __cplusplus
 }

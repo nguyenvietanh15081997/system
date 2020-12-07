@@ -81,7 +81,10 @@ typedef enum{
 	SetTimePoll_typedef = 0x06,
 	UpdateLight_typedef = 0x07,
 	CCT_Set_typedef = 0x08,
-	Lightness_Set_typedef = 0x09
+	Lightness_Set_typedef = 0x09a,
+	AddSence_typedef = 0x0a,
+	DelSence_typedef = 0x0b,
+	CallSence_typedef = 0x0c
 } functionTypeDef;
 
 void ResetNode(uint16_t uniAdrReset);
@@ -90,6 +93,11 @@ void Lightness_Set(uint16_t uniAdrSetDim, uint16_t valueLightness);
 void CCT_Set(uint16_t uniAdrSetCCT, uint16_t valueCCT);
 void AddGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
 void DelGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
+
+void AddSence(uint16_t uniAdrSence, uint16_t senceID);
+void CallSence(uint16_t senceId);
+void DelSence(uint16_t uniAdrDelSence, uint16_t senceId);
+
 void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff);
 void UpdateLight();
 void SetTimePoll(uint16_t uniAdrSensor, uint16_t timePoll);

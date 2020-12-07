@@ -265,25 +265,61 @@ void GWIF_ProcessData (void){
             /*..........................*/
 /*
  * TODO: process of light
+ * - check opcode
+ * - get status
+ * - send mqtt
  */
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE){
 				uint16_t valueOpcode,jsonadr,jsonvalue;
 				valueOpcode = (vrts_GWIF_IncomeMessage->Message[5] | (vrts_GWIF_IncomeMessage->Message[6]<<8));
+				jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				switch (valueOpcode){
 				case G_ONOFF_STATUS:
-					//uint16_t adr,value;
-					jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
-					jsonvalue = vrts_GWIF_IncomeMessage->Message[7] & 0xFF;
-					CreatJson(TP_STATUS_ONOFF,TP_STATUS_UPDATE,"Adr","ONOFF",jsonadr,jsonvalue);
+					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+					if(vrui_GWIF_LengthMeassge == 9){
+						jsonvalue = vrts_GWIF_IncomeMessage->Message[7] & 0xFF;
+					}
+					else{
+						jsonvalue = vrts_GWIF_IncomeMessage->Message[8] & 0xFF;
+					}
+					CreatJson(TP_STATUS_UPDATE,"ADR","ONOFF",jsonadr,jsonvalue);
 					break;
 				case LIGHT_CTL_TEMP_STATUS:
-					// process status cct
+					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+					jsonvalue = vrts_GWIF_IncomeMessage->Message[7] | (vrts_GWIF_IncomeMessage->Message[8]<<8);
+					CreatJson(TP_STATUS_CCT,"ADR","CCT",jsonadr,jsonvalue);
 					break;
 				case LIGHTNESS_STATUS:
-					//process status dim
+					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+					if(vrui_GWIF_LengthMeassge == 10){
+						jsonvalue = vrts_GWIF_IncomeMessage->Message[8] & 0xFF;
+					}
+					if(vrui_GWIF_LengthMeassge == 13){
+						jsonvalue = vrts_GWIF_IncomeMessage->Message[10] & 0xFF;
+					}
+					CreatJson(TP_STATUS_DIM, "ADR", "DIM", jsonadr, jsonvalue);
 					break;
 				case LIGHT_HSL_STATUS:
 					//status HSL
+					break;
+				case CFG_MODEL_SUB_STATUS:
+					jsonvalue = vrts_GWIF_IncomeMessage->Message[10] & 0xFF;
+					if(check_add_or_del_group){
+						CreatJson(TP_STATUS_ADDGROUP, "ADR", "ADDGROUP", jsonadr, jsonvalue);
+					}
+					else {
+						CreatJson(TP_STATUS_DELGROUP, "ADR", "DELGROUP", jsonadr, jsonvalue);
+					}
+					break;
+				case SCENE_REG_STATUS:
+					jsonvalue = vrts_GWIF_IncomeMessage->Message[8]| vrts_GWIF_IncomeMessage->Message[9]<<8;
+					CreatJson(TP_CONTROL_ADDSENCE, "ADR", "ADDSENCE", jsonadr, jsonvalue);
+					break;
+				case SCENE_STATUS:
+					if(vrts_GWIF_IncomeMessage->Message[6]==0){
+						jsonvalue = vrts_GWIF_IncomeMessage->Message[7] | vrts_GWIF_IncomeMessage->Message[8]<<8;
+						CreatJson(TP_STATUS_CALLSENCE, "ADR", "CALLSENCE", jsonadr, jsonvalue);
+					}
 					break;
 				}
 			}

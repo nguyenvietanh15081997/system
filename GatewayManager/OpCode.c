@@ -6,6 +6,7 @@ bool MODE_PROVISION = false;
 bool MODE_MQTT = false;
 bool MODE_BUTTON = false;
 bool MODE_CONTROL = false;
+bool check_add_or_del_group = false ;
 
 //message control
 uint8_t OUTMESSAGE_ScanStop[3]     = {0xE9, 0xFF, 0x01};

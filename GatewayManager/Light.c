@@ -77,6 +77,34 @@ void DelGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup)
 	vrts_CMD_STRUCTURE.para[4] = 0x00;
 	vrts_CMD_STRUCTURE.para[5] = 0x10;
 }
+void AddSence(uint16_t uniAdrSence, uint16_t senceID)
+{
+	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrSence & 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrSence>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[0] = SCENE_STORE & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[1] = (SCENE_STORE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[0] = senceID & 0xFF;
+	vrts_CMD_STRUCTURE.para[1] = (senceID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[2]= vrts_CMD_STRUCTURE.para[3]= vrts_CMD_STRUCTURE.para[4]= 0;
+}
+void CallSence(uint16_t senceId)
+{
+	vrts_CMD_STRUCTURE.adr_dst[0] = 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[1] = 0xFF;
+	vrts_CMD_STRUCTURE.opCode[0] = SCENE_RECALL & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[1] = (SCENE_RECALL>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[0] = senceId & 0xFF;
+	vrts_CMD_STRUCTURE.para[1] = (senceId>>8) & 0xFF;
+}
+void DelSence(uint16_t uniAdrDelSence, uint16_t senceId)
+{
+	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrDelSence & 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[0] = (uniAdrDelSence>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[0] = SCENE_DEL & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[1] = (SCENE_DEL>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[0] = senceId & 0xFF;
+	vrts_CMD_STRUCTURE.para[1] = (senceId>>8) & 0xFF;
+}
 void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrControlOnOff & 0xFF;
@@ -168,6 +196,15 @@ void FunctionPer(uint16_t cmd,\
 	}
 	else if (Func == UpdateLight_typedef){
 		UpdateLight();
+	}
+	else if(Func == AddSence_typedef){
+		AddSence(unicastAdr, parSenceId);
+	}
+	else if(Func == DelSence_typedef){
+		DelSence(unicastAdr, parSenceId);
+	}
+	else if(Func == CallSence_typedef){
+		CallSence(parSenceId);
 	}
 	uint8_t *TempData;
 
