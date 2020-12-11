@@ -99,7 +99,7 @@ void CallSence(uint16_t senceId)
 void DelSence(uint16_t uniAdrDelSence, uint16_t senceId)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrDelSence & 0xFF;
-	vrts_CMD_STRUCTURE.adr_dst[0] = (uniAdrDelSence>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrDelSence>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[0] = SCENE_DEL & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[1] = (SCENE_DEL>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[0] = senceId & 0xFF;
@@ -150,6 +150,12 @@ void SetTimePoll(uint16_t uniAdrSensor, uint16_t timePoll)
  * TODO: gan struct vao chuoi xong chuyen uart
  *
  */
+//void SetSenceRemote(uint16_t uniAdrRemoteSetSence, uint16_t senceId)
+//{
+//	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrRemoteSetSence & 0xFF;
+//	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrRemoteSetSence>>8) & 0xFF;
+//	//vrts_CMD_STRUCTURE.opCode[0]
+//}
 void FunctionPer(uint16_t cmd,\
 				functionTypeDef Func,\
 				uint16_t unicastAdr,\

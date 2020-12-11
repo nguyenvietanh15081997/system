@@ -5,6 +5,7 @@ pthread_t tmp;
 
 // timeout check data in buffer
 unsigned int Timeout_CheckDataBuffer = 0;
+unsigned char scanNotFoundDev =0 ;
 
 bool flag_selectmac     	= false;
 bool flag_getpro_info   	= false;
@@ -30,13 +31,30 @@ void *ProvisionThread (void *argv )
 	while(MODE_PROVISION){
 		if((flag_done == true) || (Timeout_CheckDataBuffer == 32000))
 		{
+			scanNotFoundDev++;
+			if(scanNotFoundDev==3)
+			{
+				scanNotFoundDev = 0;
+				puts("Provision stop");
+				MODE_PROVISION=false;
+				pthread_cancel(tmp);
+				ControlMessage(3, OUTMESSAGE_ScanStop);
+				flag_selectmac     = false;
+				flag_getpro_info   = false;
+				flag_getpro_element= false;
+				flag_provision     = false;
+				flag_mac           = true;
+				flag_check_select_mac  = false;
+				flag_done          = true;
+			}
+			else{
 			flag_done = false;
 			Timeout_CheckDataBuffer=0;
 			sleep(1);
 			ControlMessage(3, OUTMESSAGE_ScanStart);
 			printf ("scan\n");
 			flag_check_select_mac= true;
-		}
+		}}
 
 		if((flag_selectmac==true) && (flag_mac==true) )
 		{

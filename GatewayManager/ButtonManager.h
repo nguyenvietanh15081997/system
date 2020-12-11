@@ -34,13 +34,7 @@ extern remotersp * vrts_Remote_Rsp;
 #define ModeIDDouble        0x03
 #define ModeIDHold          0x05
 
-//flag
-//extern bool flag_button0;
-//extern bool flag_button1;
-//extern bool flag_button2;
-//extern bool flag_button3;
-//extern bool flag_button4;
-//extern bool flag_button5;
+#define OPCODEREMOTERSP     0xA082
 
 
 bool IsRemoteSetup(remotersp * rsp,unsigned char parButtonId,unsigned char parModeId,unsigned char parSenceId1,unsigned char parSenceId2);

@@ -26,13 +26,15 @@ extern "C" {
 #include <mosquitto.h>
 
 
-#define mqtt_host 			"soldier.cloudmqtt.com"//"postman.cloudmqtt.com"//
-#define mqtt_port 			1875//13001
-#define mqtt_username 		"jpcvzwgj"//"insklndl"//"jpcvzwgj"//
-#define mqtt_password 		"2k756Wus2bJE"//"JCCSw9dYngMF"//"2k756Wus2bJE"//
+#define mqtt_host 			"postman.cloudmqtt.com"//"soldier.cloudmqtt.com"//
+#define mqtt_port 			13001//11875//
+#define mqtt_username 		"insklndl"//"jpcvzwgj"//
+#define mqtt_password 		"x9aBwks70kmQ"//"JCCSw9dYngMF"//"2k756Wus2bJE"//
 
-#define TP_PROVISION_START            "RD/PROVISION/START"  // {"PRO":"1","VALUE":"1"}
-#define TP_PROVISION_STOP             "RD/PROVISION/STOP"   // {"PRO":"1","VALUE":"0"}
+
+#define TP_PROVISION_START          "RD/PROVISION/START"    // {"PRO":"1","VALUE":"1"}
+#define TP_PROVISION_STOP           "RD/PROVISION/STOP"     // {"PRO":"1","VALUE":"0"}
+#define TP_CONTROL_RESETNODE		"RD/CONTROL/RESETNODE"  // {"ADR":"adr","VALUE":"1"}
 #define TP_CONTROL_UPDATE		"RD/CONTROL/UPDATE"         // {"ADR":"65535","VALUE":"1"}
 #define TP_CONTROL_ONOFF        "RD/CONTROL/ONOFF"          // {"ADR":"adr","VALUE":"1 0r 0"}
 #define TP_CONTROL_CCT        	"RD/CONTROL/CCT"			// {"ADR":"adr","VALUE":"cct"}
@@ -45,6 +47,7 @@ extern "C" {
 #define TP_CONTROL_DELSENCE   	"RD/CONTROL/DELSENCE"		// {"ADR":"adr","VALUE":"id sence"}
 #define TP_CONTROL_RESETNODE   	"RD/CONTROL/RESETNODE"		// {"ADR":"adr","VALUE":"1"}
 
+#define TP_TPYE_DEVICE      "RD/TYPE_DEVICE"            // {"ADR":"adr","MMAINDEVICE":"main","SUBDEVICE":"sub","POWER":"power",}
 #define TP_STATUS_UPDATE    "RD/STATUS/UPDATE"			//{"ADR":"adr","ONOFF":"1 or 0"} gửi nhiều lần của từng con đèn trong mạng
 #define TP_STATUS_ONOFF   	"RD/STATUS/ONOFF"           //{"ADR":"adr","ONOFF":"1 or 0"}
 #define TP_STATUS_CCT   	"RD/STATUS/CCT"				//{"ADR":"adr","CCT":"cct"}
@@ -55,6 +58,7 @@ extern "C" {
 #define TP_STATUS_ADDSENCE   "RD/STATUS/ADDSENCE"       //{"ADR":"adr","ADDSENCE":"id sence"}
 #define TP_STATUS_CALLSENCE	 "RD/STATUS/CALLSENCE"      //{"ADR":"adr","CALLSENCE":"id sence"}
 #define TP_STATUS_DELSENCE   "RD/STATUS/DELSENCE"
+#define TP_STATUS_RESETNODE  "RD/STATUS/RESETNODE"      //{"ADR":"adr","RESETNODE":"1"}
 
 
 extern int run;

@@ -21,6 +21,7 @@ extern bool flag_done;
 
 // timeout check data in buffer
 extern unsigned int Timeout_CheckDataBuffer;
+extern unsigned char scanNotFoundDev;
 
 
 extern pthread_t tmp ;

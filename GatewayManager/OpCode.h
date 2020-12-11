@@ -254,6 +254,7 @@ extern "C" {
 #define G_LOCATION_LOCAL_SET			0x2882
 #define G_LOCATION_LOCAL_SET_NOACK		0x2982
 
+// opcode of scene
 #define SCENE_GET		        		0x4182
 #define SCENE_RECALL		        	0x4282
 #define SCENE_RECALL_NOACK		        0x4382
@@ -266,10 +267,54 @@ extern "C" {
 #define SCENE_DEL_NOACK		    		0x9F82
 //
 
+/*
+ * TODO: for type dev
+ */
+#define OPCODE_TYPEDEV              	0xA182
+typedef enum{
+	RD_MAINTYPE_LAMP   = 0,
+	RD_MAINTYPE_SENCE  = 1,
+	RD_MAINTYPE_SENSOR = 2
+} RD_TYPE_MAINDEVICE;
+
+typedef enum{
+	RD_TYPE_LAMP_ONOFF   	= 0,
+	RD_TYPE_LAMP_CCT  		= 1,
+	RD_TYPE_LAMP_RGB 		= 2,
+	RD_TYPE_LAMP_CCT_RGB 	= 3
+} RD_TYPE_LAMP;
+
+typedef enum{
+	RD_TYPE_SENCE_AC   		= 0,
+	RD_TYPE_SENCE_DC  		= 1
+} RD_TYPE_SENCE;
+
+typedef enum{
+	RD_TYPE_SENSOR_PIR   		= 0,
+	RD_TYPE_SENSOR_LIGHT 		= 1
+} RD_TYPE_SENSOR;
+
+
+typedef enum{
+	RD_TYPE_POWER_NONE   		= 0,
+	RD_TYPE_POWER_3W   			= 1,
+	RD_TYPE_POWER_5W   			= 2,
+	RD_TYPE_POWER_7W   			= 3,
+	RD_TYPE_POWER_9W   			= 4,
+	RD_TYPE_POWER_15W   		= 5
+} RD_TYPE_POWER;
+
+
+
+
+
+
 extern bool MODE_PROVISION;
 extern bool MODE_MQTT;
 extern bool MODE_BUTTON;
 extern bool MODE_CONTROL;
+
+
 
 //message control
 extern uint8_t OUTMESSAGE_ScanStop[3];
@@ -280,6 +325,7 @@ extern uint8_t OUTMESSAGE_Provision[28];
 extern uint8_t OUTMESSAGE_BindingALl[22];
 
 extern bool check_add_or_del_group;
+
 
 #ifdef __cplusplus
 }

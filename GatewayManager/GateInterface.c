@@ -83,6 +83,7 @@ void GWIF_CheckData (void){
 
 	// Neu co du lieu trong Buffer
 	if(vrts_ringbuffer_Data.count >= 1){
+		scanNotFoundDev = 0;
 		Timeout_CheckDataBuffer=0;
 		if(vrb_GWIF_UpdateLate == false){
 
@@ -151,6 +152,10 @@ void GWIF_CheckData (void){
 	else
 	{
 		Timeout_CheckDataBuffer++;
+//		if(Timeout_CheckDataBuffer == 3199){
+//			scanNotFoundDev++;
+//			printf("%d",scanNotFoundDev);
+//		}
 	}
 
 }
@@ -227,7 +232,7 @@ void GWIF_ProcessData (void){
 				flag_mac=true;
 			}
             /*...........................................*/
-
+			if(vrts_GWIF_IncomeMessage->Message)
 /*
  * TODO: process for sensor(light, PIR, remote,...)
  */
@@ -271,9 +276,16 @@ void GWIF_ProcessData (void){
  */
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE){
 				uint16_t valueOpcode,jsonadr,jsonvalue;
+				uint8_t jsonmain,jsonsub,jsonpower;
 				valueOpcode = (vrts_GWIF_IncomeMessage->Message[5] | (vrts_GWIF_IncomeMessage->Message[6]<<8));
 				jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				switch (valueOpcode){
+				case OPCODE_TYPEDEV:
+					jsonmain = vrts_GWIF_IncomeMessage->Message[9];
+					jsonsub = vrts_GWIF_IncomeMessage->Message[10];
+					jsonpower = vrts_GWIF_IncomeMessage->Message[11];
+					CreatJson_TypeDev(TP_TPYE_DEVICE, "ADR", "MAINDEVICE", "SUBDEVICE", "POWER", jsonadr, jsonmain, jsonsub, jsonpower);
+					break;
 				case G_ONOFF_STATUS:
 					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 					if(vrui_GWIF_LengthMeassge == 9){
@@ -286,7 +298,7 @@ void GWIF_ProcessData (void){
 					break;
 				case LIGHT_CTL_TEMP_STATUS:
 					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
-					jsonvalue = vrts_GWIF_IncomeMessage->Message[7] | (vrts_GWIF_IncomeMessage->Message[8]<<8);
+					jsonvalue = vrts_GWIF_IncomeMessage->Message[11] | (vrts_GWIF_IncomeMessage->Message[12]<<8);
 					CreatJson(TP_STATUS_CCT,"ADR","CCT",jsonadr,jsonvalue);
 					break;
 				case LIGHTNESS_STATUS:
@@ -313,13 +325,17 @@ void GWIF_ProcessData (void){
 					break;
 				case SCENE_REG_STATUS:
 					jsonvalue = vrts_GWIF_IncomeMessage->Message[8]| vrts_GWIF_IncomeMessage->Message[9]<<8;
-					CreatJson(TP_CONTROL_ADDSENCE, "ADR", "ADDSENCE", jsonadr, jsonvalue);
+					CreatJson(TP_STATUS_ADDSENCE, "ADR", "ADDSENCE", jsonadr, jsonvalue);
 					break;
 				case SCENE_STATUS:
 					if(vrts_GWIF_IncomeMessage->Message[6]==0){
 						jsonvalue = vrts_GWIF_IncomeMessage->Message[7] | vrts_GWIF_IncomeMessage->Message[8]<<8;
 						CreatJson(TP_STATUS_CALLSENCE, "ADR", "CALLSENCE", jsonadr, jsonvalue);
 					}
+					break;
+				case NODE_RESET_STATUS:
+					jsonvalue = 1;
+					CreatJson(TP_STATUS_RESETNODE, "ADR", "RESET", jsonadr, jsonvalue);
 					break;
 				}
 			}

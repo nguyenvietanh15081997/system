@@ -78,10 +78,13 @@ void CheckTopic(char *topicJson, uint16_t adr, uint16_t par)
 		FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr, NULL8, NULL8, NULL16, NULL16, par, NULL16, 14);
 	}
 	else if(strcmp(topicJson,TP_CONTROL_CALLSENCE) == 0){
-		FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, adr, NULL8, NULL8, NULL16, NULL16, par, NULL16, 17);
+		FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, adr, NULL16, 17);
 	}
 	else if(strcmp(topicJson,TP_CONTROL_DELSENCE) == 0){
 		FunctionPer(HCI_CMD_GATEWAY_CMD, DelSence_typedef, adr, NULL8, NULL8, NULL16, NULL16, par, NULL16, 14);
+	}
+	else if(strcmp(topicJson,TP_CONTROL_RESETNODE) == 0){
+		FunctionPer(HCI_CMD_GATEWAY_CMD, ResetNode_typedef, adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, 12);
 	}
 }
 //void FunctionPer(uint16_t cmd,\
@@ -115,7 +118,7 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 
 int mqtt_send(struct mosquitto *mosq, char *msg)
 {
-	mosquitto_publish(mosq, NULL, "RD/STATUS/ONOFF", strlen(msg), msg, 0, 0);
+	mosquitto_publish(mosq, NULL, "RANG DONG", strlen(msg), msg, 0, 0);
 	return 0;
 }
 void * MQTT_Thread(void *argv)
@@ -143,7 +146,7 @@ void * MQTT_Thread(void *argv)
 			mosquitto_subscribe(mosq,NULL, "RD/PROVISION/+",0);
 			mosquitto_subscribe(mosq,NULL, "RD/CONTROL/+",0);
 
-			int snd = mqtt_send(mosq, "Rang Dong Anh Hung Va Co Bac Ho");
+			int snd = mqtt_send(mosq, "RANG DONG ANH HUNG VA CO BAC HO");
 			if(snd != 0) printf("mqtt_send error=%i\n", snd);
 			sleep(10);
 

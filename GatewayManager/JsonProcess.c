@@ -42,3 +42,20 @@ void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,
 	rsp = json_object_to_json_string(object);
 	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
 }
+void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJsonMain, uint8_t *objectJsonSub, uint8_t *objectJsonPower, uint8_t parAdr, uint8_t parMain, uint8_t parSub, uint8_t parPower)
+{
+	struct json_object * object;
+	object = json_object_new_object();
+	char valueJsonSend[4];
+	sprintf(valueJsonSend,"%d",parAdr);
+	json_object_object_add(object, objectJsonAdr, json_object_new_string(valueJsonSend));
+	sprintf(valueJsonSend,"%d",parMain);
+	json_object_object_add(object, objectJsonMain, json_object_new_string(valueJsonSend));
+	sprintf(valueJsonSend,"%d",parSub);
+	json_object_object_add(object, objectJsonSub, json_object_new_string(valueJsonSend));
+	sprintf(valueJsonSend,"%d",parPower);
+	json_object_object_add(object, objectJsonPower, json_object_new_string(valueJsonSend));
+	char *rsp;
+	rsp = json_object_to_json_string(object);
+	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
+}
