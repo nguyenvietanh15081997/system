@@ -119,11 +119,11 @@ void TimeForInternet()
 	  dataTimeInternet[2]= (path[17]-48) * 10 + (path[18]-48);
 	  dataTimeInternet[4]= (path[8]-48) * 10 +  (path[9]-48);
 	  dataTimeInternet[6]= (path[26]-48) * 10 + (path[27]-48);
-	  int n;
-	  for(n=0;n<7;n++){
-		  printf ("%d-",dataTimeInternet[n]);
-	  }
-	  printf("\n");
+//	  int n;
+//	  for(n=0;n<7;n++){
+//		  printf ("%d-",dataTimeInternet[n]);
+//	  }
+//	  printf("\n");
 }
 void SetTimeForDs1307(uint8_t seconds, uint8_t minutes, uint8_t hours, uint8_t days, uint8_t dates, uint8_t months, uint8_t years)
 {
@@ -135,15 +135,31 @@ void SetTimeForDs1307(uint8_t seconds, uint8_t minutes, uint8_t hours, uint8_t d
 	mraa_i2c_write_byte_data(i2c, DEC2BCD(months), 0x05);
 	mraa_i2c_write_byte_data(i2c, DEC2BCD(years), 0x06);
 }
+/*
+ * TODO: set a second of minutes offall
+ * 1 minutes update
+ */
 void * Time_Thread(void *argv)
 {
-	//Ds1307_Init();
+	Ds1307_Init();
+	bool flag_Updated;
+//	bool flag_Schedule;
 	while(1)
 	{
 		TimeForInternet();
-//		if(dataTimeInternet[0]==vrts_Json_String.hours && dataTimeInternet[1]==15){
-//			//JsonControl(key);
+//		if(flag_second==1){
+//			if((dataTimeInternet[2]==vrts_Json_String.seconds) && flag_Schedule==false){
+//				FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,vrts_Json_String.adr,NULL8,0, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
+//			}
+//			else (data
 //		}
+		if((dataTimeInternet[2]==0) && (flag_Updated==false)){
+			FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
+			flag_Updated=true;
+		}
+		if(dataTimeInternet[2]!=0){
+			flag_Updated= false;
+		}
 	}
 	return NULL;
 }

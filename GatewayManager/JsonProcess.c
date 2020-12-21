@@ -1,13 +1,16 @@
 #include "../GatewayManager/JsonProcess.h"
 #include "../GatewayManager/MQTT.h"
 #include "../GatewayManager/Light.h"
+#include "../GatewayManager/Provision.h"
 
 
 uint16_t valueObject[20];
 uint16_t numObject;
 jsonstring vrts_Json_String;
 defineCmd flagDefineCmd;
+pthread_t vrts_System_TestSend;
 
+char flagSecond=0;
 void JsonControl(char *key){
 	if(strcmp(key,"ONOFF")==0){
 		 flagDefineCmd = onoff_enum;
@@ -25,7 +28,6 @@ void JsonControl(char *key){
 		 sleep(1);
 	 }
 	 else if(strcmp(key,"HOURS")==0){
-		 puts("4");
 		 flagDefineCmd = hours_enum;
 	 }
 	 else if(strcmp(key,"MINUTES")==0){
@@ -33,6 +35,7 @@ void JsonControl(char *key){
 	 }
 	 else if(strcmp(key,"SECONDS")==0){
 		 flagDefineCmd = seconds_enum;
+		 flagSecond= 1;
 	 }
 	 else if(strcmp(key,"ADDGROUP")==0){
 		 flagDefineCmd = addgroup_enum;
@@ -74,9 +77,24 @@ void JsonControl(char *key){
 	 }
 	 else if(strcmp(key,"START")==0){
 		 flagDefineCmd = start_enum;
+		 puts("Provision start");
+		MODE_PROVISION=true;
+		pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
+		//pthread_join(vrts_System_TestSend, NULL);
 	 }
 	 else if(strcmp(key,"STOP")==0){
 		 flagDefineCmd = stop_enum;
+		puts("Provision stop");
+		MODE_PROVISION=false;
+		pthread_cancel(tmp);
+		ControlMessage(3, OUTMESSAGE_ScanStop);
+		flag_selectmac     = false;
+		flag_getpro_info   = false;
+		flag_getpro_element= false;
+		flag_provision     = false;
+		flag_mac           = true;
+		flag_check_select_mac  = false;
+		flag_done          = true;
 	 }
 	 else if(strcmp(key,"UPDATE")==0){
 		 flagDefineCmd = update_enum;

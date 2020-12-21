@@ -7,8 +7,8 @@ extern "C" {
 
 
 #include <json-c/json.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 extern uint16_t numObject;
 extern uint16_t valueObject[20];
@@ -35,7 +35,7 @@ typedef struct jsonstring
 	uint8_t update;
 } jsonstring;
 extern jsonstring vrts_Json_String;
-
+extern char flagSecond;
 
 typedef enum{
 	onoff_enum		=1,
@@ -58,7 +58,6 @@ typedef enum{
 	resetnode_enum	=18
 } defineCmd;
 extern defineCmd flagDefineCmd;
-
 
 void JsonControl(char *key);
 void Json_Parse(json_object * jobj);
