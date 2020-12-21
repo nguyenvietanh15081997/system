@@ -299,6 +299,7 @@ void GWIF_ProcessData (void){
 				case LIGHT_CTL_TEMP_STATUS:
 					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 					jsonvalue = vrts_GWIF_IncomeMessage->Message[11] | (vrts_GWIF_IncomeMessage->Message[12]<<8);
+					//printf ("%d", jsonvalue);
 					CreatJson(TP_STATUS_CCT,"ADR","CCT",jsonadr,jsonvalue);
 					break;
 				case LIGHTNESS_STATUS:

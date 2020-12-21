@@ -24,7 +24,8 @@ extern lightsensorRsp * vrts_LighSensor_Rsp;
 /*
  * TODO: define friend_poll
  */
-#define SENSOR_DESCRIP_GET 0x3082
+#define SENSOR_DESCRIP_GET     0x3082
+#define SENSOR_DESCRIP_STATUS  0x51
 
 
 //extern bool flag_sensor_light_rsp;

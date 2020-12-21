@@ -12,10 +12,12 @@
 #include "GatewayManager/Provision.h"
 #include "GatewayManager/MQTT.h"
 #include "GatewayManager/SensorLight.h"
+#include "GatewayManager/Ds1307.h"
 
 pthread_t vrts_System_ThreadGWIF;
 pthread_t vrts_System_TestSend;
 pthread_t vrts_System_MQTT;
+//pthread_t vrts_System_Time;
 
 
 
@@ -32,9 +34,12 @@ int main(void) {
 	pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
     pthread_create(&vrts_System_ThreadGWIF, NULL, GWINF_Thread, NULL);
     pthread_create(&vrts_System_MQTT,   NULL,   MQTT_Thread,    NULL);
+    //pthread_create(&vrts_System_Time,NULL,Time_Thread, NULL);
+
 	pthread_join(vrts_System_ThreadGWIF, NULL);
 	pthread_join(vrts_System_TestSend, NULL);
     pthread_join(vrts_System_MQTT,NULL);
+    //pthread_join(vrts_System_Time, NULL);
 	while(1){
 	}
 	return EXIT_SUCCESS;

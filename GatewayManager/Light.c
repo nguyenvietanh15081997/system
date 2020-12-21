@@ -165,6 +165,9 @@ void FunctionPer(uint16_t cmd,\
 				uint16_t parCCT,\
 				uint16_t parSenceId,\
 				uint16_t parTimePoll,\
+				uint16_t parH,
+				uint16_t parS,
+				uint16_t parL,
 				uint8_t cmdLenght)
 {
 	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0] = cmd & 0xFF;

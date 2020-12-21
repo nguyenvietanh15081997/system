@@ -26,10 +26,10 @@ extern "C" {
 #include <mosquitto.h>
 
 
-#define mqtt_host 			"postman.cloudmqtt.com"//"soldier.cloudmqtt.com"//
-#define mqtt_port 			13001//11875//
+#define mqtt_host 			"postman.cloudmqtt.com"//"soldier.cloudmqtt.com"//"192.168.33.1"//
+#define mqtt_port 			13001//11875//1883//
 #define mqtt_username 		"insklndl"//"jpcvzwgj"//
-#define mqtt_password 		"x9aBwks70kmQ"//"JCCSw9dYngMF"//"2k756Wus2bJE"//
+#define mqtt_password 		"x9aBwks70kmQ"//"JCCSw9dYngMF"//"2k756Wus2bJE"///
 
 
 #define TP_PROVISION_START          "RD/PROVISION/START"    // {"PRO":"1","VALUE":"1"}
@@ -46,6 +46,7 @@ extern "C" {
 #define TP_CONTROL_CALLSENCE    "RD/CONTROL/CALLSENCE"      // {"IDSENCE":"idsence","VALUE":"1"}
 #define TP_CONTROL_DELSENCE   	"RD/CONTROL/DELSENCE"		// {"ADR":"adr","VALUE":"id sence"}
 #define TP_CONTROL_RESETNODE   	"RD/CONTROL/RESETNODE"		// {"ADR":"adr","VALUE":"1"}
+#define TP_CONTROL_SCHEDULE     "RD/CONTROL/SHEDULE"		// {"ADR":"adr","HOURS":"hours","MINUTES":"minutes","SECOND":"second","ONOFF":"x","DIM":"xx,"CCT":"xx"}
 
 #define TP_TPYE_DEVICE      "RD/TYPE_DEVICE"            // {"ADR":"adr","MMAINDEVICE":"main","SUBDEVICE":"sub","POWER":"power",}
 #define TP_STATUS_UPDATE    "RD/STATUS/UPDATE"			//{"ADR":"adr","ONOFF":"1 or 0"} gửi nhiều lần của từng con đèn trong mạng
@@ -59,7 +60,7 @@ extern "C" {
 #define TP_STATUS_CALLSENCE	 "RD/STATUS/CALLSENCE"      //{"ADR":"adr","CALLSENCE":"id sence"}
 #define TP_STATUS_DELSENCE   "RD/STATUS/DELSENCE"
 #define TP_STATUS_RESETNODE  "RD/STATUS/RESETNODE"      //{"ADR":"adr","RESETNODE":"1"}
-
+#define TP_STATUS_SHEDULE    "RD/STATUS/SHEDULE"		//{"ADR":"adr","HOURS":"hours","MINUTES":"minutes","SECOND":"second","ONOFF":"x","DIM":"xx,"CCT":"xx"}
 
 extern int run;
 
