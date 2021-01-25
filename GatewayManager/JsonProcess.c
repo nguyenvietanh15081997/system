@@ -17,72 +17,72 @@ void JsonControl(char *key){
 		 FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,vrts_Json_String.adr ,NULL8, vrts_Json_String.onoff, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
 		 sleep(1);
 	 }
-	 else if(strcmp(key,"CCT")==0){
+	 if(strcmp(key,"CCT")==0){
 		 flagDefineCmd = cct_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, CCT_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16,vrts_Json_String.cct, NULL16, NULL16,NULL16, NULL16, NULL16, 17);
 		 sleep(1);
 	 }
-	 else if(strcmp(key,"DIM")==0){
+	 if(strcmp(key,"DIM")==0){
 		 flagDefineCmd = dim_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, Lightness_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, vrts_Json_String.dim, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
 		 sleep(1);
 	 }
-	 else if(strcmp(key,"HOURS")==0){
+	 if(strcmp(key,"HOURS")==0){
 		 flagDefineCmd = hours_enum;
 	 }
-	 else if(strcmp(key,"MINUTES")==0){
+	 if(strcmp(key,"MINUTES")==0){
 		 flagDefineCmd = minutes_enum;
 	 }
-	 else if(strcmp(key,"SECONDS")==0){
+	 if(strcmp(key,"SECONDS")==0){
 		 flagDefineCmd = seconds_enum;
 		 flagSecond= 1;
 	 }
-	 else if(strcmp(key,"ADDGROUP")==0){
+	 if(strcmp(key,"ADDGROUP")==0){
 		 flagDefineCmd = addgroup_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, AddGroup_typedef, vrts_Json_String.adr, vrts_Json_String.addgroup , NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
 		 sleep(1);
 	 }
-	 else if(strcmp(key,"DELGROUP")==0){
+	 if(strcmp(key,"DELGROUP")==0){
 		 flagDefineCmd = delgroup_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, DelGroup_typedef, vrts_Json_String.adr, vrts_Json_String.delgroup, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
 		 sleep(1);
 	 }
-	 else if(strcmp(key,"ADDSCENE")==0){
+	 if(strcmp(key,"ADDSCENE")==0){
 		 flagDefineCmd = addscene_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.addscene, NULL16,NULL16, NULL16, NULL16, 14);
 		 sleep(1);
 	 }
-	 else if(strcmp(key,"CALLSCENE")==0){
+	 if(strcmp(key,"CALLSCENE")==0){
 		 flagDefineCmd = callscene_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.callscene, NULL16,NULL16, NULL16, NULL16, 17);
 		 sleep(1);
 	 }
-	 else if(strcmp(key,"DELSCENE")==0){
+	 if(strcmp(key,"DELSCENE")==0){
 		 flagDefineCmd = delscene_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, DelSence_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.delscene, NULL16,NULL16, NULL16, NULL16, 14);
 		 sleep(1);
 	 }
-	 else if(strcmp(key,"HUE")==0){
+	 if(strcmp(key,"HUE")==0){
 		 flagDefineCmd = hue_eum;
 	 }
-	 else if(strcmp(key,"SATURATION")==0){
+	 if(strcmp(key,"SATURATION")==0){
 		 flagDefineCmd = saturation_enum;
 	 }
-	 else if(strcmp(key,"LIGHTNESS")==0){
+	 if(strcmp(key,"LIGHTNESS")==0){
 		 flagDefineCmd = lightness_enum;
 	 }
-	 else if(strcmp(key,"RESETNODE")==0){
+	 if(strcmp(key,"RESET")==0){
 		 flagDefineCmd = resetnode_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, ResetNode_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
 	 }
-	 else if(strcmp(key,"START")==0){
+	 if(strcmp(key,"START")==0){
 		 flagDefineCmd = start_enum;
 		 puts("Provision start");
 		MODE_PROVISION=true;
 		pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
 		//pthread_join(vrts_System_TestSend, NULL);
 	 }
-	 else if(strcmp(key,"STOP")==0){
+	 if(strcmp(key,"STOP")==0){
 		 flagDefineCmd = stop_enum;
 		puts("Provision stop");
 		MODE_PROVISION=false;
@@ -96,9 +96,16 @@ void JsonControl(char *key){
 		flag_check_select_mac  = false;
 		flag_done          = true;
 	 }
-	 else if(strcmp(key,"UPDATE")==0){
+	 if(strcmp(key,"UPDATE")==0){
 		 flagDefineCmd = update_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
+	 }
+	 if((strcmp(key,"BUTTONID")==0)){
+		 uint8_t vrbuttonid= vrts_Json_String.buttonid;
+		 uint8_t vrmodeid  = vrts_Json_String.modeid;
+		 uint16_t vrsceneforremote= vrts_Json_String.sceneforremote;
+		 //puts("anh");
+		 ControlRemote(HCI_CMD_GATEWAY_CMD, vrts_Json_String.adr, vrbuttonid, vrmodeid, vrsceneforremote,16);
 	 }
 }
 void Json_Parse(json_object * jobj)
@@ -124,10 +131,13 @@ void Json_Parse(json_object * jobj)
 								 vrts_Json_String.hue 			= (json_object_get_int(json_object_object_get(jobj,"HUE")));
 								 vrts_Json_String.saturation	= (json_object_get_int(json_object_object_get(jobj,"SATURATION")));
 								 vrts_Json_String.lightness 	= (json_object_get_int(json_object_object_get(jobj,"LIGHTNESS")));
-								 vrts_Json_String.resetnode 	= (json_object_get_int(json_object_object_get(jobj,"RESETNODE")));
+								 vrts_Json_String.resetnode 	= (json_object_get_int(json_object_object_get(jobj,"RESET")));
 								 vrts_Json_String.start 		= (json_object_get_int(json_object_object_get(jobj,"START")));
 								 vrts_Json_String.stop 			= (json_object_get_int(json_object_object_get(jobj,"STOP")));
 								 vrts_Json_String.update 		= (json_object_get_int(json_object_object_get(jobj,"UPDATE")));
+								 vrts_Json_String.buttonid      = (json_object_get_int(json_object_object_get(jobj,"BUTTONID")));
+								 vrts_Json_String.modeid        = (json_object_get_int(json_object_object_get(jobj,"MODEID")));
+								 vrts_Json_String.sceneforremote= (json_object_get_int(json_object_object_get(jobj,"SCENEFORREMOTE")));
 								 break;
 			 }
 			 JsonControl(key);

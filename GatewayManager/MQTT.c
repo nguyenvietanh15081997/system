@@ -129,7 +129,7 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 
 int mqtt_send(struct mosquitto *mosq, char *msg)
 {
-	mosquitto_publish(mosq, NULL, "RD/STATUS/SYSMSG", strlen(msg), msg, 0, 0);
+	mosquitto_publish(mosq, NULL, "RD", strlen(msg), msg, 0, 0);
 	return 0;
 }
 void * MQTT_Thread(void *argv)
@@ -154,9 +154,10 @@ void * MQTT_Thread(void *argv)
 			abc = mosquitto_username_pw_set(mosq, mqtt_username, mqtt_password);
 			rc = mosquitto_connect(mosq, mqtt_host, mqtt_port, 60);
 
-			mosquitto_subscribe(mosq,NULL, "RD/PROVISION/+",0);
-			mosquitto_subscribe(mosq,NULL, "RD/CONTROL/+",0);
+			mosquitto_subscribe(mosq,NULL, "RD_CONTROL",0);
+			//mosquitto_subscribe(mosq,NULL, "RD/CONTROL/+",0);
 			mosquitto_subscribe(mosq,NULL, "RangDong",0);
+			//mosquitto_subscribe(mosq,NULL, "UTC",0);
 
 			int snd = mqtt_send(mosq, "{\"MSG\":\"\"RANG DONG ANH HUNG VA CO BAC HO\"}");
 			if(snd != 0) printf("mqtt_send error=%i\n", snd);

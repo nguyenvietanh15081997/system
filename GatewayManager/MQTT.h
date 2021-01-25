@@ -26,10 +26,10 @@ extern "C" {
 #include <mosquitto.h>
 
 
-#define mqtt_host 			"192.168.100.1"//"postman.cloudmqtt.com"//"soldier.cloudmqtt.com"//"192.168.33.1"//
-#define mqtt_port 			1883//13001//11875//
-#define mqtt_username 		"RD"//"insklndl"//"jpcvzwgj"//
-#define mqtt_password 		"1"//"x9aBwks70kmQ"//"JCCSw9dYngMF"//"2k756Wus2bJE"///
+#define mqtt_host 			"postman.cloudmqtt.com"//"soldier.cloudmqtt.com"//"192.168.33.1"//"192.168.100.1"//
+#define mqtt_port 			13001//11875//1883//
+#define mqtt_username 		"insklndl"//"jpcvzwgj"//"RD"//
+#define mqtt_password 		"x9aBwks70kmQ"//"JCCSw9dYngMF"//"2k756Wus2bJE"//"1"//
 
 
 #define TP_PROVISION_START          "RD/PROVISION/START"    // {"PRO":"1","VALUE":"1"}
@@ -62,6 +62,7 @@ extern "C" {
 #define TP_STATUS_RESETNODE  "RD/STATUS/RESETNODE"      //{"ADR":"adr","RESETNODE":"1"}
 #define TP_STATUS_SHEDULE    "RD/STATUS/SHEDULE"		//{"ADR":"adr","HOURS":"hours","MINUTES":"minutes","SECOND":"second","ONOFF":"x","DIM":"xx,"CCT":"xx"}
 
+#define TP_STATUS            "RD_STATUS"
 extern int run;
 
 extern bool flag_on_all;

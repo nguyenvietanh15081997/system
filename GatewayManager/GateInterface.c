@@ -12,6 +12,7 @@
 #include "../GatewayManager/Light.h"
 #include "../GatewayManager/Battery.h"
 #include "../GatewayManager/MQTT.h"
+//#include "../GatewayManager/JsonProcess.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -241,8 +242,10 @@ void GWIF_ProcessData (void){
 				   (vrts_GWIF_IncomeMessage->Message[7] == (REMOTE_MODULE_DC_TYPE>>8) & 0xFF)){
 					puts(">>Remote DC");
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
-					if(IsRemoteSetup(vrts_Remote_Rsp, 1, 1, 0, 0)){
-						//add code at here
+					uint16_t pscene = (vrts_Remote_Rsp->senceID[0] <<8) |(vrts_Remote_Rsp->senceID[1]);
+					if(pscene!=0)
+					{
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscene, NULL16,NULL16, NULL16, NULL16, 17);
 					}
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (REMOTE_MODULE_AC_TYPE & 0xFF)) && \
@@ -284,7 +287,7 @@ void GWIF_ProcessData (void){
 					jsonmain = vrts_GWIF_IncomeMessage->Message[9];
 					jsonsub = vrts_GWIF_IncomeMessage->Message[10];
 					jsonpower = vrts_GWIF_IncomeMessage->Message[11];
-					CreatJson_TypeDev(TP_TPYE_DEVICE, "ADR", "MAINDEVICE", "SUBDEVICE", "POWER", jsonadr, jsonmain, jsonsub, jsonpower);
+					CreatJson_TypeDev(TP_STATUS, "ADR", "MAINDEVICE", "SUBDEVICE", "POWER", jsonadr, jsonmain, jsonsub, jsonpower);
 					break;
 				case G_ONOFF_STATUS:
 					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
@@ -294,13 +297,13 @@ void GWIF_ProcessData (void){
 					else{
 						jsonvalue = vrts_GWIF_IncomeMessage->Message[8] & 0xFF;
 					}
-					CreatJson(TP_STATUS_UPDATE,"ADR","ONOFF",jsonadr,jsonvalue);
+					CreatJson(TP_STATUS,"ADR","ONOFF",jsonadr,jsonvalue);
 					break;
 				case LIGHT_CTL_TEMP_STATUS:
 					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 					jsonvalue = vrts_GWIF_IncomeMessage->Message[11] | (vrts_GWIF_IncomeMessage->Message[12]<<8);
 					//printf ("%d", jsonvalue);
-					CreatJson(TP_STATUS_CCT,"ADR","CCT",jsonadr,jsonvalue);
+					CreatJson(TP_STATUS,"ADR","CCT",jsonadr,jsonvalue);
 					break;
 				case LIGHTNESS_STATUS:
 					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
@@ -310,7 +313,7 @@ void GWIF_ProcessData (void){
 					if(vrui_GWIF_LengthMeassge == 13){
 						jsonvalue = vrts_GWIF_IncomeMessage->Message[10] & 0xFF;
 					}
-					CreatJson(TP_STATUS_DIM, "ADR", "DIM", jsonadr, jsonvalue);
+					CreatJson(TP_STATUS, "ADR", "DIM", jsonadr, jsonvalue);
 					break;
 				case LIGHT_HSL_STATUS:
 					//status HSL
@@ -318,25 +321,25 @@ void GWIF_ProcessData (void){
 				case CFG_MODEL_SUB_STATUS:
 					jsonvalue = vrts_GWIF_IncomeMessage->Message[10] & 0xFF;
 					if(check_add_or_del_group){
-						CreatJson(TP_STATUS_ADDGROUP, "ADR", "ADDGROUP", jsonadr, jsonvalue);
+						CreatJson(TP_STATUS, "ADR", "ADDGROUP", jsonadr, jsonvalue);
 					}
 					else {
-						CreatJson(TP_STATUS_DELGROUP, "ADR", "DELGROUP", jsonadr, jsonvalue);
+						CreatJson(TP_STATUS, "ADR", "DELGROUP", jsonadr, jsonvalue);
 					}
 					break;
 				case SCENE_REG_STATUS:
 					jsonvalue = vrts_GWIF_IncomeMessage->Message[8]| vrts_GWIF_IncomeMessage->Message[9]<<8;
-					CreatJson(TP_STATUS_ADDSENCE, "ADR", "ADDSENCE", jsonadr, jsonvalue);
+					CreatJson(TP_STATUS, "ADR", "ADDSENCE", jsonadr, jsonvalue);
 					break;
 				case SCENE_STATUS:
 					if(vrts_GWIF_IncomeMessage->Message[6]==0){
 						jsonvalue = vrts_GWIF_IncomeMessage->Message[7] | vrts_GWIF_IncomeMessage->Message[8]<<8;
-						CreatJson(TP_STATUS_CALLSENCE, "ADR", "CALLSENCE", jsonadr, jsonvalue);
+						CreatJson(TP_STATUS, "ADR", "CALLSENCE", jsonadr, jsonvalue);
 					}
 					break;
 				case NODE_RESET_STATUS:
 					jsonvalue = 1;
-					CreatJson(TP_STATUS_RESETNODE, "ADR", "RESET", jsonadr, jsonvalue);
+					CreatJson(TP_STATUS, "ADR", "RESET", jsonadr, jsonvalue);
 					break;
 				}
 			}

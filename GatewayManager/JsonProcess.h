@@ -33,6 +33,9 @@ typedef struct jsonstring
 	uint8_t start;
 	uint8_t stop;
 	uint8_t update;
+	uint8_t buttonid;
+	uint8_t modeid;
+	uint16_t sceneforremote;
 } jsonstring;
 extern jsonstring vrts_Json_String;
 extern char flagSecond;
@@ -55,7 +58,10 @@ typedef enum{
 	start_enum		=15,
 	stop_enum		=16,
 	update_enum		=17,
-	resetnode_enum	=18
+	resetnode_enum	=18,
+	setsceneforremote_enum=19,
+	buttonid_enum         =20,
+	modeid_enum           =21
 } defineCmd;
 extern defineCmd flagDefineCmd;
 

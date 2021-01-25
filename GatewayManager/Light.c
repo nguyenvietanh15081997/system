@@ -227,6 +227,29 @@ void FunctionPer(uint16_t cmd,\
 	    ControlMessage(cmdLenght, TempData);
 }
 
+
+void ControlRemote(uint16_t cmd, uint16_t adrRemote, uint8_t buttonID, uint8_t modeID, uint16_t sceneId,uint8_t cmdLenght)
+{
+	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0] = cmd & 0xFF;
+	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[1] = (cmd>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode00[0] = 0;
+	vrts_CMD_STRUCTURE.opCode00[1] = 0;
+	vrts_CMD_STRUCTURE.opCode00[2] = 0;
+	vrts_CMD_STRUCTURE.opCode00[3] = 0;
+	vrts_CMD_STRUCTURE.retry_cnt = parRetry_cnt;
+	vrts_CMD_STRUCTURE.rsp_max = 0;
+	SetSceneForRemote(adrRemote, buttonID, modeID, sceneId);
+	uint8_t *TempData;
+
+		TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
+		int i;
+		    printf("Content:");
+		    for (i = 0; i <cmdLenght; i++){
+		    	printf("%2x-",TempData[i]);
+		    }
+		    printf("\n");
+		    ControlMessage(cmdLenght, TempData);
+}
 /*
  * TODO: functions process message receive of node and send mqtt
  */
