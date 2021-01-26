@@ -166,10 +166,12 @@ void GWIF_CheckData (void){
  * Hien tai dung lai o xu ly ban len Terminal
  * TODO: Thuc hien boc ban tin theo cac nhom lenh tuong ung, hoan thien chuan xu ly ban tin den
  */
-void GWIF_ProcessData (void){
+void GWIF_ProcessData (void)
+{
 	unsigned int vrui_Count;
 	unsigned int i;
-	if(vrb_GWIF_CheckNow){
+	if(vrb_GWIF_CheckNow)
+	{
 		vrb_GWIF_CheckNow = false;
 
 /*
@@ -190,7 +192,8 @@ void GWIF_ProcessData (void){
  * TODO: process for provision
  */
 
-			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_UPDATE_MAC) && (flag_check_select_mac == true)){  //scan
+			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_UPDATE_MAC) && (flag_check_select_mac == true))
+			{  //scan
 				for(i=0; i<6; i++)
 				{
 					OUTMESSAGE_MACSelect[i+3]=vrts_GWIF_IncomeMessage->Message[i+1];
@@ -199,18 +202,45 @@ void GWIF_ProcessData (void){
 				flag_selectmac=true;
 				flag_check_select_mac= false;
 			}
-
-			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_PRO_STS_RSP){
-
+			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_PRO_STS_RSP) &&\
+					(vrts_GWIF_IncomeMessage->Message[21] != 0x11) &&\
+					(vrts_GWIF_IncomeMessage->Message[22] != 0x22) &&\
+					(vrts_GWIF_IncomeMessage->Message[23] != 0x33) &&\
+					(vrts_GWIF_IncomeMessage->Message[24] != 0x44))
+			{
+					flag_setpro = true;
+			}
+			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_SETPRO_SUSCESS)
+			{
+				flag_admitpro = true;
+			}
+			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_PRO_STS_RSP) &&\
+					(vrts_GWIF_IncomeMessage->Message[21] == 0x11) &&\
+					(vrts_GWIF_IncomeMessage->Message[22] == 0x22) &&\
+					(vrts_GWIF_IncomeMessage->Message[23] == 0x33) &&\
+					(vrts_GWIF_IncomeMessage->Message[24] == 0x44))
+			{
 				OUTMESSAGE_Provision[0]=HCI_CMD_GATEWAY_CTL;    //0xE9
 				OUTMESSAGE_Provision[1]=HCI_CMD_GATEWAY_CTL>>8; //0xFF;
-				OUTMESSAGE_Provision[2]=HCI_GATEWAY_CMD_SET_NODE_PARA;
-				//unicast_address = (vrts_GWIF_IncomeMessage->Message[25]) | (vrts_GWIF_IncomeMessage->Message[26]<<8);
-				for (i=0;i<25;i++)
+			    OUTMESSAGE_Provision[2]=HCI_GATEWAY_CMD_SET_NODE_PARA;
+				if((vrts_GWIF_IncomeMessage->Message[25] == 0x00) &&\
+				   (vrts_GWIF_IncomeMessage->Message[26] == 0x00))
 				{
-					OUTMESSAGE_Provision[i+3]=vrts_GWIF_IncomeMessage->Message[i+2];
+					for (i=0;i<23;i++)
+					{
+						OUTMESSAGE_Provision[i+3]=vrts_GWIF_IncomeMessage->Message[i+2];
+					}
+					OUTMESSAGE_Provision[26] = 0x02;
+					OUTMESSAGE_Provision[27] = 0x00;
 				}
-				flag_getpro_info=true;
+				else
+				{
+					for (i=0;i<25;i++)
+					{
+						OUTMESSAGE_Provision[i+3]=vrts_GWIF_IncomeMessage->Message[i+2];
+					}
+				}
+				flag_getpro_info = true;
 			}
 
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_SEND_ELE_CNT)
@@ -277,12 +307,14 @@ void GWIF_ProcessData (void){
  * - get status
  * - send mqtt
  */
-			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE){
+			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE)
+			{
 				uint16_t valueOpcode,jsonadr,jsonvalue;
 				uint8_t jsonmain,jsonsub,jsonpower;
 				valueOpcode = (vrts_GWIF_IncomeMessage->Message[5] | (vrts_GWIF_IncomeMessage->Message[6]<<8));
 				jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
-				switch (valueOpcode){
+				switch (valueOpcode)
+				{
 				case OPCODE_TYPEDEV:
 					jsonmain = vrts_GWIF_IncomeMessage->Message[9];
 					jsonsub = vrts_GWIF_IncomeMessage->Message[10];
