@@ -22,16 +22,37 @@ bool IsRemoteSetup(remotersp * rsp,unsigned char parButtonId,unsigned char parMo
 	}
 	else return false;
 }
-
-void SetSceneForRemote(uint16_t addressremote,uint8_t buttonId, uint8_t modeId, uint16_t sceneId)
+/*
+ * Code old, without header
+ */
+//void SetSceneForRemote(uint16_t addressremote,uint8_t buttonId, uint8_t modeId, uint16_t sceneId)
+//{
+//	vrts_CMD_STRUCTURE.adr_dst[0]= addressremote & 0xFF;
+//	vrts_CMD_STRUCTURE.adr_dst[1]= (addressremote>>8) & 0xFF;
+//	vrts_CMD_STRUCTURE.opCode[0]= OPCODEREMOTERSP & 0xFF;
+//	vrts_CMD_STRUCTURE.opCode[1]= (OPCODEREMOTERSP>>8) & 0xFF;
+//	vrts_CMD_STRUCTURE.para[0]= buttonId;
+//	vrts_CMD_STRUCTURE.para[1]= modeId;
+//	vrts_CMD_STRUCTURE.para[2]= sceneId & 0xFF;
+//	vrts_CMD_STRUCTURE.para[3]= (sceneId>>8) & 0xFF;
+//}
+void SetSceneForRemote(uint16_t addressremote,uint16_t header, uint8_t buttonId, uint8_t modeId, uint16_t sceneId, uint16_t appID, uint8_t SrgbID)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0]= addressremote & 0xFF;
 	vrts_CMD_STRUCTURE.adr_dst[1]= (addressremote>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[0]= OPCODEREMOTERSP & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[1]= (OPCODEREMOTERSP>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[0]= buttonId;
-	vrts_CMD_STRUCTURE.para[1]= modeId;
-	vrts_CMD_STRUCTURE.para[2]= sceneId & 0xFF;
-	vrts_CMD_STRUCTURE.para[3]= (sceneId>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[0]= header & 0xFF;
+	vrts_CMD_STRUCTURE.para[1]= (header>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[2]= buttonId;
+	vrts_CMD_STRUCTURE.para[3]= modeId;
+	vrts_CMD_STRUCTURE.para[4]= sceneId & 0xFF;
+	vrts_CMD_STRUCTURE.para[5]= (sceneId>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[6]= appID & 0xFF;
+	vrts_CMD_STRUCTURE.para[7]= (appID >>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[8]= SrgbID;
+	int i;
+	for(i=0; i<7; i++){
+		vrts_CMD_STRUCTURE.para[i+9]= 0;
+	}
 }
-

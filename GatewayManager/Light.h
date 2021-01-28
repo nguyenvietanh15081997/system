@@ -15,7 +15,7 @@ typedef struct{
 	uint8_t rsp_max;  // num of rsp
 	uint8_t adr_dst[2];    // adr
 	uint8_t opCode[2];
-	uint8_t para[16];
+	uint8_t para[32];
 } cmdcontrol_t;
 
 extern cmdcontrol_t vrts_CMD_STRUCTURE;
@@ -114,6 +114,11 @@ void FunctionPer(uint16_t cmd,\
 				uint16_t parS,
 				uint16_t parL,
 				uint8_t cmdLenght);
+void StoreSceneRemote(uint16_t cmd, uint16_t adrRemote, uint8_t header, uint8_t buttonID, uint8_t modeID, uint16_t sceneID,uint16_t appID, uint8_t SrgbID,uint8_t cmdLength);
+void StoreSceneSensor(uint16_t cmd, uint16_t adrSensor, uint8_t header, uint8_t stt, uint16_t condition, uint16_t low_lux,\
+		uint16_t hight_lux, uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID, uint16_t cmdLength);
+
+
 #ifdef __cplusplus
 }
 #endif

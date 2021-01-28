@@ -296,7 +296,7 @@ void GWIF_ProcessData (void)
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] = (PIR_SENSOR_MODULE_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] = ((PIR_SENSOR_MODULE_TYPE>>8) & 0xFF))){
-					puts(">>PIR Sensor");
+					puts(">>PIR MOTION");
 
 				}
 			}
@@ -361,7 +361,7 @@ void GWIF_ProcessData (void)
 					break;
 				case SCENE_REG_STATUS:
 					jsonvalue = vrts_GWIF_IncomeMessage->Message[8]| vrts_GWIF_IncomeMessage->Message[9]<<8;
-					CreatJson(TP_STATUS, "ADR", "ADDSENCE", jsonadr, jsonvalue);
+					CreatJson(TP_STATUS, "ADR", "ADDSCENE", jsonadr, jsonvalue);
 					break;
 				case SCENE_STATUS:
 					if(vrts_GWIF_IncomeMessage->Message[6]==0){

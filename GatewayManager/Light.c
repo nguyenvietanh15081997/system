@@ -228,7 +228,7 @@ void FunctionPer(uint16_t cmd,\
 }
 
 
-void ControlRemote(uint16_t cmd, uint16_t adrRemote, uint8_t buttonID, uint8_t modeID, uint16_t sceneId,uint8_t cmdLenght)
+void StoreSceneRemote(uint16_t cmd, uint16_t adrRemote, uint8_t header, uint8_t buttonID, uint8_t modeID, uint16_t sceneID,uint16_t appID, uint8_t SrgbID,uint8_t cmdLength)
 {
 	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0] = cmd & 0xFF;
 	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[1] = (cmd>>8) & 0xFF;
@@ -238,25 +238,41 @@ void ControlRemote(uint16_t cmd, uint16_t adrRemote, uint8_t buttonID, uint8_t m
 	vrts_CMD_STRUCTURE.opCode00[3] = 0;
 	vrts_CMD_STRUCTURE.retry_cnt = parRetry_cnt;
 	vrts_CMD_STRUCTURE.rsp_max = 0;
-	SetSceneForRemote(adrRemote, buttonID, modeID, sceneId);
-	uint8_t *TempData;
+	SetSceneForRemote(adrRemote, header, buttonID, modeID, sceneID, appID, SrgbID);
 
-		TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
-		int i;
-		    printf("Content:");
-		    for (i = 0; i <cmdLenght; i++){
-		    	printf("%2x-",TempData[i]);
-		    }
-		    printf("\n");
-		    ControlMessage(cmdLenght, TempData);
+	uint8_t *TempData;
+	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
+	int i;
+		printf("Content:");
+		for (i = 0; i <cmdLength; i++){
+			printf("%2x-",TempData[i]);
+		}
+		printf("\n");
+		ControlMessage(cmdLength, TempData);
 }
-/*
- * TODO: functions process message receive of node and send mqtt
- */
-//void RspStatusOnOff()
-//{
-//
-//}
+void StoreSceneSensor(uint16_t cmd, uint16_t adrSensor, uint8_t header, uint8_t stt, uint16_t condition, uint16_t low_lux,\
+		uint16_t hight_lux, uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID, uint16_t cmdLength)
+{
+	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0] = cmd & 0xFF;
+	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[1] = (cmd>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode00[0] = 0;
+	vrts_CMD_STRUCTURE.opCode00[1] = 0;
+	vrts_CMD_STRUCTURE.opCode00[2] = 0;
+	vrts_CMD_STRUCTURE.opCode00[3] = 0;
+	vrts_CMD_STRUCTURE.retry_cnt = parRetry_cnt;
+	vrts_CMD_STRUCTURE.rsp_max = 0;
+	SetScenceForSensor(adrSensor, header, stt, condition, low_lux, hight_lux, action, sceneID, appID, srgbID);
+
+	uint8_t *TempData;
+	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
+	int i;
+		printf("Content:");
+		for (i = 0; i <cmdLength; i++){
+			printf("%2x-",TempData[i]);
+		}
+		printf("\n");
+		ControlMessage(cmdLength, TempData);
+}
 
 
 

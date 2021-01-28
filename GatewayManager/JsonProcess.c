@@ -100,12 +100,17 @@ void JsonControl(char *key){
 		 flagDefineCmd = update_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
 	 }
-	 if((strcmp(key,"BUTTONID")==0)){
-		 uint8_t vrbuttonid= vrts_Json_String.buttonid;
-		 uint8_t vrmodeid  = vrts_Json_String.modeid;
-		 uint16_t vrsceneforremote= vrts_Json_String.sceneforremote;
-		 //puts("anh");
-		 ControlRemote(HCI_CMD_GATEWAY_CMD, vrts_Json_String.adr, vrbuttonid, vrmodeid, vrsceneforremote,16);
+	 if((strcmp(key,"HEADER")==0)){
+		 if(vrts_Json_String.header == 1)
+		 {
+			 StoreSceneRemote(HCI_CMD_GATEWAY_CMD, vrts_Json_String.adr, vrts_Json_String.header, vrts_Json_String.buttonid,\
+					 vrts_Json_String.modeid, vrts_Json_String.sceneforremote, vrts_Json_String.appID, vrts_Json_String.SrgbID,28);
+		 }
+		 if(vrts_Json_String.header == 2)
+		 {
+			 StoreSceneSensor(HCI_CMD_GATEWAY_CMD, vrts_Json_String.adr, vrts_Json_String.header, vrts_Json_String.stt, vrts_Json_String.condition,\
+					 vrts_Json_String.low_lux, vrts_Json_String.hight_lux, vrts_Json_String.action, vrts_Json_String.sceneforsensor, vrts_Json_String.appID, vrts_Json_String.SrgbID, 28);
+		 }
 	 }
 }
 void Json_Parse(json_object * jobj)
@@ -135,24 +140,30 @@ void Json_Parse(json_object * jobj)
 								 vrts_Json_String.start 		= (json_object_get_int(json_object_object_get(jobj,"START")));
 								 vrts_Json_String.stop 			= (json_object_get_int(json_object_object_get(jobj,"STOP")));
 								 vrts_Json_String.update 		= (json_object_get_int(json_object_object_get(jobj,"UPDATE")));
+								 vrts_Json_String.header        = (json_object_get_int(json_object_object_get(jobj,"HEADER")));
+								 vrts_Json_String.stt           = (json_object_get_int(json_object_object_get(jobj,"STT")));
+								 vrts_Json_String.action        = (json_object_get_int(json_object_object_get(jobj,"ACTION")));
+								 vrts_Json_String.condition     = (json_object_get_int(json_object_object_get(jobj,"CONDITION")));
+								 vrts_Json_String.low_lux       = (json_object_get_int(json_object_object_get(jobj,"LOW_LUX")));
+								 vrts_Json_String.hight_lux     = (json_object_get_int(json_object_object_get(jobj,"HIGHT_LUX")));
 								 vrts_Json_String.buttonid      = (json_object_get_int(json_object_object_get(jobj,"BUTTONID")));
 								 vrts_Json_String.modeid        = (json_object_get_int(json_object_object_get(jobj,"MODEID")));
 								 vrts_Json_String.sceneforremote= (json_object_get_int(json_object_object_get(jobj,"SCENEFORREMOTE")));
+								 vrts_Json_String.sceneforsensor= (json_object_get_int(json_object_object_get(jobj,"SCENEFORSENSOR")));
+								 vrts_Json_String.appID         = (json_object_get_int(json_object_object_get(jobj,"APPID")));
+								 vrts_Json_String.SrgbID        = (json_object_get_int(json_object_object_get(jobj,"SRGB")));
+
 								 break;
 			 }
 			 JsonControl(key);
 		 }
-		 //printf("Data:%d %d %d %d\n",vrts_Json_String.adr,vrts_Json_String.cct,vrts_Json_String.dim,vrts_Json_String.start);
-		 puts("done");
+		 //puts("done");
 }
 void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,uint16_t par1, uint16_t par2)
 {
 	struct json_object * object;
-	//char valueJsonSend[2];
-	//sprintf(valueJsonSend,"%d",par1);
 	object = json_object_new_object();
 	json_object_object_add(object, objectJsonAdr, json_object_new_int(par1));
-	//sprintf(valueJsonSend,"%d",par2);
 	json_object_object_add(object, objectJsonValue, json_object_new_int(par2));
 	char *rsp;
 	rsp = json_object_to_json_string(object);
@@ -162,14 +173,9 @@ void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJs
 {
 	struct json_object * object;
 	object = json_object_new_object();
-	//char valueJsonSend[4];
-	//sprintf(valueJsonSend,"%d",parAdr);
 	json_object_object_add(object, objectJsonAdr, json_object_new_int(parAdr));
-	//sprintf(valueJsonSend,"%d",parMain);
 	json_object_object_add(object, objectJsonMain, json_object_new_int(parMain));
-	//sprintf(valueJsonSend,"%d",parSub);
 	json_object_object_add(object, objectJsonSub, json_object_new_int(parSub));
-	//sprintf(valueJsonSend,"%d",parPower);
 	json_object_object_add(object, objectJsonPower, json_object_new_int(parPower));
 	char *rsp;
 	rsp = json_object_to_json_string(object);

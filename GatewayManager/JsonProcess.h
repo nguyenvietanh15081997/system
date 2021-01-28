@@ -33,9 +33,18 @@ typedef struct jsonstring
 	uint8_t start;
 	uint8_t stop;
 	uint8_t update;
+	uint16_t header;
+	uint8_t stt;
+	uint16_t condition;
 	uint8_t buttonid;
 	uint8_t modeid;
+	uint16_t low_lux;
+	uint16_t hight_lux;
+	uint16_t action;
+	uint16_t appID;
 	uint16_t sceneforremote;
+	uint16_t sceneforsensor;
+	uint8_t SrgbID;
 } jsonstring;
 extern jsonstring vrts_Json_String;
 extern char flagSecond;
