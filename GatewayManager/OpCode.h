@@ -302,7 +302,12 @@ typedef enum{
 	RD_TYPE_POWER_5W   			= 2,
 	RD_TYPE_POWER_7W   			= 3,
 	RD_TYPE_POWER_9W   			= 4,
-	RD_TYPE_POWER_15W   		= 5
+	RD_TYPE_POWER_15W   		= 5,
+	RD_TYPE_POWER_20W			= 6,
+	RD_TYPE_POWER_25W			= 7,
+	RD_TYPE_POWER_30W			= 8,
+	RD_TYPE_POWER_35W			= 9,
+	RD_TYPE_POWER_40W			= 10
 } RD_TYPE_POWER;
 
 

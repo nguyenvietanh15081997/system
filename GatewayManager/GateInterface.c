@@ -12,7 +12,7 @@
 #include "../GatewayManager/Light.h"
 #include "../GatewayManager/Battery.h"
 #include "../GatewayManager/MQTT.h"
-//#include "../GatewayManager/JsonProcess.h"
+#include "../GatewayManager/JsonProcess.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -272,15 +272,21 @@ void GWIF_ProcessData (void)
 				   (vrts_GWIF_IncomeMessage->Message[7] == (REMOTE_MODULE_DC_TYPE>>8) & 0xFF)){
 					puts(">>Remote DC");
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
-					uint16_t pscene = (vrts_Remote_Rsp->senceID[0] <<8) |(vrts_Remote_Rsp->senceID[1]);
-					if(pscene!=0)
+					uint16_t pscenedc = (vrts_Remote_Rsp->senceID[0] <<8) |(vrts_Remote_Rsp->senceID[1]);
+					if(pscenedc!=0)
 					{
-						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscene, NULL16,NULL16, NULL16, NULL16, 17);
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
 					}
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (REMOTE_MODULE_AC_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((REMOTE_MODULE_AC_TYPE>>8) & 0xFF))){
 					puts(">>Remote AC");
+					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
+					uint16_t psceneac = (vrts_Remote_Rsp->senceID[0] <<8) |(vrts_Remote_Rsp->senceID[1]);
+					if(psceneac!=0)
+					{
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,psceneac, NULL16,NULL16, NULL16, NULL16, 17);
+					}
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (POWER_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((POWER_TYPE>>8) & 0xFF))){
@@ -292,12 +298,15 @@ void GWIF_ProcessData (void)
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((LIGHT_SENSOR_MODULE_TYPE>>8) & 0xFF))){
 					puts(">>Light Sensor");
 					vrts_LighSensor_Rsp = (lightsensorRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
+					uint16_t adrSensorLight= vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 					ProcessLightSensor(vrts_LighSensor_Rsp);
+					CreatJson(TP_STATUS, "ADR", "LUX", adrSensorLight, value_Lux);
 				}
-				else if ((vrts_GWIF_IncomeMessage->Message[6] = (PIR_SENSOR_MODULE_TYPE & 0xFF)) && \
-				   (vrts_GWIF_IncomeMessage->Message[7] = ((PIR_SENSOR_MODULE_TYPE>>8) & 0xFF))){
+				else if ((vrts_GWIF_IncomeMessage->Message[6] == (PIR_SENSOR_MODULE_TYPE & 0xFF)) && \
+				   (vrts_GWIF_IncomeMessage->Message[7] == ((PIR_SENSOR_MODULE_TYPE>>8) & 0xFF))){
 					puts(">>PIR MOTION");
-
+					uint16_t adrSensorPIR= vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+					CreatJson(TP_STATUS, "ADR", "PIR", adrSensorPIR, 1);
 				}
 			}
             /*..........................*/
@@ -364,10 +373,15 @@ void GWIF_ProcessData (void)
 					CreatJson(TP_STATUS, "ADR", "ADDSCENE", jsonadr, jsonvalue);
 					break;
 				case SCENE_STATUS:
-					if(vrts_GWIF_IncomeMessage->Message[6]==0){
-						jsonvalue = vrts_GWIF_IncomeMessage->Message[7] | vrts_GWIF_IncomeMessage->Message[8]<<8;
-						CreatJson(TP_STATUS, "ADR", "CALLSENCE", jsonadr, jsonvalue);
+					if(vrui_GWIF_LengthMeassge == 13)
+					{
+						jsonvalue = vrts_GWIF_IncomeMessage->Message[9] | vrts_GWIF_IncomeMessage->Message[10]<<8;
 					}
+					else
+					{
+						jsonvalue = vrts_GWIF_IncomeMessage->Message[7] | vrts_GWIF_IncomeMessage->Message[8]<<8;
+					}
+					CreatJson(TP_STATUS, "ADR", "CALLSENCE", jsonadr, jsonvalue);
 					break;
 				case NODE_RESET_STATUS:
 					jsonvalue = 1;
