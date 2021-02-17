@@ -117,7 +117,8 @@ void FunctionPer(uint16_t cmd,\
 void StoreSceneRemote(uint16_t cmd, uint16_t adrRemote, uint8_t header, uint8_t buttonID, uint8_t modeID, uint16_t sceneID,uint16_t appID, uint8_t SrgbID,uint8_t cmdLength);
 void StoreSceneSensor(uint16_t cmd, uint16_t adrSensor, uint8_t header, uint8_t stt, uint16_t condition, uint16_t low_lux,\
 		uint16_t hight_lux, uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID, uint16_t cmdLength);
-
+void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8_t countLog, uint8_t periodLog, uint8_t tll, uint16_t feature, uint16_t cmdLength);
+void SetSceneForRGB(uint16_t cmd, uint16_t pAdrRgb, uint16_t pHearder, uint16_t pAppID, uint8_t pSrgbID,uint16_t cmdLength);
 
 #ifdef __cplusplus
 }

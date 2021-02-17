@@ -2,7 +2,10 @@
 #include "../GatewayManager/GateInterface.h"
 #include "../GatewayManager/Provision.h"
 #include "../GatewayManager/SensorLight.h"
+#include "../GatewayManager/slog.h"
 
+
+char *pHeaderCmd= "cmd";
 cmdcontrol_t vrts_CMD_STRUCTURE;
 uint8_t parRetry_cnt = 0x02;
 uint8_t parRsp_Max = 0x01;
@@ -215,16 +218,20 @@ void FunctionPer(uint16_t cmd,\
 	else if(Func == CallSence_typedef){
 		CallSence(parSenceId);
 	}
-	uint8_t *TempData;
+	uint8_t *tempDataUart;
+	uint8_t tempDataLog[200];
+	uint8_t temp[4];
 
-	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
+	tempDataUart = (uint8_t *)&vrts_CMD_STRUCTURE;
+	ControlMessage(cmdLenght, tempDataUart);
 	int i;
-	    printf("Content:");
-	    for (i = 0; i <cmdLenght; i++){
-	    	printf("%2x-",TempData[i]);
-	    }
-	    printf("\n");
-	    ControlMessage(cmdLenght, TempData);
+	//strcpy(TempData2,h);
+	for(i=0;i< cmdLenght;i++){
+		sprintf(temp,"%x ",tempDataUart[i]);
+		strcat(tempDataLog,temp);
+	}
+	slog_print(SLOG_INFO, 1, "(cmd)%s",tempDataLog);
+	tempDataLog[200]="";
 }
 
 
@@ -241,14 +248,19 @@ void StoreSceneRemote(uint16_t cmd, uint16_t adrRemote, uint8_t header, uint8_t 
 	SetSceneForRemote(adrRemote, header, buttonID, modeID, sceneID, appID, SrgbID);
 
 	uint8_t *TempData;
+	uint8_t TempData2[200];
+	uint8_t h[4];
+
 	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
+	ControlMessage(cmdLength, TempData);
 	int i;
-		printf("Content:");
-		for (i = 0; i <cmdLength; i++){
-			printf("%2x-",TempData[i]);
-		}
-		printf("\n");
-		ControlMessage(cmdLength, TempData);
+	//strcpy(TempData2,h);
+	for(i=0;i< cmdLength;i++){
+		sprintf(h,"%x ",TempData[i]);
+		strcat(TempData2,h);
+	}
+	slog_print(SLOG_NOTAG, 1, "(cmd)%s",TempData2);
+	TempData2[200]="";
 }
 void StoreSceneSensor(uint16_t cmd, uint16_t adrSensor, uint8_t header, uint8_t stt, uint16_t condition, uint16_t low_lux,\
 		uint16_t hight_lux, uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID, uint16_t cmdLength)
@@ -264,16 +276,92 @@ void StoreSceneSensor(uint16_t cmd, uint16_t adrSensor, uint8_t header, uint8_t 
 	SetScenceForSensor(adrSensor, header, stt, condition, low_lux, hight_lux, action, sceneID, appID, srgbID);
 
 	uint8_t *TempData;
+	uint8_t TempData2[200];
+	uint8_t h[4];
+
 	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
+	ControlMessage(cmdLength, TempData);
 	int i;
-		printf("Content:");
-		for (i = 0; i <cmdLength; i++){
-			printf("%2x-",TempData[i]);
-		}
-		printf("\n");
-		ControlMessage(cmdLength, TempData);
+	//strcpy(TempData2,h);
+	for(i=0;i< cmdLength;i++){
+		sprintf(h,"%x ",TempData[i]);
+		strcat(TempData2,h);
+	}
+	slog_print(SLOG_NOTAG, 1, "(cmd)%s",TempData2);
+	TempData2[200]="";
 }
+void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8_t countLog, uint8_t periodLog, uint8_t tll, uint16_t feature, uint16_t cmdLength)
+{
+	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0]= cmd & 0xFF;
+	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[1]= (cmd>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode00[0] = 0;
+	vrts_CMD_STRUCTURE.opCode00[1] = 0;
+	vrts_CMD_STRUCTURE.opCode00[2] = 0;
+	vrts_CMD_STRUCTURE.opCode00[3] = 0;
+	vrts_CMD_STRUCTURE.retry_cnt = parRetry_cnt;
+	vrts_CMD_STRUCTURE.rsp_max = 0;
+	vrts_CMD_STRUCTURE.adr_dst[0] = drsHeartbeat & 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[1] = (drsHeartbeat>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[0] = HEARTBEAT_PUB_SET & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[1] = (HEARTBEAT_PUB_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[0] = srcHeartbeat & 0XFF;
+	vrts_CMD_STRUCTURE.para[1] = (srcHeartbeat>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[2] = countLog;
+	vrts_CMD_STRUCTURE.para[3] = periodLog;
+	vrts_CMD_STRUCTURE.para[4] = tll;
+	vrts_CMD_STRUCTURE.para[5] = feature & 0xFF;
+	vrts_CMD_STRUCTURE.para[6] = (feature>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[7]= vrts_CMD_STRUCTURE.para[8]= 0;
+	uint8_t *TempData;
+	uint8_t TempData2[200];
+	uint8_t h[4];
 
+	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
+	ControlMessage(cmdLength, TempData);
+	int i;
+	//strcpy(TempData2,h);
+	for(i=0;i< cmdLength;i++){
+		sprintf(h,"%x ",TempData[i]);
+		strcat(TempData2,h);
+	}
+	slog_print(SLOG_NOTAG, 1, "(cmd)%s",TempData2);
+	TempData2[200]="";
+}
+void SetSceneForRGB(uint16_t cmd, uint16_t pAdrRgb, uint16_t pHearder, uint16_t pAppID, uint8_t pSrgbID,uint16_t cmdLength)
+{
+	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0]= cmd & 0xFF;
+	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[1]= (cmd>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode00[0] = 0;
+	vrts_CMD_STRUCTURE.opCode00[1] = 0;
+	vrts_CMD_STRUCTURE.opCode00[2] = 0;
+	vrts_CMD_STRUCTURE.opCode00[3] = 0;
+	vrts_CMD_STRUCTURE.retry_cnt = parRetry_cnt;
+	vrts_CMD_STRUCTURE.rsp_max = 0;
+	vrts_CMD_STRUCTURE.adr_dst[0] = pAdrRgb & 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[1] = (pAdrRgb>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[0] =  0xFF;
+	vrts_CMD_STRUCTURE.opCode[1] =  0xFF;
+	vrts_CMD_STRUCTURE.para[0] = pHearder & 0xFF;
+	vrts_CMD_STRUCTURE.para[1] = (pHearder>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[2] = pAppID & 0xFF;
+	vrts_CMD_STRUCTURE.para[3] = (pAppID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[4] = pSrgbID;
+	vrts_CMD_STRUCTURE.para[5] = vrts_CMD_STRUCTURE.para[6] = vrts_CMD_STRUCTURE.para[7] = 0;
 
+	uint8_t *TempData;
+	uint8_t TempData2[200];
+	uint8_t h[4];
+
+	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
+	ControlMessage(cmdLength, TempData);
+	int i;
+	//strcpy(TempData2,h);
+	for(i=0;i< cmdLength;i++){
+		sprintf(h,"%x ",TempData[i]);
+		strcat(TempData2,h);
+	}
+	slog_print(SLOG_NOTAG, 1, "(cmd)%s",TempData2);
+	TempData2[200]="";
+}
 
 

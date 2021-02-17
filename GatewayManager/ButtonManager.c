@@ -40,8 +40,8 @@ void SetSceneForRemote(uint16_t addressremote,uint16_t header, uint8_t buttonId,
 {
 	vrts_CMD_STRUCTURE.adr_dst[0]= addressremote & 0xFF;
 	vrts_CMD_STRUCTURE.adr_dst[1]= (addressremote>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.opCode[0]= OPCODEREMOTERSP & 0xFF;
-	vrts_CMD_STRUCTURE.opCode[1]= (OPCODEREMOTERSP>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[0]= OPCODEREMOTE_CMD & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[1]= (OPCODEREMOTE_CMD>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[0]= header & 0xFF;
 	vrts_CMD_STRUCTURE.para[1]= (header>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[2]= buttonId;

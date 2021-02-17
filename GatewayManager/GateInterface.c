@@ -13,6 +13,7 @@
 #include "../GatewayManager/Battery.h"
 #include "../GatewayManager/MQTT.h"
 #include "../GatewayManager/JsonProcess.h"
+#include "../GatewayManager/slog.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -170,6 +171,7 @@ void GWIF_ProcessData (void)
 {
 	unsigned int vrui_Count;
 	unsigned int i;
+	unsigned int adr_heartbeat;
 	if(vrb_GWIF_CheckNow)
 	{
 		vrb_GWIF_CheckNow = false;
@@ -177,14 +179,24 @@ void GWIF_ProcessData (void)
 /*
  * TODO: Display data rsp
  */
-		printf("A coming message:\n");
-		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
-		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
-		printf("\tMessage:");
+		uint8_t temDataLog[200];
+		uint8_t temp[4];
+		uint8_t *temDataUart;
+		temDataUart= (uint8_t *)&vrts_GWIF_IncomeMessage->Opcode;
+
+		sprintf(temp,"%x ",vrts_GWIF_IncomeMessage->Opcode);
+		strcpy(temDataLog,temp);
+//		printf("A coming message:\n");
+//		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
+//		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
+//		printf("\tMessage:");
 		for (vrui_Count = 0; vrui_Count < vrui_GWIF_LengthMeassge-1; vrui_Count++){
-			printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
+			//printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
+			sprintf(temp,"%x ",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
+			strcat(temDataLog,temp);
 		}
-		printf("\n");
+		//printf("\n");
+		slog_print(SLOG_INFO, 1, "(rsp)%s",temDataLog);
         /*............*/
 
 
@@ -198,7 +210,6 @@ void GWIF_ProcessData (void)
 				{
 					OUTMESSAGE_MACSelect[i+3]=vrts_GWIF_IncomeMessage->Message[i+1];
 				}
-
 				flag_selectmac=true;
 				flag_check_select_mac= false;
 			}
@@ -232,6 +243,7 @@ void GWIF_ProcessData (void)
 					}
 					OUTMESSAGE_Provision[26] = 0x02;
 					OUTMESSAGE_Provision[27] = 0x00;
+					adr_heartbeat=2;
 				}
 				else
 				{
@@ -239,7 +251,9 @@ void GWIF_ProcessData (void)
 					{
 						OUTMESSAGE_Provision[i+3]=vrts_GWIF_IncomeMessage->Message[i+2];
 					}
+					adr_heartbeat= OUTMESSAGE_Provision[26] | (OUTMESSAGE_Provision[27]<<8);
 				}
+				printf ("ADRASASASASASSASA= %d\n",adr_heartbeat);
 				flag_getpro_info = true;
 			}
 
@@ -261,9 +275,11 @@ void GWIF_ProcessData (void)
 			{
 				flag_done=true;
 				flag_mac=true;
+				//printf ("ADRASASASASASSASA= %d\n",adr_heartbeat);
+				//HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 6, 5, 7, 21);
 			}
             /*...........................................*/
-			if(vrts_GWIF_IncomeMessage->Message)
+			//if(vrts_GWIF_IncomeMessage->Message)
 /*
  * TODO: process for sensor(light, PIR, remote,...)
  */
@@ -324,12 +340,12 @@ void GWIF_ProcessData (void)
 				jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				switch (valueOpcode)
 				{
-				case OPCODE_TYPEDEV:
-					jsonmain = vrts_GWIF_IncomeMessage->Message[9];
-					jsonsub = vrts_GWIF_IncomeMessage->Message[10];
-					jsonpower = vrts_GWIF_IncomeMessage->Message[11];
-					CreatJson_TypeDev(TP_STATUS, "ADR", "MAINDEVICE", "SUBDEVICE", "POWER", jsonadr, jsonmain, jsonsub, jsonpower);
-					break;
+//				case OPCODE_TYPEDEV:
+//					jsonmain = vrts_GWIF_IncomeMessage->Message[9];
+//					jsonsub = vrts_GWIF_IncomeMessage->Message[10];
+//					jsonpower = vrts_GWIF_IncomeMessage->Message[11];
+//					CreatJson_TypeDev(TP_STATUS, "ADR", "MAINDEVICE", "SUBDEVICE", "POWER", jsonadr, jsonmain, jsonsub, jsonpower);
+//					break;
 				case G_ONOFF_STATUS:
 					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 					if(vrui_GWIF_LengthMeassge == 9){

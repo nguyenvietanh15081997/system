@@ -2,6 +2,7 @@
 #include "../GatewayManager/MQTT.h"
 #include "../GatewayManager/Light.h"
 #include "../GatewayManager/Provision.h"
+#include "../GatewayManager/slog.h"
 
 
 uint16_t valueObject[20];
@@ -115,7 +116,6 @@ void JsonControl(char *key){
 }
 void Json_Parse(json_object * jobj)
 {
-	puts("ok");
 	enum json_type type;
 		 json_object_object_foreach(jobj, key, val) {
 			 type= json_object_get_type(val);
@@ -157,7 +157,6 @@ void Json_Parse(json_object * jobj)
 			 }
 			 JsonControl(key);
 		 }
-		 //puts("done");
 }
 void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,uint16_t par1, uint16_t par2)
 {
@@ -168,6 +167,7 @@ void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,
 	char *rsp;
 	rsp = json_object_to_json_string(object);
 	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
+	slog_info("(mqtt)Message_send:%s",rsp);
 }
 void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJsonMain, uint8_t *objectJsonSub, uint8_t *objectJsonPower, uint8_t parAdr, uint8_t parMain, uint8_t parSub, uint8_t parPower)
 {

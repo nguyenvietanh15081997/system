@@ -142,23 +142,16 @@ void SetTimeForDs1307(uint8_t seconds, uint8_t minutes, uint8_t hours, uint8_t d
 void * Time_Thread(void *argv)
 {
 	Ds1307_Init();
-	bool flag_Updated;
-//	bool flag_Schedule;
 	while(1)
 	{
 		TimeForInternet();
-//		if(flag_second==1){
-//			if((dataTimeInternet[2]==vrts_Json_String.seconds) && flag_Schedule==false){
-//				FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,vrts_Json_String.adr,NULL8,0, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
-//			}
-//			else (data
-//		}
-		if((dataTimeInternet[2]==0) && (flag_Updated==false)){
-			FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
-			flag_Updated=true;
+		if((dataTimeInternet[0] == 15) && (dataTimeInternet[1] == 0) && (dataTimeInternet[2] == 5))
+		{
+			FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,65535 ,NULL8,0, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
 		}
-		if(dataTimeInternet[2]!=0){
-			flag_Updated= false;
+		if((dataTimeInternet[0] == 12) && (dataTimeInternet[1] == 0) && (dataTimeInternet[2] == 6))
+		{
+			FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,65535 ,NULL8,1, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
 		}
 	}
 	return NULL;
