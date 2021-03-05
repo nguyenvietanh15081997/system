@@ -7,7 +7,7 @@
 #include "../GatewayManager/Provision.h"
 #include "../GatewayManager/SensorLight.h"
 #include "../GatewayManager/slog.h"
-#include "../GatewayManager/GPIO.h"
+#include "../GatewayManager/LedProcess.h"
 
 
 char *pHeaderCmd= "cmd";
@@ -25,10 +25,10 @@ void ResetNode(uint16_t uniAdrReset)
 	vrts_CMD_STRUCTURE.opCode[0] = NODE_RESET & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[1]= (NODE_RESET >> 8) & 0xFF;
 }
-void Lightness_Get()
+void Lightness_Get(uint16_t adrLightnessGet)
 {
-	vrts_CMD_STRUCTURE.adr_dst[0] = 0xFF;
-	vrts_CMD_STRUCTURE.adr_dst[1] = 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[0] = adrLightnessGet & 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[1] = (adrLightnessGet>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[0] = LIGHTNESS_GET & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[1] = (LIGHTNESS_GET>>8) & 0xFF;
 }
@@ -40,6 +40,13 @@ void Lightness_Set(uint16_t uniAdrSetDim, uint16_t valueLightness)
 	vrts_CMD_STRUCTURE.opCode[1] = (LIGHTNESS_SET>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[0] = 0;
 	vrts_CMD_STRUCTURE.para[1] = valueLightness & 0xFF;
+}
+void CCT_Get(uint16_t adrCCTGet)
+{
+	vrts_CMD_STRUCTURE.adr_dst[0] = adrCCTGet & 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[1] = (adrCCTGet>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[0] = LIGHT_CTL_TEMP_GET & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[1] = (LIGHT_CTL_TEMP_GET>>8) & 0xFF;
 }
 void CCT_Set(uint16_t uniAdrSetCCT, uint16_t valueCCT)
 {
@@ -117,13 +124,20 @@ void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff)
 	vrts_CMD_STRUCTURE.opCode[1] = (LIGHTOPCODE_ONOFF >>8) & 0xFF;
 	if(statuOnOff == 1){
 		vrts_CMD_STRUCTURE.para[0] = statuOnOff;
-		gpio_value(15, 0);
+		flag_blink = false;
 	}
 	if(statuOnOff == 0){
 		vrts_CMD_STRUCTURE.para[0] = statuOnOff;
-		gpio_value(15, 1);
+		flag_blink = true;
 	}
 	vrts_CMD_STRUCTURE.para[1] = 0;
+}
+void HSL_Get(uint16_t adrHSLGet)
+{
+	vrts_CMD_STRUCTURE.adr_dst[0] = adrHSLGet & 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[1] = (adrHSLGet>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[0] = LIGHTOPCODE_SELECT & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[1] = (LIGHTOPCODE_SELECT>>8) & 0xFF;
 }
 void HSL_Set(uint16_t uniAdrHSL, uint16_t h, uint16_t s, uint16_t l)
 {
@@ -195,7 +209,7 @@ void FunctionPer(uint16_t cmd,\
 		ResetNode(unicastAdr);
 	}
 	else if(Func == Lightness_Get_typedef){
-		Lightness_Get();
+		Lightness_Get(unicastAdr);
 	}
 	else if(Func == AddGroup_typedef){
 		AddGroup(unicastAdr, adrGroup);
@@ -230,6 +244,12 @@ void FunctionPer(uint16_t cmd,\
 	}
 	else if(Func == HSL_Set_typedef){
 		HSL_Set(unicastAdr, parH, parS, parL);
+	}
+	else if(Func == CCT_Get_typedef){
+		CCT_Get(unicastAdr);
+	}
+	else if(Func == HSL_Get_typedef){
+		HSL_Get(unicastAdr);
 	}
 
 	uint8_t *tempDataUart;

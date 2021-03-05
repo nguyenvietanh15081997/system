@@ -7,6 +7,7 @@
 #include "../GatewayManager/Light.h"
 #include "../GatewayManager/Provision.h"
 #include "../GatewayManager/slog.h"
+#include "../GatewayManager/LedProcess.h"
 
 
 uint16_t valueObject[20];
@@ -92,6 +93,8 @@ void JsonControl(char *key){
 		 slog_print(SLOG_NOTAG, 1, "<provision>Provision stop");
 		MODE_PROVISION=false;
 		pthread_cancel(tmp);
+		flag_blink=false;
+		pthread_cancel(tmp1);
 		ControlMessage(3, OUTMESSAGE_ScanStop);
 		flag_selectmac     = false;
 		flag_getpro_info   = false;

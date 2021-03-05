@@ -3,9 +3,10 @@
  */
 
 #include "../GatewayManager/Provision.h"
-#include "mraa/gpio.h"
+#include "../GatewayManager/LedProcess.h"
 
 pthread_t tmp;
+pthread_t vrts_System_Gpio;
 
 unsigned int Timeout_CheckDataBuffer = 0;
 unsigned char scanNotFoundDev =0 ;
@@ -55,6 +56,8 @@ void *ProvisionThread (void *argv )
 				puts("Provision stop");
 				MODE_PROVISION=false;
 				pthread_cancel(tmp);
+				flag_blink=false;
+				pthread_cancel(tmp1);
 				ControlMessage(3, OUTMESSAGE_ScanStop);
 				flag_selectmac     = false;
 				flag_getpro_info   = false;
@@ -74,6 +77,8 @@ void *ProvisionThread (void *argv )
 				sleep(1);
 				ControlMessage(3, OUTMESSAGE_ScanStart);
 				printf ("SCAN\n");
+				flag_blink = true;
+			    pthread_create(&vrts_System_Gpio,NULL,Led_Thread,NULL);
 				mraa_gpio_write(mraa_gpio_init(15), 0);
 				flag_check_select_mac= true;
 			}
@@ -135,6 +140,8 @@ void *ProvisionThread (void *argv )
 			sleep(1);
 			ControlMessage(22, OUTMESSAGE_BindingALl);
 			printf ("BINDING ALL\n");
+			flag_blink=false;
+			pthread_cancel(tmp1);
 			mraa_gpio_write(mraa_gpio_init(15), 1);
 		}
 	}

@@ -14,7 +14,7 @@
 #include "GatewayManager/SensorLight.h"
 #include "GatewayManager/Ds1307.h"
 #include "GatewayManager/slog.h"
-#include "GatewayManager/GPIO.h"
+#include "GatewayManager/LedProcess.h"
 
 pthread_t vrts_System_ThreadGWIF;
 pthread_t vrts_System_TestSend;
@@ -48,7 +48,7 @@ int main(void) {
     pthread_create(&vrts_System_ThreadGWIF, NULL, GWINF_Thread, NULL);
     pthread_create(&vrts_System_MQTT,   NULL,   MQTT_Thread,    NULL);
     pthread_create(&vrts_System_Time,NULL,Time_Thread, NULL);
-    //pthread_create(&vrts_System_Gpio,NULL,GPIO_Thread,NULL);
+    pthread_create(&vrts_System_Gpio,NULL,Led_Thread,NULL);
 
 	pthread_join(vrts_System_ThreadGWIF, NULL);
 	pthread_join(vrts_System_TestSend, NULL);
@@ -58,6 +58,7 @@ int main(void) {
 
 
 	while(1){
+		 //FunctionPer(HCI_CMD_GATEWAY_CMD, Lightness_Get_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
 	}
 	return EXIT_SUCCESS;
 }

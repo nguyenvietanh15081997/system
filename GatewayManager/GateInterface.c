@@ -11,7 +11,7 @@
 #include "../GatewayManager/MQTT.h"
 #include "../GatewayManager/JsonProcess.h"
 #include "../GatewayManager/slog.h"
-#include "../GatewayManager/GPIO.h"
+#include "../GatewayManager/LedProcess.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -164,7 +164,6 @@ void GWIF_ProcessData (void)
 	unsigned int vrui_Count;
 	unsigned int i;
 	unsigned int adr_heartbeat;
-	gpio_int(15, GPIO_DIR_OUT, 1);
 	if(vrb_GWIF_CheckNow)
 	{
 		vrb_GWIF_CheckNow = false;
@@ -255,6 +254,7 @@ void GWIF_ProcessData (void)
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_KEY_BIND_EVT && vrts_GWIF_IncomeMessage->Message[1] == HCI_GATEWAY_CMD_BIND_SUSCESS)
 			{
 				slog_info("<provision> success");
+				//flag_blink = false;
 			}
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_KEY_BIND_RSP)
 			{
@@ -277,6 +277,9 @@ void GWIF_ProcessData (void)
 					if(pscenedc!=0)
 					{
 						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
+						/*
+						 * add to call scene RGB
+						 */
 					}
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (REMOTE_MODULE_AC_TYPE & 0xFF)) && \
@@ -287,6 +290,9 @@ void GWIF_ProcessData (void)
 					if(psceneac!=0)
 					{
 						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,psceneac, NULL16,NULL16, NULL16, NULL16, 17);
+						/*
+						 * add to call scene RGB
+						 */
 					}
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (POWER_TYPE & 0xFF)) && \

@@ -102,31 +102,33 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 
 /* enums to is parameter for void FunctionPer()  */
 typedef enum{
-	null = 0x00,
-	ResetNode_typedef = 0x01,
-	Lightness_Get_typedef = 0x02,
-	AddGroup_typedef = 0x03,
-	DelGroup_typedef = 0x04,
-	ControlOnOff_typedef = 0x05,
-	SetTimePoll_typedef = 0x06,
-	UpdateLight_typedef = 0x07,
-	CCT_Set_typedef = 0x08,
-	Lightness_Set_typedef = 0x09a,
-	AddSence_typedef = 0x0a,
-	DelSence_typedef = 0x0b,
-	CallSence_typedef = 0x0c,
-	HSL_Set_typedef = 0x0d,
+	null 						= 0x00,
+	ResetNode_typedef 			= 0x01,
+	Lightness_Get_typedef 		= 0x02,
+	AddGroup_typedef 			= 0x03,
+	DelGroup_typedef 			= 0x04,
+	ControlOnOff_typedef 		= 0x05,
+	SetTimePoll_typedef 		= 0x06,
+	UpdateLight_typedef 		= 0x07,
+	CCT_Get_typedef 			= 0x08,
+	CCT_Set_typedef 			= 0x09,
+	Lightness_Set_typedef 		= 0x0a,
+	AddSence_typedef 			= 0x0b,
+	DelSence_typedef 			= 0x0c,
+	CallSence_typedef 			= 0x0d,
+	HSL_Get_typedef 			= 0x0e,
+	HSL_Set_typedef 			= 0x0f,
 
-	SceneForRemote_vendor_typedef = 0x0e,
-	SceneForSensor_vendor_typedef = 0x0f,
-	SceneForRGB_vendor_typedef = 0x10,
-	CallSceneRgb_vendor_typedef = 0x11,
-	CallModeRgb_vendor_typedef = 0x12,
-	DelSceneRgb_vendor_typedef = 0x13,
+	SceneForRemote_vendor_typedef = 0x10,
+	SceneForSensor_vendor_typedef = 0x11,
+	SceneForRGB_vendor_typedef 	  = 0x12,
+	CallSceneRgb_vendor_typedef   = 0x13,
+	CallModeRgb_vendor_typedef    = 0x14,
+	DelSceneRgb_vendor_typedef    = 0x15,
 
-	SaveGateway_vendor_typedef  = 0x14,
-	AskTypeDevice_vendor_typedef = 0x15,
-	SetTypeDevice_vendor_typedef = 0x16
+	SaveGateway_vendor_typedef    = 0x16,
+	AskTypeDevice_vendor_typedef  = 0x17,
+	SetTypeDevice_vendor_typedef  = 0x18
 } functionTypeDef;
 
 /*
@@ -142,17 +144,33 @@ typedef enum{
  * - SetTimePoll(): set timepoll for sensor
  */
 void ResetNode(uint16_t uniAdrReset);
-void Lightness_Get();
+
+void Lightness_Get(uint16_t adrLightnessGet);
+
 void Lightness_Set(uint16_t uniAdrSetDim, uint16_t valueLightness);
+
+void CCT_Get(uint16_t adrCCTGet);
+
 void CCT_Set(uint16_t uniAdrSetCCT, uint16_t valueCCT);
+
 void AddGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
+
 void DelGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
+
 void AddSence(uint16_t uniAdrSence, uint16_t senceID);
+
 void CallSence(uint16_t senceId);
+
 void DelSence(uint16_t uniAdrDelSence, uint16_t senceId);
+
 void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff);
+
+void HSL_Get(uint16_t adrHSLGet);
+
 void HSL_Set(uint16_t uniAdrHSL, uint16_t h, uint16_t s, uint16_t l);
+
 void UpdateLight();
+
 void SetTimePoll(uint16_t uniAdrSensor, uint16_t timePoll);
 
 /*
