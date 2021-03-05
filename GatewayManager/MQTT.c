@@ -1,10 +1,6 @@
 /*
  * MQTT.c
- *
- *  Created on: Nov 6, 2020
- *      Author: rd
  */
-
 
 #include "../GatewayManager/MQTT.h"
 #include "../GatewayManager/OpCode.h"
@@ -21,13 +17,17 @@ void handle_signal(int s)
 {
 	run = 0;
 }
-
+int mqtt_send(struct mosquitto *mosq, char * topic,char *msg)
+{
+	mosquitto_publish(mosq, NULL,topic, strlen(msg), msg, 0, 0);
+	slog_info("(%s)Message_send: %s",pHeaderMqtt,msg);
+	return 0;
+}
 void connect_callback(struct mosquitto *mosq, void *obj, int result)
 {
-	//printf("connect callback, rc=%d\n", result);
 	slog_info("(%s)%s: Connect callback, rc=%d",pHeaderMqtt,mqtt_host,result);
+	mqtt_send(mosq,"RD_STATUS","CONNECTED");
 }
-
 void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
 {
 	char* msg = (char*)message->payload;
@@ -39,16 +39,9 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 	}
 }
 
-int mqtt_send(struct mosquitto *mosq, char * topic,char *msg)
-{
-	mosquitto_publish(mosq, NULL,topic, strlen(msg), msg, 0, 0);
-	slog_info("(%s)Message_send: %s",pHeaderMqtt,msg);
-	return 0;
-}
 void * MQTT_Thread(void *argv)
 {
 		char clientid[24];
-		//struct mosquitto *mosq;
 		int rc = 0;
 		int abc = 0;
 
@@ -68,14 +61,11 @@ void * MQTT_Thread(void *argv)
 			rc = mosquitto_connect(mosq, mqtt_host, mqtt_port, 60);
 
 			mosquitto_subscribe(mosq,NULL, "RD_CONTROL",0);
-//			int snd = mqtt_send(mosq,"RANG DONG", "{\"MSG\":\"\"RANG DONG ANH HUNG VA CO BAC HO\"}");
-//			if(snd != 0) slog_info("(mqtt)mqtt_send error!");
-//			sleep(5);
 			while(run){
 				rc= abc = mosquitto_loop(mosq, -1, 1);
 				if(run && rc){
 					slog_warn("Connection mqtt error");
-					sleep(10);
+					sleep(4);
 					mosquitto_reconnect(mosq);
 				}
 			}

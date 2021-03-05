@@ -1,3 +1,6 @@
+/*
+ * OpCode.h contain operation code of system
+ */
 #ifndef GATEWAYMANAGER_OPCODE_H_
 #define GATEWAYMANAGER_OPCODE_H_
 
@@ -7,10 +10,7 @@ extern "C" {
 
 #include "../GatewayManager/ShareMessage.h"
 
-//mode
-
-
-// rsp cmd part 
+/*rsp cmd part*/
 #define HCI_GATEWAY_RSP_UNICAST	   		0x80
 #define HCI_GATEWAY_RSP_OP_CODE	 	 	0X81
 #define HCI_GATEWAY_KEY_BIND_RSP 		0x82
@@ -22,8 +22,7 @@ extern "C" {
 #define HCI_GATEWAY_CMD_SEND_ELE_CNT 	0x8c
 #define HCI_GATEWAY_CMD_SEND_NODE_INFO 	0x8d
 
-
-// send cmd part 
+/*send cmd part*/
 #define HCI_GATEWAY_CMD_START				0x00
 #define HCI_GATEWAY_CMD_STOP				0x01
 #define HCI_GATEWAY_CMD_RESET       		0x02
@@ -40,21 +39,20 @@ extern "C" {
 #define HCI_GATEWAY_CMD_DEL_VC_NODE_INFO    0x11
 #define HCI_GATEWAY_CMD_SEND_VC_NODE_INFO	0x12
 
-//TSCRIPT
+/*TSCRIPT*/
 #define TSCRIPT_MESH_RX 			0x80
 #define TSCRIPT_MESH_RX_NW 			0x90
 #define TSCRIPT_GATEWAY_DIR_RSP 	0x91
 #define HCI_GATEWAY_CMD_SAR_MSG		0x92
 #define TSCRIPT_CMD_VC_DEBUG 		0xfa
 
-
-//flag provision
+/*flag provision*/
 #define HCI_GATEWAY_CMD_PROVISION_SUSCESS 0x01
 #define HCI_GATEWAY_CMD_BIND_SUSCESS      0x01
 #define HCI_GATEWAY_CMD_BIND_DONE         0x00
 #define HCI_GATEWAY_CMD_SETPRO_SUSCESS    0x9a
 
-// user
+/*user*/
 #define HCI_CMD_USER_START			0xFF00
 #define HCI_CMD_USER				HCI_CMD_USER_START
 #define	HCI_CMD_USER_END			0xFF7F
@@ -68,8 +66,6 @@ extern "C" {
 #define	HCI_CMD_ADV_DEBUG_MESH_LED	0xFFA7		// control LED
 #define	HCI_CMD_BULK_SET_PAR2USB	0xFFA8
 #define	HCI_CMD_SET_VC_PAR			0xFFAA
-		
-//
 #define	HCI_CMD_KMA_DONGLE_SET_MAC  			0xFFE0
 #define	HCI_CMD_KMA_DONGLE_SPP_TEST_DATA		0xFFE1
 #define	HCI_CMD_KMA_DONGLE_SPP_TEST_STATUS  	0xFFE2
@@ -81,9 +77,7 @@ extern "C" {
 #define	HCI_CMD_MESH_OTA			0xFFEB
 #define	HCI_CMD_PROVISION			0xFEA0
 
-/*
- * TODO: opcode to function of lights
- */
+/*opcode to function of lights*/
 #define SIG_MD_LIGHTNESS_S              0x1300
 #define SIG_MD_LIGHTNESS_SETUP_S        0x1301
 #define SIG_MD_LIGHTNESS_C              0x1302
@@ -102,26 +96,23 @@ extern "C" {
 #define SIG_MD_LIGHT_LC_S              	0x130F
 #define SIG_MD_LIGHT_LC_SETUP_S        	0x1310
 
-/*
- * TODO: opcode of sensor
- */
+/*opcode of sensor*/
 #define SENSOR_TYPE						0x52
-/*
- * TODO: define type device
- */
+
+/*define type device*/
 #define POWER_TYPE  					0x0001
 #define REMOTE_MODULE_DC_TYPE			0x0002
 #define REMOTE_MODULE_AC_TYPE			0x0003
 #define LIGHT_SENSOR_MODULE_TYPE		0x0004
 #define PIR_SENSOR_MODULE_TYPE 			0x0005
 
-//
+/* appkey*/
 #define APPKEY_DEL		                0x0080
 #define APPKEY_GET		                0x0180
 #define APPKEY_LIST		                0x0280
 #define APPKEY_STATUS		            0x0380
 
-// attenttion timer
+/*attention timer*/
 #define HEALTH_ATTENTION_GET			0x0480
 #define HEALTH_ATTENTION_SET			0x0580
 #define HEALTH_ATTENTION_SET_NOACK		0x0680
@@ -203,7 +194,7 @@ extern "C" {
 #define VENDOR_MODEL_APP_GET		    0x4D80
 #define VENDOR_MODEL_APP_LIST		    0x4E80
 
-// generic
+/*generic*/
 #define G_ONOFF_GET		                0x0182
 #define G_ONOFF_SET		                0x0282
 #define G_ONOFF_SET_NOACK		        0x0382
@@ -255,7 +246,7 @@ extern "C" {
 #define G_LOCATION_LOCAL_SET			0x2882
 #define G_LOCATION_LOCAL_SET_NOACK		0x2982
 
-// opcode of scene
+/* opcode of scene*/
 #define SCENE_GET		        		0x4182
 #define SCENE_RECALL		        	0x4282
 #define SCENE_RECALL_NOACK		        0x4382
@@ -266,11 +257,22 @@ extern "C" {
 #define SCENE_STORE_NOACK		    	0x4782
 #define SCENE_DEL		        		0x9E82
 #define SCENE_DEL_NOACK		    		0x9F82
-//
 
-/*
- * TODO: for type dev
- */
+/*Opcode vendor*/
+#define RD_OPCODE_TYPE_SEND             (0xE0)
+#define RD_OPCODE_TYPE_RSP              (0xE1)
+
+#define RD_OPCODE_SCENE_SEND            (0xE2)
+#define RD_OPCODE_SCENE_RSP             (0xE3)
+
+#define VENDOR_ID                       0x0211
+#define STATUS_CMD                      0x0000
+
+
+/* opcode for light rgb*/
+#define LIGHT_HSL_SET		        	0x7682
+
+/*for type dev*/
 #define OPCODE_TYPEDEV              	0xA182
 typedef enum{
 	RD_MAINTYPE_LAMP   = 0,
@@ -295,7 +297,6 @@ typedef enum{
 	RD_TYPE_SENSOR_LIGHT 		= 1
 } RD_TYPE_SENSOR;
 
-
 typedef enum{
 	RD_TYPE_POWER_NONE   		= 0,
 	RD_TYPE_POWER_3W   			= 1,
@@ -310,19 +311,7 @@ typedef enum{
 	RD_TYPE_POWER_40W			= 10
 } RD_TYPE_POWER;
 
-
-
-
-
-
-extern bool MODE_PROVISION;
-extern bool MODE_MQTT;
-extern bool MODE_BUTTON;
-extern bool MODE_CONTROL;
-
-
-
-//message control
+/*message control provision*/
 extern uint8_t OUTMESSAGE_ScanStop[3];
 extern uint8_t OUTMESSAGE_ScanStart[3];
 extern uint8_t OUTMESSAGE_MACSelect[9];
@@ -331,7 +320,7 @@ extern uint8_t OUTMESSAGE_Provision[28];
 extern uint8_t OUTMESSAGE_BindingALl[22];
 
 extern bool check_add_or_del_group;
-
+extern bool MODE_PROVISION;
 
 #ifdef __cplusplus
 }

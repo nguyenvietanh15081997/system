@@ -1,8 +1,5 @@
 /*
- * GateInterface.c
- *
- *  Created on: Oct 21, 2020
- *      Author: haha
+ * GatewayInterface.c
  */
 
 #include "../GatewayManager/GateInterface.h"
@@ -14,6 +11,7 @@
 #include "../GatewayManager/MQTT.h"
 #include "../GatewayManager/JsonProcess.h"
 #include "../GatewayManager/slog.h"
+#include "../GatewayManager/GPIO.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -25,11 +23,6 @@ static uint16_t				vrui_GWIF_LengthMeassge;
 static bool					vrb_GWIF_UpdateLate = false;
 static bool					vrb_GWIF_CheckNow = false;
 static bool					vrb_GWIF_RestartMessage = true;
-
-
-
-//unsigned int Timeout_CheckDataBuffer=0;
-
 
 /*
  * Khoi tao chuong trinh giao tiep vooi Gateway bao gom:
@@ -45,7 +38,6 @@ void GWIF_Init (void){
 	// Dua con tro du lieu ve mang du lieu nhan ve
 	vrts_GWIF_IncomeMessage = (TS_GWIF_IncomingData *)vrsc_GWIF_TempBuffer;
 }
-
 
 /*
  * Ham xu ly truyen ban tin tu cac tien trinh khac den Gateway
@@ -172,32 +164,26 @@ void GWIF_ProcessData (void)
 	unsigned int vrui_Count;
 	unsigned int i;
 	unsigned int adr_heartbeat;
+	gpio_int(15, GPIO_DIR_OUT, 1);
 	if(vrb_GWIF_CheckNow)
 	{
 		vrb_GWIF_CheckNow = false;
 
 /*
- * TODO: Display data rsp
+ * TODO: show data rsp
  */
 		uint8_t temDataLog[200];
 		uint8_t temp[4];
 		uint8_t *temDataUart;
 		temDataUart= (uint8_t *)&vrts_GWIF_IncomeMessage->Opcode;
-
 		sprintf(temp,"%x ",vrts_GWIF_IncomeMessage->Opcode);
 		strcpy(temDataLog,temp);
-//		printf("A coming message:\n");
-//		printf("\tLength:%d\n",vrui_GWIF_LengthMeassge);
-//		printf("\tTSCRIPT:0x%2x\n",vrts_GWIF_IncomeMessage->Opcode);
-//		printf("\tMessage:");
 		for (vrui_Count = 0; vrui_Count < vrui_GWIF_LengthMeassge-1; vrui_Count++){
-			//printf("%2x-",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
 			sprintf(temp,"%x ",vrts_GWIF_IncomeMessage->Message[vrui_Count]);
 			strcat(temDataLog,temp);
 		}
-		//printf("\n");
 		slog_print(SLOG_INFO, 1, "(rsp)%s",temDataLog);
-        /*............*/
+
 
 
 /*
@@ -253,7 +239,6 @@ void GWIF_ProcessData (void)
 					}
 					adr_heartbeat= OUTMESSAGE_Provision[26] | (OUTMESSAGE_Provision[27]<<8);
 				}
-				printf ("ADRASASASASASSASA= %d\n",adr_heartbeat);
 				flag_getpro_info = true;
 			}
 
@@ -269,7 +254,7 @@ void GWIF_ProcessData (void)
 
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_KEY_BIND_EVT && vrts_GWIF_IncomeMessage->Message[1] == HCI_GATEWAY_CMD_BIND_SUSCESS)
 			{
-				printf("suscess!\n");
+				slog_info("<provision> success");
 			}
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_KEY_BIND_RSP)
 			{
@@ -277,9 +262,9 @@ void GWIF_ProcessData (void)
 				flag_mac=true;
 				//printf ("ADRASASASASASSASA= %d\n",adr_heartbeat);
 				//HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 6, 5, 7, 21);
+				gpio_value(15, 1);
 			}
             /*...........................................*/
-			//if(vrts_GWIF_IncomeMessage->Message)
 /*
  * TODO: process for sensor(light, PIR, remote,...)
  */
@@ -335,19 +320,12 @@ void GWIF_ProcessData (void)
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE)
 			{
 				uint16_t valueOpcode,jsonadr,jsonvalue;
-				uint8_t jsonmain,jsonsub,jsonpower;
+				uint16_t h,s,l;
 				valueOpcode = (vrts_GWIF_IncomeMessage->Message[5] | (vrts_GWIF_IncomeMessage->Message[6]<<8));
 				jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				switch (valueOpcode)
 				{
-//				case OPCODE_TYPEDEV:
-//					jsonmain = vrts_GWIF_IncomeMessage->Message[9];
-//					jsonsub = vrts_GWIF_IncomeMessage->Message[10];
-//					jsonpower = vrts_GWIF_IncomeMessage->Message[11];
-//					CreatJson_TypeDev(TP_STATUS, "ADR", "MAINDEVICE", "SUBDEVICE", "POWER", jsonadr, jsonmain, jsonsub, jsonpower);
-//					break;
 				case G_ONOFF_STATUS:
-					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 					if(vrui_GWIF_LengthMeassge == 9){
 						jsonvalue = vrts_GWIF_IncomeMessage->Message[7] & 0xFF;
 					}
@@ -357,13 +335,15 @@ void GWIF_ProcessData (void)
 					CreatJson(TP_STATUS,"ADR","ONOFF",jsonadr,jsonvalue);
 					break;
 				case LIGHT_CTL_TEMP_STATUS:
-					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
-					jsonvalue = vrts_GWIF_IncomeMessage->Message[11] | (vrts_GWIF_IncomeMessage->Message[12]<<8);
-					//printf ("%d", jsonvalue);
+					if(vrui_GWIF_LengthMeassge == 12){
+						jsonvalue = vrts_GWIF_IncomeMessage->Message[7] | (vrts_GWIF_IncomeMessage->Message[8] <<8);
+					}
+					else{
+						jsonvalue = vrts_GWIF_IncomeMessage->Message[11] | (vrts_GWIF_IncomeMessage->Message[12]<<8);
+					}
 					CreatJson(TP_STATUS,"ADR","CCT",jsonadr,jsonvalue);
 					break;
 				case LIGHTNESS_STATUS:
-					//jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 					if(vrui_GWIF_LengthMeassge == 10){
 						jsonvalue = vrts_GWIF_IncomeMessage->Message[8] & 0xFF;
 					}
@@ -372,9 +352,14 @@ void GWIF_ProcessData (void)
 					}
 					CreatJson(TP_STATUS, "ADR", "DIM", jsonadr, jsonvalue);
 					break;
+
 				case LIGHT_HSL_STATUS:
-					//status HSL
+					h = vrts_GWIF_IncomeMessage->Message[9]  | (vrts_GWIF_IncomeMessage->Message[10]<<8);
+					s = vrts_GWIF_IncomeMessage->Message[11] | (vrts_GWIF_IncomeMessage->Message[12]<<8);
+					l = vrts_GWIF_IncomeMessage->Message[7]  | (vrts_GWIF_IncomeMessage->Message[8]<<8);
+					CreatJson_TypeDev(TP_STATUS, "ADR","HUE","SATURATION","LIGHTNESS",jsonadr, h, s, l);
 					break;
+
 				case CFG_MODEL_SUB_STATUS:
 					jsonvalue = vrts_GWIF_IncomeMessage->Message[10] & 0xFF;
 					if(check_add_or_del_group){
@@ -405,7 +390,51 @@ void GWIF_ProcessData (void)
 					break;
 				}
 			}
-
+			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE) && \
+					(vrts_GWIF_IncomeMessage->Message[5] == RD_OPCODE_TYPE_RSP) && \
+					(((vrts_GWIF_IncomeMessage->Message[6]>>8)|vrts_GWIF_IncomeMessage->Message[7]) == VENDOR_ID))
+			{
+				uint16_t jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+				if(((vrts_GWIF_IncomeMessage->Message[8]|vrts_GWIF_IncomeMessage->Message[9]) == HEADER_TYPE_ASK) || \
+						((vrts_GWIF_IncomeMessage->Message[8]|vrts_GWIF_IncomeMessage->Message[9]) == HEADER_TYPE_SET)){
+					uint8_t jsonType,jsonAttrubute,jsonApplication;
+					jsonType = vrts_GWIF_IncomeMessage->Message[10];
+					jsonAttrubute = vrts_GWIF_IncomeMessage->Message[11];
+					jsonApplication = vrts_GWIF_IncomeMessage->Message[12];
+					CreatJson_TypeDev(TP_STATUS, "ADR", "TPYE", "ATTRUBUTE", "APPLICATION", jsonadr, jsonType, jsonAttrubute, jsonApplication);
+				}
+				else if((vrts_GWIF_IncomeMessage->Message[8]|vrts_GWIF_IncomeMessage->Message[9]) == HEADER_TYPE_SAVEGW){
+					CreatJson(TP_STATUS, "ADR", "SAVEGATEWAY", jsonadr, 1);
+				}
+			}
+			if((vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE) && \
+					(vrts_GWIF_IncomeMessage->Message[5] == RD_OPCODE_SCENE_RSP) && \
+					(((vrts_GWIF_IncomeMessage->Message[6]>>8)|vrts_GWIF_IncomeMessage->Message[7]) == VENDOR_ID))
+			{
+				uint16_t jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+				uint16_t header_scene= vrts_GWIF_IncomeMessage->Message[8]| vrts_GWIF_IncomeMessage->Message[9];
+				switch(header_scene)
+				{
+				case HEADER_SCENE_CALL_MODE:
+					CreatJson(TP_STATUS, "ADR", "CALLMODERGB",jsonadr , vrts_GWIF_IncomeMessage->Message[12]);
+					break;
+				case HEADER_SCENE_DEL:
+					CreatJson(TP_STATUS, "ADR", "DELSCENERGB", jsonadr, (vrts_GWIF_IncomeMessage->Message[10]>>8)|vrts_GWIF_IncomeMessage->Message[11]);
+					break;
+				case HEADER_SCENE_SET:
+					CreatJson(TP_STATUS, "ADR","SETSCENERGB" , jsonadr,(vrts_GWIF_IncomeMessage->Message[10]>>8)|vrts_GWIF_IncomeMessage->Message[11]);
+					break;
+				case HEADER_SCENE_CALL_SCENE_RGB:
+					CreatJson(TP_STATUS,"ADR","CALLSCENERGB", jsonadr,(vrts_GWIF_IncomeMessage->Message[10]>>8)|vrts_GWIF_IncomeMessage->Message[11] );
+					break;
+				case HEADER_SCENE_REMOTE_SET:
+					CreatJson(TP_STATUS, "ADR","SCENEFORREMOTE", jsonadr, 1);
+					break;
+				case HEADER_SCENE_SENSOR_SET:
+					CreatJson(TP_STATUS, "ADR", "SCENEFORSENSOR", jsonadr, 1);
+					break;
+				}
+			}
 	}
 }
 

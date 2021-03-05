@@ -1,19 +1,23 @@
+/*
+ * Light.c
+ */
+
 #include "../GatewayManager/Light.h"
 #include "../GatewayManager/GateInterface.h"
 #include "../GatewayManager/Provision.h"
 #include "../GatewayManager/SensorLight.h"
 #include "../GatewayManager/slog.h"
+#include "../GatewayManager/GPIO.h"
 
 
 char *pHeaderCmd= "cmd";
 cmdcontrol_t vrts_CMD_STRUCTURE;
+cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 uint8_t parRetry_cnt = 0x02;
 uint8_t parRsp_Max = 0x01;
 uint8_t parFuture = 0;
 
-/*
- * TODO: functions process message send
- */
+
 void ResetNode(uint16_t uniAdrReset)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrReset & 0xFF;
@@ -28,9 +32,6 @@ void Lightness_Get()
 	vrts_CMD_STRUCTURE.opCode[0] = LIGHTNESS_GET & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[1] = (LIGHTNESS_GET>>8) & 0xFF;
 }
-/*
- * TODO: HOw many byte decide to dim, cct, hsl in data fields
- */
 void Lightness_Set(uint16_t uniAdrSetDim, uint16_t valueLightness)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrSetDim & 0xFF;
@@ -116,12 +117,27 @@ void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff)
 	vrts_CMD_STRUCTURE.opCode[1] = (LIGHTOPCODE_ONOFF >>8) & 0xFF;
 	if(statuOnOff == 1){
 		vrts_CMD_STRUCTURE.para[0] = statuOnOff;
+		gpio_value(15, 0);
 	}
 	if(statuOnOff == 0){
 		vrts_CMD_STRUCTURE.para[0] = statuOnOff;
+		gpio_value(15, 1);
 	}
-
 	vrts_CMD_STRUCTURE.para[1] = 0;
+}
+void HSL_Set(uint16_t uniAdrHSL, uint16_t h, uint16_t s, uint16_t l)
+{
+	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrHSL & 0xFF;
+	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrHSL >>8) & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[0] = LIGHT_HSL_SET & 0xFF;
+	vrts_CMD_STRUCTURE.opCode[1] = (LIGHT_HSL_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[0] = l & 0xFF;
+	vrts_CMD_STRUCTURE.para[1] = (l>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[2] = h & 0xFF;
+	vrts_CMD_STRUCTURE.para[3] = (h>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[4] = s & 0xFF;
+	vrts_CMD_STRUCTURE.para[5] = (s>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[6] = 0;
 }
 /*
  * TODO: Update status of light
@@ -153,12 +169,6 @@ void SetTimePoll(uint16_t uniAdrSensor, uint16_t timePoll)
  * TODO: gan struct vao chuoi xong chuyen uart
  *
  */
-//void SetSenceRemote(uint16_t uniAdrRemoteSetSence, uint16_t senceId)
-//{
-//	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrRemoteSetSence & 0xFF;
-//	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrRemoteSetSence>>8) & 0xFF;
-//	//vrts_CMD_STRUCTURE.opCode[0]
-//}
 void FunctionPer(uint16_t cmd,\
 				functionTypeDef Func,\
 				uint16_t unicastAdr,\
@@ -168,10 +178,10 @@ void FunctionPer(uint16_t cmd,\
 				uint16_t parCCT,\
 				uint16_t parSenceId,\
 				uint16_t parTimePoll,\
+				uint16_t parL,
 				uint16_t parH,
 				uint16_t parS,
-				uint16_t parL,
-				uint8_t cmdLenght)
+				uint8_t cmdLength)
 {
 	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0] = cmd & 0xFF;
 	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[1] = (cmd>>8) & 0xFF;
@@ -218,77 +228,23 @@ void FunctionPer(uint16_t cmd,\
 	else if(Func == CallSence_typedef){
 		CallSence(parSenceId);
 	}
+	else if(Func == HSL_Set_typedef){
+		HSL_Set(unicastAdr, parH, parS, parL);
+	}
+
 	uint8_t *tempDataUart;
-	uint8_t tempDataLog[200];
+	uint8_t tempDataLog[200]="";
 	uint8_t temp[4];
 
 	tempDataUart = (uint8_t *)&vrts_CMD_STRUCTURE;
-	ControlMessage(cmdLenght, tempDataUart);
+	ControlMessage(cmdLength, tempDataUart);
 	int i;
 	//strcpy(TempData2,h);
-	for(i=0;i< cmdLenght;i++){
+	for(i=0;i< cmdLength;i++){
 		sprintf(temp,"%x ",tempDataUart[i]);
 		strcat(tempDataLog,temp);
 	}
-	slog_print(SLOG_INFO, 1, "(cmd)%s",tempDataLog);
-	tempDataLog[200]="";
-}
-
-
-void StoreSceneRemote(uint16_t cmd, uint16_t adrRemote, uint8_t header, uint8_t buttonID, uint8_t modeID, uint16_t sceneID,uint16_t appID, uint8_t SrgbID,uint8_t cmdLength)
-{
-	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0] = cmd & 0xFF;
-	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[1] = (cmd>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.opCode00[0] = 0;
-	vrts_CMD_STRUCTURE.opCode00[1] = 0;
-	vrts_CMD_STRUCTURE.opCode00[2] = 0;
-	vrts_CMD_STRUCTURE.opCode00[3] = 0;
-	vrts_CMD_STRUCTURE.retry_cnt = parRetry_cnt;
-	vrts_CMD_STRUCTURE.rsp_max = 0;
-	SetSceneForRemote(adrRemote, header, buttonID, modeID, sceneID, appID, SrgbID);
-
-	uint8_t *TempData;
-	uint8_t TempData2[200];
-	uint8_t h[4];
-
-	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
-	ControlMessage(cmdLength, TempData);
-	int i;
-	//strcpy(TempData2,h);
-	for(i=0;i< cmdLength;i++){
-		sprintf(h,"%x ",TempData[i]);
-		strcat(TempData2,h);
-	}
-	slog_print(SLOG_NOTAG, 1, "(cmd)%s",TempData2);
-	TempData2[200]="";
-}
-void StoreSceneSensor(uint16_t cmd, uint16_t adrSensor, uint8_t header, uint8_t stt, uint16_t condition, uint16_t low_lux,\
-		uint16_t hight_lux, uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID, uint16_t cmdLength)
-{
-	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0] = cmd & 0xFF;
-	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[1] = (cmd>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.opCode00[0] = 0;
-	vrts_CMD_STRUCTURE.opCode00[1] = 0;
-	vrts_CMD_STRUCTURE.opCode00[2] = 0;
-	vrts_CMD_STRUCTURE.opCode00[3] = 0;
-	vrts_CMD_STRUCTURE.retry_cnt = parRetry_cnt;
-	vrts_CMD_STRUCTURE.rsp_max = 0;
-	SetScenceForSensor(adrSensor, header, stt, condition, low_lux, hight_lux, action, sceneID, appID, srgbID);
-
-	uint8_t *TempData;
-	uint8_t TempData2[200];
-	uint8_t h[4];
-
-	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
-	ControlMessage(cmdLength, TempData);
-	int i;
-	//strcpy(TempData2,h);
-	for(i=0;i< cmdLength;i++){
-		sprintf(h,"%x ",TempData[i]);
-		strcat(TempData2,h);
-	}
-	slog_print(SLOG_NOTAG, 1, "(cmd)%s",TempData2);
-	TempData2[200]="";
+	slog_info("(cmd)%s",tempDataLog);
 }
 void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8_t countLog, uint8_t periodLog, uint8_t tll, uint16_t feature, uint16_t cmdLength)
 {
@@ -312,56 +268,264 @@ void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8
 	vrts_CMD_STRUCTURE.para[5] = feature & 0xFF;
 	vrts_CMD_STRUCTURE.para[6] = (feature>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[7]= vrts_CMD_STRUCTURE.para[8]= 0;
-	uint8_t *TempData;
-	uint8_t TempData2[200];
-	uint8_t h[4];
 
-	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
-	ControlMessage(cmdLength, TempData);
+	uint8_t *tempDataUart;
+	uint8_t tempDataLog[200]="";
+	uint8_t temp[4];
+
+	tempDataUart = (uint8_t *)&vrts_CMD_STRUCTURE;
+	ControlMessage(cmdLength, tempDataUart);
 	int i;
 	//strcpy(TempData2,h);
 	for(i=0;i< cmdLength;i++){
-		sprintf(h,"%x ",TempData[i]);
-		strcat(TempData2,h);
+		sprintf(temp,"%x ",tempDataUart[i]);
+		strcat(tempDataLog,temp);
 	}
-	slog_print(SLOG_NOTAG, 1, "(cmd)%s",TempData2);
-	TempData2[200]="";
+	slog_info("(cmd)%s",tempDataLog);
 }
-void SetSceneForRGB(uint16_t cmd, uint16_t pAdrRgb, uint16_t pHearder, uint16_t pAppID, uint8_t pSrgbID,uint16_t cmdLength)
+
+
+/*Cmd control use opcode vendor*/
+void SetSceneForRemote(uint16_t addressremote, uint8_t buttonId, uint8_t modeId, uint16_t sceneId, uint16_t appID, uint8_t SrgbID)
 {
-	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0]= cmd & 0xFF;
-	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[1]= (cmd>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.opCode00[0] = 0;
-	vrts_CMD_STRUCTURE.opCode00[1] = 0;
-	vrts_CMD_STRUCTURE.opCode00[2] = 0;
-	vrts_CMD_STRUCTURE.opCode00[3] = 0;
-	vrts_CMD_STRUCTURE.retry_cnt = parRetry_cnt;
-	vrts_CMD_STRUCTURE.rsp_max = 0;
-	vrts_CMD_STRUCTURE.adr_dst[0] = pAdrRgb & 0xFF;
-	vrts_CMD_STRUCTURE.adr_dst[1] = (pAdrRgb>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.opCode[0] =  0xFF;
-	vrts_CMD_STRUCTURE.opCode[1] =  0xFF;
-	vrts_CMD_STRUCTURE.para[0] = pHearder & 0xFF;
-	vrts_CMD_STRUCTURE.para[1] = (pHearder>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[2] = pAppID & 0xFF;
-	vrts_CMD_STRUCTURE.para[3] = (pAppID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[4] = pSrgbID;
-	vrts_CMD_STRUCTURE.para[5] = vrts_CMD_STRUCTURE.para[6] = vrts_CMD_STRUCTURE.para[7] = 0;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0]= addressremote & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1]= (addressremote>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0]= RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1]= (VENDOR_ID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2]= (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_SET & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2]= buttonId;
+	vrts_CMD_STRUCTURE_VENDOR.para[3]= modeId;
+	vrts_CMD_STRUCTURE_VENDOR.para[4]= sceneId & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[5]= (sceneId>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[6]= appID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[7]= (appID >>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[8]= SrgbID;
+	int i;
+	for(i=0; i<7; i++){
+		vrts_CMD_STRUCTURE.para[i+9]= 0;
+	}
+}
+void SetSceneForSensor(uint16_t addressSensor, uint8_t stt, uint16_t condition, uint16_t low_lux,\
+		uint16_t hight_lux, uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = addressSensor & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (addressSensor>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = (VENDOR_ID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SENSOR_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SENSOR_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = stt;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = (condition>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[4] = condition & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[5] = low_lux & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[6] = (low_lux>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[7] = hight_lux & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[8] = (hight_lux>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[9] = action & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[10] = (action>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[11] = sceneID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[12] = (sceneID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[13] = appID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[14] = (appID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[15] = srgbID;
+}
 
-	uint8_t *TempData;
-	uint8_t TempData2[200];
-	uint8_t h[4];
+void SetSceneForRGB(uint16_t pAdrRgb, uint16_t pAppID, uint8_t pSrgbID)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = pAdrRgb & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (pAdrRgb>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] =  RD_OPCODE_SCENE_SEND;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] =  VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = pAppID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3]=(pAppID>>8)& 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[4] = pSrgbID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[5] = vrts_CMD_STRUCTURE_VENDOR.para[6]=vrts_CMD_STRUCTURE_VENDOR.para[7]=0x00;
+}
+void CallSceneRgb(uint16_t appID)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] =  RD_OPCODE_SCENE_SEND;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] =  VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_CALL_SCENE_RGB>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_CALL_SCENE_RGB) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = appID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3]=(appID>>8)& 0xFF;
+	int i;
+	for(i=0;i<4;i++){
+		vrts_CMD_STRUCTURE_VENDOR.para[i+4]= 0x00;
+	}
+}
+void CallModeRgb(uint16_t adrCallModeRgb, uint8_t SrgbID)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrCallModeRgb & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrCallModeRgb>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] =  RD_OPCODE_SCENE_SEND;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] =  VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_CALL_MODE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_CALL_MODE) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = vrts_CMD_STRUCTURE_VENDOR.para[3] = 0x00;
+	vrts_CMD_STRUCTURE_VENDOR.para[4] = SrgbID;
+	int i;
+	for(i=0;i<3;i++){
+		vrts_CMD_STRUCTURE_VENDOR.para[i+5]= 0x00;
+	}
+}
+void DelSceneRgb(uint16_t adrDelSceneRgb, uint16_t appID)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrDelSceneRgb & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrDelSceneRgb>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] =  RD_OPCODE_SCENE_SEND;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] =  VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_DEL>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = appID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = (appID>>8) & 0xFF;
+	int i;
+	for(i=0;i<4;i++){
+		vrts_CMD_STRUCTURE_VENDOR.para[i+4]= 0x00;
+	}
+}
 
-	TempData = (uint8_t *)&vrts_CMD_STRUCTURE;
-	ControlMessage(cmdLength, TempData);
+
+void AskTypeDevice()
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_TYPE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_ASK>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_ASK) & 0xFF;
+	int i;
+	for(i=0;i<11;i++){
+		vrts_CMD_STRUCTURE_VENDOR.para[i+2] = 0x00;
+	}
+}
+void SetTypeDevice(uint16_t adrSetTypeDevice,uint8_t type, uint8_t attrubute, uint8_t application)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrSetTypeDevice & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrSetTypeDevice>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_TYPE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = type & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = attrubute & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[4] = application & 0xFF;
+	int i;
+	for(i=0;i<8;i++){
+		vrts_CMD_STRUCTURE_VENDOR.para[i+5] = 0x00;
+	}
+}
+void SaveGateway(uint16_t adrSaveGateway)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrSaveGateway & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrSaveGateway>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_TYPE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_SAVEGW>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_SAVEGW) & 0xFF;
+	int i;
+	for(i=0;i<11;i++){
+		vrts_CMD_STRUCTURE_VENDOR.para[i+2] = 0x00;
+	}
+}
+void Function_Vendor(uint16_t cmd,\
+		functionTypeDef Func_vendor,\
+		uint16_t adr,\
+		uint16_t header,\
+		uint8_t buttonID,\
+		uint8_t modeID,\
+		uint8_t stt,\
+		uint16_t condition,\
+		uint16_t low_lux,\
+		uint16_t hight_lux,\
+		uint16_t action,\
+		uint16_t sceneID,\
+		uint16_t appID,\
+		uint8_t srgbID,\
+		uint8_t type,\
+		uint8_t attrubute,\
+		uint8_t application,\
+		uint16_t cmdLength
+		)
+{
+	vrts_CMD_STRUCTURE_VENDOR.HCI_CMD_GATEWAY[0]= cmd & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.HCI_CMD_GATEWAY[1]= (cmd>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode00[0] = vrts_CMD_STRUCTURE_VENDOR.opCode00[1]= \
+			vrts_CMD_STRUCTURE_VENDOR.opCode00[2]= vrts_CMD_STRUCTURE_VENDOR.opCode00[3]=0;
+	vrts_CMD_STRUCTURE_VENDOR.retry_cnt = parRetry_cnt;
+	vrts_CMD_STRUCTURE_VENDOR.rsp_max = 0;
+	if(Func_vendor == SceneForRemote_vendor_typedef){
+		SetSceneForRemote(adr, buttonID, modeID, sceneID, appID, srgbID);
+	}
+	else if(Func_vendor == SceneForSensor_vendor_typedef){
+		SetSceneForSensor(adr, stt, condition, low_lux, hight_lux, action, sceneID, appID, srgbID);
+	}
+	else if(Func_vendor == SceneForRGB_vendor_typedef){
+		SetSceneForRGB(adr, appID, srgbID);
+	}
+	else if(Func_vendor == CallSceneRgb_vendor_typedef){
+		CallSceneRgb(appID);
+	}
+	else if(Func_vendor == CallModeRgb_vendor_typedef){
+		CallModeRgb(adr, srgbID);
+	}
+	else if(Func_vendor == DelSceneRgb_vendor_typedef){
+		DelSceneRgb(adr, appID);
+	}
+	else if(Func_vendor == SaveGateway_vendor_typedef){
+		SaveGateway(adr);
+	}
+	else if(Func_vendor == AskTypeDevice_vendor_typedef){
+		AskTypeDevice();
+	}
+	else if(Func_vendor == SetTypeDevice_vendor_typedef){
+		SetTypeDevice(adr,type,attrubute,application);
+	}
+
+	uint8_t *tempDataUart;
+	uint8_t tempDataLog[200]="";
+	uint8_t temp[4];
+
+	tempDataUart = (uint8_t *)&vrts_CMD_STRUCTURE_VENDOR;
+	ControlMessage(cmdLength, tempDataUart);
 	int i;
 	//strcpy(TempData2,h);
 	for(i=0;i< cmdLength;i++){
-		sprintf(h,"%x ",TempData[i]);
-		strcat(TempData2,h);
+		sprintf(temp,"%x ",tempDataUart[i]);
+		strcat(tempDataLog,temp);
 	}
-	slog_print(SLOG_NOTAG, 1, "(cmd)%s",TempData2);
-	TempData2[200]="";
+	slog_info("(cmd)%s",tempDataLog);
 }
-
 

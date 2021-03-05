@@ -1,3 +1,7 @@
+/*
+ * ButtonManager.h library process tasks of remote
+ *
+ */
 #ifndef GATEWAYMANAGER_BUTTONMANAGER_H_
 #define GATEWAYMANAGER_BUTTONMANAGER_H_
 
@@ -13,6 +17,7 @@ extern "C" {
 #include <string.h>
 #include <unistd.h>
 
+/* format of data respond remote*/
 typedef struct remotersp
 {
 	uint8_t   typeDev[2];
@@ -23,22 +28,30 @@ typedef struct remotersp
 }remotersp;
 extern remotersp * vrts_Remote_Rsp;
 
-#define ButtonID0           0x00
-#define ButtonID1           0x01
-#define ButtonID2           0x02
-#define ButtonID3           0x03
-#define ButtonID4           0x04
-#define ButtonID5           0x05
+#define BUTTONID0           0x00
+#define BUTTONID1           0x01
+#define BUTTONID2           0x02
+#define BUTTONID3           0x03
+#define BUTTONID4           0x04
+#define BUTTONID5           0x05
 
-#define ModeIDClick         0x01
-#define ModeIDDouble        0x03
-#define ModeIDHold          0x05
+#define MODEIDCLICK         0x01
+#define MODEIDDOUBLE        0x02
+
 
 #define OPCODEREMOTE_CMD     0xA082
 #define OPCODEREMOTE_RSP     0xA182
 
-
-bool IsRemoteSetup(remotersp * rsp,unsigned char parButtonId,unsigned char parModeId,unsigned char parSenceId1,unsigned char parSenceId2);
+/*
+ * Check press on remote (button, mode press)
+ *
+ * @param rsp data respond remote
+ * @param parButtonId buttonid
+ * @param parModeId modeid
+ * @return true- check correct buttonid and modeid,
+ * @return false- check wrong buttonid or modeid
+ */
+bool IsRemoteSetup(remotersp * rsp,unsigned char parButtonId,unsigned char parModeId);
 
 #ifdef __cplusplus
 }

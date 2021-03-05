@@ -1,9 +1,7 @@
 /*
  * RingBuffer.c
- *
- *  Created on: Oct 21, 2020
- *      Author: duanlc
  */
+
 #include "../GatewayManager/RingBuffer.h"
 
 #include <assert.h>
@@ -27,7 +25,6 @@ bool ring_init(ringbuffer_t *cb, size_t capacity, size_t sz){
 	cb->tail = cb->buffer;
 	return true;
 }
-
 bool ring_free(ringbuffer_t *cb)
 {
 	if(cb->buffer){
@@ -38,7 +35,6 @@ bool ring_free(ringbuffer_t *cb)
 	}
 	return true;
 }
-
 bool ring_push_head(ringbuffer_t *cb, const void *item)
 {
 	if(cb->count == cb->capacity){
@@ -54,7 +50,6 @@ bool ring_push_head(ringbuffer_t *cb, const void *item)
 
 	return true;
 }
-
 bool ring_pop_tail(ringbuffer_t *cb, void *item)
 {
 	if(cb->count == 0){

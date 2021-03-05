@@ -1,6 +1,11 @@
+/*
+ * Ds1307.c
+ */
+
 #include "../GatewayManager/Ds1307.h"
 #include "../GatewayManager/Light.h"
 #include "../GatewayManager/JsonProcess.h"
+#include "../GatewayManager/slog.h"
 
 uint8_t dataDecTimeDs1307[7];
 uint8_t dataBcdTimeDs1307[7];
@@ -10,7 +15,6 @@ uint8_t dataTimeInternet[7];
 #define DS1307_ADDR 0x68
 
 mraa_i2c_context i2c;
-
 
 uint8_t  BCD2DEC(uint8_t dataBCD)
 {
@@ -29,7 +33,10 @@ void Ds1307_Init()
 	mraa_i2c_frequency(i2c, 0);
 	mraa_i2c_address(i2c, DS1307_ADDR);
 }
-
+/*
+ * Lấy dữ liệu thời gian trong Ds1307
+ * - có 7 biến: h/m/s ngày trong tuần d/m/y
+ */
 void TimeForDs1307()
 {
 	mraa_i2c_read_bytes_data(i2c, 0x00, dataBcdTimeDs1307, 7);
@@ -37,19 +44,28 @@ void TimeForDs1307()
 	for(i=0;i<7;i++){
 		dataDecTimeDs1307[i]= BCD2DEC(dataBcdTimeDs1307[i]);
 	}
-
+	char arrayTime[200]="";
+	char tempTime[4];
 	for(i=0;i<7;i++){
-		printf("%d-",dataDecTimeDs1307[i]);
+		sprintf(tempTime,"%d ",dataDecTimeDs1307[i]);
+		strcat(arrayTime,tempTime);
 	}
+	slog_trace("%s",arrayTime);
 }
 
+/*
+ * Lấy dữ liệu thời gian từ hệ thống
+ * - cần chỉnh cho hệ thống chạy đúng múi giờ trước
+ * - dữ liệu được tách sau khi chạy lệnh cmd date trên terminal
+ * TODO: lấy dữ liệu hệ thống không cần phải chạy lệnh trên terminal
+ */
 void TimeForInternet()
 {
 	FILE *fp;
 	  char path[1035];
 	  fp = popen("date", "r");
 	  if (fp == NULL) {
-		printf("Failed to run command\n" );
+		printf("Failed to run command");
 		exit(1);
 	  }
 	  while (fgets(path, sizeof(path), fp) != NULL) {
@@ -119,12 +135,8 @@ void TimeForInternet()
 	  dataTimeInternet[2]= (path[17]-48) * 10 + (path[18]-48);
 	  dataTimeInternet[4]= (path[8]-48) * 10 +  (path[9]-48);
 	  dataTimeInternet[6]= (path[26]-48) * 10 + (path[27]-48);
-//	  int n;
-//	  for(n=0;n<7;n++){
-//		  printf ("%d-",dataTimeInternet[n]);
-//	  }
-//	  printf("\n");
 }
+
 void SetTimeForDs1307(uint8_t seconds, uint8_t minutes, uint8_t hours, uint8_t days, uint8_t dates, uint8_t months, uint8_t years)
 {
 	mraa_i2c_write_byte_data(i2c, DEC2BCD(seconds), 0x00);
@@ -136,23 +148,39 @@ void SetTimeForDs1307(uint8_t seconds, uint8_t minutes, uint8_t hours, uint8_t d
 	mraa_i2c_write_byte_data(i2c, DEC2BCD(years), 0x06);
 }
 /*
- * TODO: set a second of minutes offall
- * 1 minutes update
+ *TODO: Lập trình cho hệ thống chạy theo lịch ở đây
  */
 void * Time_Thread(void *argv)
 {
 	Ds1307_Init();
+	bool checkTime = false;
 	while(1)
 	{
 		TimeForInternet();
-		if((dataTimeInternet[0] == 15) && (dataTimeInternet[1] == 0) && (dataTimeInternet[2] == 5))
+		if(dataTimeInternet[1]!=0 && dataTimeInternet[1]!=15 &&\
+					dataTimeInternet[1]!=30 && dataTimeInternet[1]!=45)
 		{
-			FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,65535 ,NULL8,0, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
+			checkTime = false;
 		}
-		if((dataTimeInternet[0] == 12) && (dataTimeInternet[1] == 0) && (dataTimeInternet[2] == 6))
+		if(checkTime == false)
 		{
-			FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,65535 ,NULL8,1, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
+			if(dataTimeInternet[1]==0 || dataTimeInternet[1]==15 ||\
+					dataTimeInternet[1]==30 || dataTimeInternet[1]== 45)
+			{
+				FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, 65535, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
+				checkTime = true;
+			}
 		}
+
+//		if((dataTimeInternet[2] == 15) && checkTime==false)
+//		{
+//			FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, 65535, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
+//			checkTime=true;
+//		}
+//		if((dataTimeInternet[2] != 15))
+//		{
+//			checkTime=false;
+//		}
 	}
 	return NULL;
 }

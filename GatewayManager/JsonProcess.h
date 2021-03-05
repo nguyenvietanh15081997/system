@@ -1,3 +1,8 @@
+/*
+ * JsonProcess.h process json data
+ * Transmit data format json
+ *
+ */
 #ifndef GATEWAYMANAGER_JSONPROCESS_H_
 #define GATEWAYMANAGER_JSONPROCESS_H_
 
@@ -42,9 +47,23 @@ typedef struct jsonstring
 	uint16_t hight_lux;
 	uint16_t action;
 	uint16_t appID;
-	uint16_t sceneforremote;
-	uint16_t sceneforsensor;
-	uint8_t SrgbID;
+	uint8_t srgbID;
+	uint16_t sceneID;
+
+	uint8_t sceneforremote;
+	uint8_t sceneforsensor;
+
+	uint8_t setsceneRGB;
+	uint8_t callsceneRGB;
+	uint8_t callmodeRGB;
+	uint8_t delsceneRGB;
+
+	uint8_t savegateway;
+	uint8_t settypedevice;
+	uint8_t typedevicescan;
+	uint8_t type;
+	uint8_t attrubute;
+	uint8_t application;
 } jsonstring;
 extern jsonstring vrts_Json_String;
 extern char flagSecond;
@@ -70,14 +89,16 @@ typedef enum{
 	resetnode_enum	=18,
 	setsceneforremote_enum=19,
 	buttonid_enum         =20,
-	modeid_enum           =21
+	modeid_enum           =21,
+
 } defineCmd;
 extern defineCmd flagDefineCmd;
 
 void JsonControl(char *key);
 void Json_Parse(json_object * jobj);
 void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,uint16_t par1, uint16_t par2);
-void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJsonMain, uint8_t *objectJsonSub, uint8_t *objectJsonPower, uint8_t parAdr, uint8_t parMain, uint8_t parSub, uint8_t parPower);
+void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJsonType, uint8_t *objectJsonAttrubute, \
+		uint8_t *objectJsonApplication,uint16_t parAdr, uint16_t parType, uint16_t parAttrubute, uint16_t parApplication);
 
 #ifdef __cplusplus
 }

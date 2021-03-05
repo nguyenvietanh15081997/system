@@ -1,10 +1,6 @@
 /*
- * ShareMessage.h
- *
- *  Created on: Oct 22, 2020
- *      Author: duanlc
+ * ShareMessage.h save general data
  */
-
 #ifndef GATEWAYMANAGER_SHAREMESSAGE_H_
 #define GATEWAYMANAGER_SHAREMESSAGE_H_
 
@@ -30,5 +26,4 @@ extern pthread_mutex_t	vrpth_SHAREMESS_Send2GatewayLock;
 #ifdef __cplusplus
 }
 #endif
-
 #endif /* GATEWAYMANAGER_SHAREMESSAGE_H_ */

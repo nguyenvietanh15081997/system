@@ -1,3 +1,7 @@
+/*
+ * SensorLight.c
+ */
+
 #include "../GatewayManager/SensorLight.h"
 #include "../GatewayManager/Provision.h"
 #include "../GatewayManager/Light.h"
@@ -32,27 +36,4 @@ void ProcessLightSensor(lightsensorRsp *rsp)
 	value_Lux = CalculateLux(luxReg);
 	printf ("Lux= %d\n",value_Lux);
 }
-void SetScenceForSensor(uint16_t addressSensor, uint16_t header, uint8_t stt, uint16_t condition, uint16_t low_lux, uint16_t hight_lux, \
-		uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID)
-{
-	vrts_CMD_STRUCTURE.adr_dst[0] = addressSensor & 0xFF;
-	vrts_CMD_STRUCTURE.adr_dst[1] = (addressSensor>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.opCode[0] = SCENE_STORE & 0xFF;
-	vrts_CMD_STRUCTURE.opCode[1] = (SCENE_STORE>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[0] = header & 0xFF;
-	vrts_CMD_STRUCTURE.para[1] = (header>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[2] = stt;
-	vrts_CMD_STRUCTURE.para[3] = (condition>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[4] = condition & 0xFF;
-	vrts_CMD_STRUCTURE.para[5] = low_lux & 0xFF;
-	vrts_CMD_STRUCTURE.para[6] = (low_lux>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[7] = hight_lux & 0xFF;
-	vrts_CMD_STRUCTURE.para[8] = (hight_lux>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[9] = action & 0xFF;
-	vrts_CMD_STRUCTURE.para[10] = (action>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[11] = sceneID & 0xFF;
-	vrts_CMD_STRUCTURE.para[12] = (sceneID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[13] = appID & 0xFF;
-	vrts_CMD_STRUCTURE.para[14] = (appID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[15] = srgbID;
-}
+

@@ -1,10 +1,6 @@
 /*
  * ShareMessage.c
- *
- *  Created on: Oct 22, 2020
- *      Author: duanlc
  */
-
 
 #include "../GatewayManager/ShareMessage.h"
 

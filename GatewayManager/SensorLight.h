@@ -1,3 +1,7 @@
+/*
+ * SensorLight.h manage tasks-related sensor( light, PIR)
+ *
+ */
 #ifndef GATEWAYMANAGER_SENSORLIGHT_H_
 #define GATEWAYMANAGER_SENSORLIGHT_H_
 
@@ -13,6 +17,7 @@ extern "C" {
 #include <math.h>
 #include <unistd.h>
 
+/*Frame of rsp data sensor*/
 typedef struct lightsensorRsp
 {
 	uint8_t  typeDev[2];
@@ -21,28 +26,35 @@ typedef struct lightsensorRsp
 }lightsensorRsp;
 extern lightsensorRsp * vrts_LighSensor_Rsp;
 
-/*
- * TODO: define friend_poll
- */
+/*Define friend_poll*/
 #define SENSOR_DESCRIP_GET     0x3082
 #define SENSOR_DESCRIP_STATUS  0x51
 
-
-//extern bool flag_sensor_light_rsp;
 extern uint16_t  value_Lux;
 
 /*
- * Calculate lux
+ * Calculate lux of lightsensor
  *
- * @para rsp_lux lux value
- * @return
+ * @param rsp_lux two byte lux
+ * @return lux value calculated
  */
 unsigned int CalculateLux(unsigned int rsp_lux);
+
+/*
+ * Process when have message of sensor
+ *
+ * @param rsp message of sensor
+ * @return null
+ */
 void ProcessLightSensor(lightsensorRsp *rsp);
+
+/*
+ * Build message set scene for sensor
+ *TODO: to review
+ */
 void SetScenceForSensor(uint16_t addressSensor, uint16_t header, uint8_t stt, uint16_t condition, uint16_t low_lux, uint16_t hight_lux, \
 		uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID);
 #ifdef __cplusplus
 }
 #endif
-
 #endif

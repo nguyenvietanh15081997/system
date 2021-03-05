@@ -1,3 +1,8 @@
+/*
+ * Battery.h process power of device
+ * - Get data respond
+ * - Calculate % power
+ */
 #ifndef GATEWAYMANAGER_BATTERY_H_
 #define GATEWAYMANAGER_BATTERY_H_
 
@@ -13,6 +18,7 @@ extern "C" {
 #include <math.h>
 #include <unistd.h>
 
+/* Format data respond power*/
 typedef struct batteryRsp
 {
 	uint8_t  typeDev[2];
@@ -21,8 +27,12 @@ typedef struct batteryRsp
 }batteryRsp;
 extern batteryRsp * vrts_Battery_Rsp;
 
-
-void ProcessBat(batteryRsp *batRsp);
+/*
+ * Calculate % power
+ * @param batRsp data respond
+ * @return valueBattery % power
+ */
+uint16_t ProcessBat(batteryRsp * batRsp);
 
 #ifdef __cplusplus
 }
