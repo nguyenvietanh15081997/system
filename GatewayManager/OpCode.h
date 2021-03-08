@@ -320,6 +320,7 @@ extern uint8_t OUTMESSAGE_Provision[28];
 extern uint8_t OUTMESSAGE_BindingALl[22];
 
 extern bool check_add_or_del_group;
+extern bool check_add_or_del_scene;
 extern bool MODE_PROVISION;
 
 #ifdef __cplusplus

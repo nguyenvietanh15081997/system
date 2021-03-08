@@ -274,9 +274,13 @@ void GWIF_ProcessData (void)
 					puts(">>Remote DC");
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					uint16_t pscenedc = (vrts_Remote_Rsp->senceID[0] <<8) |(vrts_Remote_Rsp->senceID[1]);
+					uint16_t scenrgb = (vrts_Remote_Rsp->futureID[0] <<8) |(vrts_Remote_Rsp->futureID[1]);
 					if(pscenedc!=0)
 					{
 						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
+						sleep(1);
+						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
+								NULL16, NULL16,NULL16, NULL16,scenrgb, NULL8, NULL8, NULL8, NULL8,23);
 						/*
 						 * add to call scene RGB
 						 */
@@ -287,9 +291,13 @@ void GWIF_ProcessData (void)
 					puts(">>Remote AC");
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					uint16_t psceneac = (vrts_Remote_Rsp->senceID[0] <<8) |(vrts_Remote_Rsp->senceID[1]);
+					uint16_t scenrgb = (vrts_Remote_Rsp->futureID[0] <<8) |(vrts_Remote_Rsp->futureID[1]);
 					if(psceneac!=0)
 					{
 						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,psceneac, NULL16,NULL16, NULL16, NULL16, 17);
+						sleep(1);
+						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
+														NULL16, NULL16,NULL16, NULL16,scenrgb, NULL8, NULL8, NULL8, NULL8,23);
 						/*
 						 * add to call scene RGB
 						 */
@@ -376,8 +384,14 @@ void GWIF_ProcessData (void)
 					}
 					break;
 				case SCENE_REG_STATUS:
-					jsonvalue = vrts_GWIF_IncomeMessage->Message[8]| vrts_GWIF_IncomeMessage->Message[9]<<8;
-					CreatJson(TP_STATUS, "ADR", "ADDSCENE", jsonadr, jsonvalue);
+					if(check_add_or_del_scene){
+						jsonvalue = vrts_GWIF_IncomeMessage->Message[8]| vrts_GWIF_IncomeMessage->Message[9]<<8;
+						CreatJson(TP_STATUS, "ADR", "ADDSCENE", jsonadr, jsonvalue);
+					}
+					else{
+						jsonvalue = vrts_Json_String.delscene;
+						CreatJson(TP_STATUS, "ADR", "DELSCENE", jsonadr, jsonvalue);
+					}
 					break;
 				case SCENE_STATUS:
 					if(vrui_GWIF_LengthMeassge == 13)
@@ -419,6 +433,7 @@ void GWIF_ProcessData (void)
 			{
 				uint16_t jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				uint16_t header_scene= vrts_GWIF_IncomeMessage->Message[8]| vrts_GWIF_IncomeMessage->Message[9];
+				printf("%x %x",vrts_GWIF_IncomeMessage->Message[8],vrts_GWIF_IncomeMessage->Message[9]);
 				switch(header_scene)
 				{
 				case HEADER_SCENE_CALL_MODE:

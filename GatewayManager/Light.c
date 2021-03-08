@@ -315,8 +315,8 @@ void SetSceneForRemote(uint16_t addressremote, uint8_t buttonId, uint8_t modeId,
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2]= (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_SET>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_SET & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_SET>>8 & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2]= buttonId;
 	vrts_CMD_STRUCTURE_VENDOR.para[3]= modeId;
 	vrts_CMD_STRUCTURE_VENDOR.para[4]= sceneId & 0xFF;
@@ -339,8 +339,8 @@ void SetSceneForSensor(uint16_t addressSensor, uint8_t stt, uint16_t condition, 
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SENSOR_SET>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SENSOR_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SENSOR_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SENSOR_SET>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = stt;
 	vrts_CMD_STRUCTURE_VENDOR.para[3] = (condition>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[4] = condition & 0xFF;
@@ -366,8 +366,8 @@ void SetSceneForRGB(uint16_t pAdrRgb, uint16_t pAppID, uint8_t pSrgbID)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SET>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SET>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = pAppID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[3]=(pAppID>>8)& 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[4] = pSrgbID & 0xFF;
@@ -382,8 +382,8 @@ void CallSceneRgb(uint16_t appID)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_CALL_SCENE_RGB>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_CALL_SCENE_RGB) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_CALL_SCENE_RGB) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_CALL_SCENE_RGB>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = appID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[3]=(appID>>8)& 0xFF;
 	int i;
@@ -400,8 +400,8 @@ void CallModeRgb(uint16_t adrCallModeRgb, uint8_t SrgbID)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_CALL_MODE>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_CALL_MODE) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_CALL_MODE) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_CALL_MODE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = vrts_CMD_STRUCTURE_VENDOR.para[3] = 0x00;
 	vrts_CMD_STRUCTURE_VENDOR.para[4] = SrgbID;
 	int i;
@@ -418,8 +418,8 @@ void DelSceneRgb(uint16_t adrDelSceneRgb, uint16_t appID)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_DEL>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_DEL>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = appID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[3] = (appID>>8) & 0xFF;
 	int i;
@@ -438,8 +438,8 @@ void AskTypeDevice()
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_ASK>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_ASK) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_ASK) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_ASK>>8) & 0xFF;
 	int i;
 	for(i=0;i<11;i++){
 		vrts_CMD_STRUCTURE_VENDOR.para[i+2] = 0x00;
@@ -454,8 +454,8 @@ void SetTypeDevice(uint16_t adrSetTypeDevice,uint8_t type, uint8_t attrubute, ui
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_SET>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_SET>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = type & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[3] = attrubute & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[4] = application & 0xFF;
@@ -473,8 +473,8 @@ void SaveGateway(uint16_t adrSaveGateway)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_SAVEGW>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_SAVEGW) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_SAVEGW) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_SAVEGW>>8) & 0xFF;
 	int i;
 	for(i=0;i<11;i++){
 		vrts_CMD_STRUCTURE_VENDOR.para[i+2] = 0x00;

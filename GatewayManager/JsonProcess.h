@@ -17,8 +17,10 @@ extern "C" {
 
 extern uint16_t numObject;
 extern uint16_t valueObject[20];
+extern uint16_t adr_dv[100], j;
 typedef struct jsonstring
 {
+	uint16_t id;
 	uint16_t adr;
 	uint8_t onoff;
 	uint16_t cct;
@@ -68,6 +70,9 @@ typedef struct jsonstring
 extern jsonstring vrts_Json_String;
 extern char flagSecond;
 
+extern _Bool arr_json, flag_addscene, flag_delscene;
+extern int i, arraylen, lst_count_id;
+
 typedef enum{
 	onoff_enum		=1,
 	cct_enum		=2,
@@ -94,8 +99,14 @@ typedef enum{
 } defineCmd;
 extern defineCmd flagDefineCmd;
 
-void JsonControl(char *key);
+void JsonControl(json_object *jobj,char *key);
+
+void json_value(json_object *jobj);
+
+int json_parse_array( json_object *jobj, char *key);
+
 void Json_Parse(json_object * jobj);
+
 void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,uint16_t par1, uint16_t par2);
 void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJsonType, uint8_t *objectJsonAttrubute, \
 		uint8_t *objectJsonApplication,uint16_t parAdr, uint16_t parType, uint16_t parAttrubute, uint16_t parApplication);

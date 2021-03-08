@@ -11,16 +11,24 @@
 
 
 uint16_t valueObject[20];
-uint16_t numObject;
+uint16_t numObject,scene_id;
 jsonstring vrts_Json_String;
 defineCmd flagDefineCmd;
 pthread_t vrts_System_TestSend;
 
+bool arr_json = false;
+bool flag_addscene = false;
+bool flag_delscene = false;
+uint16_t adr_dv[100];
+int i, arraylen, lst_count_id;
+
 char flagSecond=0;
+
+
 /*
  * TODO: xử lý chuỗi json phức tạp không dùng delay
  */
-void JsonControl(char *key){
+void JsonControl(json_object *jobj,char *key){
 	if(strcmp(key,"ONOFF")==0){
 		 flagDefineCmd = onoff_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,vrts_Json_String.adr ,NULL8, vrts_Json_String.onoff, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
@@ -46,32 +54,66 @@ void JsonControl(char *key){
 		 flagDefineCmd = seconds_enum;
 		 flagSecond= 1;
 	 }
+//	 if(strcmp(key,"ADDGROUP")==0){
+//		 flagDefineCmd = addgroup_enum;
+//		 check_add_or_del_group=true;
+//		 FunctionPer(HCI_CMD_GATEWAY_CMD, AddGroup_typedef, vrts_Json_String.adr, vrts_Json_String.addgroup , NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
+//		 sleep(1);
+//	 }
 	 if(strcmp(key,"ADDGROUP")==0){
 		 flagDefineCmd = addgroup_enum;
-		 check_add_or_del_group=true;
-		 FunctionPer(HCI_CMD_GATEWAY_CMD, AddGroup_typedef, vrts_Json_String.adr, vrts_Json_String.addgroup , NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
-		 sleep(1);
+		 check_add_or_del_group= true;
+		 for(i=0; i<arraylen; i++)
+		 {
+			 FunctionPer(HCI_CMD_GATEWAY_CMD, AddGroup_typedef, adr_dv[i], vrts_Json_String.addgroup , NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
+			 printf("adr_dv: %d\n",adr_dv[i]);
+			 usleep(500000);
+		 }
 	 }
+//	 if(strcmp(key,"DELGROUP")==0){
+//		 flagDefineCmd = delgroup_enum;
+//		 check_add_or_del_group=false;
+//		 FunctionPer(HCI_CMD_GATEWAY_CMD, DelGroup_typedef, vrts_Json_String.adr, vrts_Json_String.delgroup, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
+//		 sleep(1);
+//	 }
 	 if(strcmp(key,"DELGROUP")==0){
 		 flagDefineCmd = delgroup_enum;
-		 check_add_or_del_group=false;
-		 FunctionPer(HCI_CMD_GATEWAY_CMD, DelGroup_typedef, vrts_Json_String.adr, vrts_Json_String.delgroup, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
-		 sleep(1);
+		 check_add_or_del_group= false;
+		 for(i=0; i<arraylen; i++)
+		 {
+			 FunctionPer(HCI_CMD_GATEWAY_CMD, DelGroup_typedef, adr_dv[i], vrts_Json_String.delgroup, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
+			 usleep(500000);
+		 }
 	 }
+//	 if(strcmp(key,"ADDSCENE")==0){
+//		 flagDefineCmd = addscene_enum;
+//		 FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.addscene, NULL16,NULL16, NULL16, NULL16, 14);
+//		 sleep(1);
+//	 }
 	 if(strcmp(key,"ADDSCENE")==0){
 		 flagDefineCmd = addscene_enum;
-		 FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.addscene, NULL16,NULL16, NULL16, NULL16, 14);
-		 sleep(1);
-	 }
+		 scene_id = vrts_Json_String.addscene;
+		 flag_addscene = true;
+		 check_add_or_del_scene= true;
+	 	 }
 	 if(strcmp(key,"CALLSCENE")==0){
 		 flagDefineCmd = callscene_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.callscene, NULL16,NULL16, NULL16, NULL16, 17);
 		 sleep(1);
 	 }
+//	 if(strcmp(key,"DELSCENE")==0){
+//		 flagDefineCmd = delscene_enum;
+//		 FunctionPer(HCI_CMD_GATEWAY_CMD, DelSence_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.delscene, NULL16,NULL16, NULL16, NULL16, 14);
+//		 sleep(1);
+//	 }
 	 if(strcmp(key,"DELSCENE")==0){
 		 flagDefineCmd = delscene_enum;
-		 FunctionPer(HCI_CMD_GATEWAY_CMD, DelSence_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.delscene, NULL16,NULL16, NULL16, NULL16, 14);
-		 sleep(1);
+		 check_add_or_del_scene= false;
+		 for(i=0; i<arraylen; i++)
+		 {
+			 FunctionPer(HCI_CMD_GATEWAY_CMD, DelSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, vrts_Json_String.delscene, NULL16,NULL16, NULL16, NULL16, 14);
+			 usleep(500000);
+		 }
 	 }
 	 if(strcmp(key,"HUE")==0){
 		 flagDefineCmd = hue_eum;
@@ -148,6 +190,53 @@ void JsonControl(char *key){
 				 vrts_Json_String.type, vrts_Json_String.attrubute, vrts_Json_String.application,28);
 	 }
 }
+void json_value(json_object *jobj)
+{
+	enum json_type type;
+	type = json_object_get_type(jobj);
+	switch (type)
+	{
+		case json_type_int:
+			adr_dv[i] = json_object_get_int(jobj);
+			break;
+	}
+}
+
+int json_parse_array( json_object *jobj, char *key)
+{
+	enum json_type type;
+
+	json_object *jarray = jobj;
+	if(key)
+	{
+		jarray = json_object_object_get(jobj, key);
+	}
+
+	arraylen = json_object_array_length(jarray);
+	//printf("Array Length: %d\n",arraylen);
+	json_object * jvalue;
+
+	for (i=0; i< arraylen; i++)
+	{
+		jvalue = json_object_array_get_idx(jarray, i);
+		type = json_object_get_type(jvalue);
+		if (type != json_type_object)
+		{
+			json_value(jvalue);
+		}
+		else if(type == json_type_object)
+		{
+			vrts_Json_String.id        		= (json_object_get_int(json_object_object_get(jvalue,"id")));
+			vrts_Json_String.cct 			= (json_object_get_int(json_object_object_get(jvalue,"CCT")));
+			vrts_Json_String.dim 			= (json_object_get_int(json_object_object_get(jvalue,"DIM")));
+			FunctionPer(HCI_CMD_GATEWAY_CMD, CCT_Set_typedef, vrts_Json_String.id+1, NULL8, NULL8, NULL16,vrts_Json_String.cct, NULL16, NULL16,NULL16, NULL16, NULL16, 17);sleep(1);
+			FunctionPer(HCI_CMD_GATEWAY_CMD, Lightness_Set_typedef, vrts_Json_String.id, NULL8, NULL8, vrts_Json_String.dim, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);sleep(1);
+			FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, vrts_Json_String.id, NULL8, NULL8, NULL16, NULL16, scene_id, NULL16,NULL16, NULL16, NULL16, 14);sleep(1);
+		}
+	}
+	return 1;
+}
+
 /*
  * TODO: cần xử lý kiểu object(object)
  */
@@ -203,9 +292,14 @@ void Json_Parse(json_object * jobj)
 								 vrts_Json_String.type      = (json_object_get_int(json_object_object_get(jobj,"TYPE")));
 								 vrts_Json_String.attrubute       = (json_object_get_int(json_object_object_get(jobj,"ATTRUBUTE")));
 								 vrts_Json_String.application   = (json_object_get_int(json_object_object_get(jobj,"APPLICATION")));
+								 JsonControl(jobj,key);
 								 break;
+							 case json_type_array:
+									//printf("type: json_type_array\n");
+									json_parse_array(jobj, key);
+									break;
 			 }
-			 JsonControl(key);
+			 //JsonControl(key);
 		 }
 }
 /*
