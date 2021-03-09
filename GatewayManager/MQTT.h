@@ -25,10 +25,10 @@ extern "C" {
 #include <mosquitto.h>
 
 /* Information of mqtt broker*/
-#define mqtt_host 			"192.168.100.1"//"postman.cloudmqtt.com"//"soldier.cloudmqtt.com"//"192.168.33.1"//
-#define mqtt_port 			1883//13001//11875//
-#define mqtt_username 		"RD"//"insklndl"//"jpcvzwgj"//
-#define mqtt_password 		"1"//"x9aBwks70kmQ"//"JCCSw9dYngMF"//"2k756Wus2bJE"//
+#define mqtt_host 			"192.168.100.1"//"postman.cloudmqtt.com"//"soldier.cloudmqtt.com"//"192.168.33.1"//"192.168.100.1"//
+#define mqtt_port 			1883//13001//11875//1883//
+#define mqtt_username 		"RD"//"insklndl"//"jpcvzwgj"//"RD"//
+#define mqtt_password 		"1"//"x9aBwks70kmQ"//"JCCSw9dYngMF"//"2k756Wus2bJE"//"1"//
 
 #define TP_STATUS            "RD_STATUS"
 

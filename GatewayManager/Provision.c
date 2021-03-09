@@ -4,12 +4,15 @@
 
 #include "../GatewayManager/Provision.h"
 #include "../GatewayManager/LedProcess.h"
+#include "../GatewayManager/slog.h"
+#include "../GatewayManager/Light.h"
 
 pthread_t tmp;
 pthread_t vrts_System_Gpio;
 
 unsigned int Timeout_CheckDataBuffer = 0;
 unsigned char scanNotFoundDev =0 ;
+unsigned int adr_heartbeat;
 
 uint8_t OUTMESSAGE_ScanStop[3]     = {0xE9, 0xFF, 0x01};
 uint8_t OUTMESSAGE_ScanStart[3]    = {0xE9, 0xFF, 0x00};
@@ -32,6 +35,8 @@ bool flag_setpro            = false;
 bool flag_admitpro          = false;
 bool flag_checkadmitpro     = true;
 
+bool flag_set_type          = false;
+
 void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 {
 	pthread_mutex_lock(&vrpth_SHAREMESS_Send2GatewayLock);
@@ -53,11 +58,10 @@ void *ProvisionThread (void *argv )
 			if(scanNotFoundDev==3)
 			{
 				scanNotFoundDev = 0;
-				puts("Provision stop");
 				MODE_PROVISION=false;
 				pthread_cancel(tmp);
-				flag_blink=false;
-				pthread_cancel(tmp1);
+//				flag_blink=false;
+//				pthread_cancel(tmp1);
 				ControlMessage(3, OUTMESSAGE_ScanStop);
 				flag_selectmac     = false;
 				flag_getpro_info   = false;
@@ -69,6 +73,7 @@ void *ProvisionThread (void *argv )
 				flag_setpro  = false;
 				flag_admitpro = false;
 				flag_checkadmitpro = true;
+				flag_set_type = false;
 			}
 			else
 			{
@@ -76,10 +81,10 @@ void *ProvisionThread (void *argv )
 				Timeout_CheckDataBuffer=0;
 				sleep(1);
 				ControlMessage(3, OUTMESSAGE_ScanStart);
-				printf ("SCAN\n");
-				flag_blink = true;
-			    pthread_create(&vrts_System_Gpio,NULL,Led_Thread,NULL);
-				mraa_gpio_write(mraa_gpio_init(15), 0);
+				slog_print(SLOG_INFO, 1, "<provision>SCAN");
+//				flag_blink = true;
+//			    pthread_create(&vrts_System_Gpio,NULL,Led_Thread,NULL);
+//				mraa_gpio_write(mraa_gpio_init(15), 0);
 				flag_check_select_mac= true;
 			}
 		}
@@ -89,10 +94,11 @@ void *ProvisionThread (void *argv )
 			flag_selectmac=false;
 			flag_mac=false;
 			ControlMessage(9, OUTMESSAGE_MACSelect);
-			printf("SELECTMAC\n");
+			slog_print(SLOG_INFO, 1, "<provision>SELECTMAC");
 			sleep(1);
 			ControlMessage(3, OUTMESSAGE_GetPro);
-			printf ("GETPRO\n");
+			slog_print(SLOG_INFO, 1, "<provision>GETPRO");
+			flag_checkadmitpro = false;
 			//sleep(3);
 		}
 		if(flag_setpro == true)
@@ -106,7 +112,8 @@ void *ProvisionThread (void *argv )
 				random=rand()%256;
 				setpro_internal[i+3]=random;
 			}
-			puts("SETPRO...");
+			//char stringset[200]="";
+			slog_print(SLOG_INFO, 1, "<provision>SETPRO....");
 			for(i=0;i<28;i++)
 				{
 					printf ("%x ",setpro_internal[i]);
@@ -116,15 +123,16 @@ void *ProvisionThread (void *argv )
 			{
 				printf ("%x ",admit_pro_internal[i]);
 			}
-			puts("ADMITPRO...");
+			slog_print(SLOG_INFO, 1, "<provision>ADMITPRO...");
 			ControlMessage(21, admit_pro_internal);
-			//sleep(3);
+			flag_checkadmitpro = true;
+			sleep(4);
 		}
 		if(flag_admitpro == true && flag_checkadmitpro== true)
 		{
 			flag_admitpro = false;
 			flag_checkadmitpro = false;
-			puts("GETPRO\n");
+			slog_print(SLOG_INFO, 1, "<provision>GETPRO");
 			ControlMessage(3, OUTMESSAGE_GetPro);
 		}
 		if((flag_getpro_info == true) && (flag_getpro_element == true))
@@ -132,18 +140,34 @@ void *ProvisionThread (void *argv )
 			flag_getpro_info = false;
 			flag_getpro_element = false;
 			ControlMessage(28, OUTMESSAGE_Provision);
-			printf ("PROVISION\n");
+			slog_print(SLOG_INFO, 1, "<provision>PROVISION");
 		}
 		if(flag_provision == true)
 		{
 			flag_provision = false;
 			sleep(1);
 			ControlMessage(22, OUTMESSAGE_BindingALl);
-			printf ("BINDING ALL\n");
-			flag_blink=false;
-			pthread_cancel(tmp1);
-			mraa_gpio_write(mraa_gpio_init(15), 1);
+			slog_print(SLOG_INFO, 1, "<provision>BINDING ALL");
+			flag_set_type = false;
+//			flag_blink=false;
+//			pthread_cancel(tmp1);
+//			mraa_gpio_write(mraa_gpio_init(15), 1);
 		}
+		if(flag_set_type == true)
+		{
+			flag_set_type = false;
+//			HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 3, 5, 7, 21);
+//			sleep(2);
+			 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, adr_heartbeat, NULL16,\
+					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
+			 sleep(2);
+			 Function_Vendor(HCI_CMD_GATEWAY_CMD, AskTypeDevice_vendor_typedef, adr_heartbeat, NULL16,\
+					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
+			 sleep(3);
+			flag_done=true;
+			flag_mac=true;
+		}
+
 	}
 	return NULL;
 }

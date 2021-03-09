@@ -220,7 +220,7 @@ void CallModeRgb(uint16_t adrCallModeRgb, uint8_t SrgbID);
 
 void DelSceneRgb(uint16_t adrDelSceneRgb, uint16_t appID);
 
-void AskTypeDevice();
+void AskTypeDevice(uint16_t adr);
 
 void SetTypeDevice(uint16_t adrSetTypeDevice,uint8_t type, uint8_t attrubute, uint8_t application);
 

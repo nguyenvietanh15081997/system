@@ -429,10 +429,10 @@ void DelSceneRgb(uint16_t adrDelSceneRgb, uint16_t appID)
 }
 
 
-void AskTypeDevice()
+void AskTypeDevice(uint16_t adr)
 {
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adr & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adr>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_TYPE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
@@ -528,7 +528,7 @@ void Function_Vendor(uint16_t cmd,\
 		SaveGateway(adr);
 	}
 	else if(Func_vendor == AskTypeDevice_vendor_typedef){
-		AskTypeDevice();
+		AskTypeDevice(adr);
 	}
 	else if(Func_vendor == SetTypeDevice_vendor_typedef){
 		SetTypeDevice(adr,type,attrubute,application);

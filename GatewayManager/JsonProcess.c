@@ -123,28 +123,52 @@ void JsonControl(json_object *jobj,char *key){
 		 flagDefineCmd = resetnode_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, ResetNode_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
 	 }
-	 if(strcmp(key,"START")==0){
-		flagDefineCmd = start_enum;
-		slog_print(SLOG_NOTAG, 1, "<provision>Provision start");
-		MODE_PROVISION=true;
-		pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
-		//pthread_join(vrts_System_TestSend, NULL);
-	 }
-	 if(strcmp(key,"STOP")==0){
-		 flagDefineCmd = stop_enum;
-		 slog_print(SLOG_NOTAG, 1, "<provision>Provision stop");
-		MODE_PROVISION=false;
-		pthread_cancel(tmp);
-		flag_blink=false;
-		pthread_cancel(tmp1);
-		ControlMessage(3, OUTMESSAGE_ScanStop);
-		flag_selectmac     = false;
-		flag_getpro_info   = false;
-		flag_getpro_element= false;
-		flag_provision     = false;
-		flag_mac           = true;
-		flag_check_select_mac  = false;
-		flag_done          = true;
+//	 if(strcmp(key,"START")==0){
+//		flagDefineCmd = start_enum;
+//		slog_print(SLOG_NOTAG, 1, "<provision>Provision start");
+//		MODE_PROVISION=true;
+//		pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
+//		//pthread_join(vrts_System_TestSend, NULL);
+//	 }
+//	 if(strcmp(key,"STOP")==0){
+//		 flagDefineCmd = stop_enum;
+//		 slog_print(SLOG_NOTAG, 1, "<provision>Provision stop");
+//		MODE_PROVISION=false;
+//		pthread_cancel(tmp);
+//		flag_blink=false;
+//		pthread_cancel(tmp1);
+//		ControlMessage(3, OUTMESSAGE_ScanStop);
+//		flag_selectmac     = false;
+//		flag_getpro_info   = false;
+//		flag_getpro_element= false;
+//		flag_provision     = false;
+//		flag_mac           = true;
+//		flag_check_select_mac  = false;
+//		flag_done          = true;
+//	 }
+	 if(strcmp(key,"CMD")==0){
+		 if(strcmp(vrts_Json_String.cmd,"SCAN")==0){
+			slog_print(SLOG_INFO, 1, "<provision>Provision start");
+			MODE_PROVISION=true;
+			pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
+			//pthread_join(vrts_System_TestSend, NULL);
+		 }
+		 if(strcmp(vrts_Json_String.cmd,"STOP")==0){
+			slog_print(SLOG_INFO, 1, "<provision>Provision stop");
+			MODE_PROVISION=false;
+			pthread_cancel(tmp);
+//			flag_blink=false;
+//			pthread_cancel(tmp1);
+			ControlMessage(3, OUTMESSAGE_ScanStop);
+			flag_selectmac     = false;
+			flag_getpro_info   = false;
+			flag_getpro_element= false;
+			flag_provision     = false;
+			flag_mac           = true;
+			flag_check_select_mac  = false;
+			flag_done          = true;
+			flag_set_type = false;
+		 }
 	 }
 	 if(strcmp(key,"UPDATE")==0){
 		 flagDefineCmd = update_enum;
@@ -178,11 +202,11 @@ void JsonControl(json_object *jobj,char *key){
 	 }
 	 if((strcmp(key,"SAVEGATEWAY")==0)){
 		 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, vrts_Json_String.adr, NULL16,\
-				 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,28);
+				 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
 	 }
 	 if((strcmp(key,"TYPEDEVICESCAN")==0)){
-		 Function_Vendor(HCI_CMD_GATEWAY_CMD, AskTypeDevice_vendor_typedef, NULL16, NULL16,\
-				 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,28);
+		 Function_Vendor(HCI_CMD_GATEWAY_CMD, AskTypeDevice_vendor_typedef, vrts_Json_String.adr, NULL16,\
+				 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
 	 }
 	 if((strcmp(key,"SETTYPEDEVICE")==0)){
 		 Function_Vendor(HCI_CMD_GATEWAY_CMD, SetTypeDevice_vendor_typedef, vrts_Json_String.adr, NULL16, \
@@ -263,8 +287,8 @@ void Json_Parse(json_object * jobj)
 								 vrts_Json_String.saturation	= (json_object_get_int(json_object_object_get(jobj,"SATURATION")));
 								 vrts_Json_String.lightness 	= (json_object_get_int(json_object_object_get(jobj,"LIGHTNESS")));
 								 vrts_Json_String.resetnode 	= (json_object_get_int(json_object_object_get(jobj,"RESET")));
-								 vrts_Json_String.start 		= (json_object_get_int(json_object_object_get(jobj,"START")));
-								 vrts_Json_String.stop 			= (json_object_get_int(json_object_object_get(jobj,"STOP")));
+//								 vrts_Json_String.start 		= (json_object_get_int(json_object_object_get(jobj,"START")));
+//								 vrts_Json_String.stop 			= (json_object_get_int(json_object_object_get(jobj,"STOP")));
 								 vrts_Json_String.update 		= (json_object_get_int(json_object_object_get(jobj,"UPDATE")));
 								 vrts_Json_String.header        = (json_object_get_int(json_object_object_get(jobj,"HEADER")));
 								 vrts_Json_String.stt           = (json_object_get_int(json_object_object_get(jobj,"STT")));
@@ -293,6 +317,10 @@ void Json_Parse(json_object * jobj)
 								 vrts_Json_String.attrubute       = (json_object_get_int(json_object_object_get(jobj,"ATTRUBUTE")));
 								 vrts_Json_String.application   = (json_object_get_int(json_object_object_get(jobj,"APPLICATION")));
 								 JsonControl(jobj,key);
+								 break;
+							 case json_type_string:
+								 vrts_Json_String.cmd 	= (json_object_get_string(json_object_object_get(jobj,"CMD")));
+								 JsonControl(jobj, key);
 								 break;
 							 case json_type_array:
 									//printf("type: json_type_array\n");

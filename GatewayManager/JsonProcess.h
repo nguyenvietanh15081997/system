@@ -51,6 +51,7 @@ typedef struct jsonstring
 	uint16_t appID;
 	uint8_t srgbID;
 	uint16_t sceneID;
+	uint8_t *cmd;
 
 	uint8_t sceneforremote;
 	uint8_t sceneforsensor;

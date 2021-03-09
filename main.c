@@ -20,7 +20,7 @@ pthread_t vrts_System_ThreadGWIF;
 pthread_t vrts_System_TestSend;
 pthread_t vrts_System_MQTT;
 pthread_t vrts_System_Time;
-pthread_t vrts_System_Gpio;
+//pthread_t vrts_System_Gpio;
 
 SLogConfig slgCfg;
 
@@ -41,19 +41,16 @@ int main(void) {
 	slog_config_set(&slgCfg);
 	flag_mac=true;
 	flag_done=true;
-	gpio_export(15);
-	gpio_dir_out(15);
-	gpio_value(15, 0);
 	pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
     pthread_create(&vrts_System_ThreadGWIF, NULL, GWINF_Thread, NULL);
     pthread_create(&vrts_System_MQTT,   NULL,   MQTT_Thread,    NULL);
-    pthread_create(&vrts_System_Time,NULL,Time_Thread, NULL);
-    pthread_create(&vrts_System_Gpio,NULL,Led_Thread,NULL);
+    //pthread_create(&vrts_System_Time,NULL,Time_Thread, NULL);
+    //pthread_create(&vrts_System_Gpio,NULL,Led_Thread,NULL);
 
 	pthread_join(vrts_System_ThreadGWIF, NULL);
 	pthread_join(vrts_System_TestSend, NULL);
     pthread_join(vrts_System_MQTT,NULL);
-    pthread_join(vrts_System_Time, NULL);
+    //pthread_join(vrts_System_Time, NULL);
     //pthread_join(vrts_System_Gpio,NULL);
 
 
