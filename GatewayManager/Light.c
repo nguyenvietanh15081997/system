@@ -548,4 +548,23 @@ void Function_Vendor(uint16_t cmd,\
 	}
 	slog_info("(cmd)%s",tempDataLog);
 }
-
+uint16_t Percent2ParamCCT(uint8_t percent)
+{
+	return ((percent*192)+800);
+}
+uint8_t Param2PrecentCCT(uint16_t param){
+	return ((param-800)/192);
+}
+uint16_t Percent2ParamDIM(uint8_t percent)
+{
+	return ((percent*255)/100);
+}
+uint8_t Param2PrecentDIM(uint16_t param){
+	return ((param*100)/255);
+}
+uint16_t Percent2ParamHSL(uint8_t percent){
+	return((percent * 65535)/100);
+}
+uint8_t Param2PercentHSL(uint16_t param){
+	return((param * 100)/65535);
+}

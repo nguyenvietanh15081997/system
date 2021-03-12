@@ -21,9 +21,3 @@ bool IsRemoteSetup(remotersp * rsp,unsigned char parButtonId,unsigned char parMo
 	else return false;
 }
 
-/*
- * TODO: xây dựng một số byte quan trọng trong bản tin điều khiển set scene cho remote
- * - hàm này sẽ được gọi trong hàm FunctionPre() trong Light.h
- * - cần xem xét tối ưu lại
- */
-

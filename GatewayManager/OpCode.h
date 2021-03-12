@@ -323,6 +323,7 @@ extern bool check_add_or_del_group;
 extern bool check_add_or_del_scene;
 extern bool MODE_PROVISION;
 
+uint16_t TypeConvertID(uint8_t type, uint8_t attrubute, uint8_t application);
 #ifdef __cplusplus
 }
 #endif

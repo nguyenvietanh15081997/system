@@ -6,6 +6,7 @@
 #include "../GatewayManager/LedProcess.h"
 #include "../GatewayManager/slog.h"
 #include "../GatewayManager/Light.h"
+#include "../GatewayManager/LedProcess.h"
 
 pthread_t tmp;
 pthread_t vrts_System_Gpio;
@@ -47,22 +48,17 @@ void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 }
 void *ProvisionThread (void *argv )
 {
-	mraa_init();
-	mraa_gpio_init(15);
-	mraa_gpio_dir(mraa_gpio_init(15), MRAA_GPIO_OUT);
 	tmp = pthread_self();
 	while(MODE_PROVISION){
-		if((flag_done == true) || (Timeout_CheckDataBuffer == 32000))
+		if((flag_done == true) || (Timeout_CheckDataBuffer == 20000))
 		{
 			scanNotFoundDev++;
 			if(scanNotFoundDev==3)
 			{
 				scanNotFoundDev = 0;
 				MODE_PROVISION=false;
-				pthread_cancel(tmp);
-//				flag_blink=false;
-//				pthread_cancel(tmp1);
 				ControlMessage(3, OUTMESSAGE_ScanStop);
+				slog_print(SLOG_INFO, 1, "<provision>Provision stop");
 				flag_selectmac     = false;
 				flag_getpro_info   = false;
 				flag_getpro_element= false;
@@ -74,6 +70,12 @@ void *ProvisionThread (void *argv )
 				flag_admitpro = false;
 				flag_checkadmitpro = true;
 				flag_set_type = false;
+
+				// for gpio
+				flag_close_gpio = false;
+				flag_blink = false;
+				led_pin_off(gpio[LED_BLE_PIN_INDEX]);
+				pthread_cancel(tmp1);
 			}
 			else
 			{
@@ -82,10 +84,13 @@ void *ProvisionThread (void *argv )
 				sleep(1);
 				ControlMessage(3, OUTMESSAGE_ScanStart);
 				slog_print(SLOG_INFO, 1, "<provision>SCAN");
-//				flag_blink = true;
-//			    pthread_create(&vrts_System_Gpio,NULL,Led_Thread,NULL);
-//				mraa_gpio_write(mraa_gpio_init(15), 0);
 				flag_check_select_mac= true;
+
+				// for gpio
+				pthread_create(&tmp1,NULL, Led_Thread, NULL);
+				flag_blink = true;
+				flag_close_gpio = false;
+				puts("blink");
 			}
 		}
 
@@ -125,8 +130,9 @@ void *ProvisionThread (void *argv )
 			}
 			slog_print(SLOG_INFO, 1, "<provision>ADMITPRO...");
 			ControlMessage(21, admit_pro_internal);
-			flag_checkadmitpro = true;
 			sleep(4);
+			flag_checkadmitpro = true;
+
 		}
 		if(flag_admitpro == true && flag_checkadmitpro== true)
 		{
@@ -149,15 +155,12 @@ void *ProvisionThread (void *argv )
 			ControlMessage(22, OUTMESSAGE_BindingALl);
 			slog_print(SLOG_INFO, 1, "<provision>BINDING ALL");
 			flag_set_type = false;
-//			flag_blink=false;
-//			pthread_cancel(tmp1);
-//			mraa_gpio_write(mraa_gpio_init(15), 1);
 		}
 		if(flag_set_type == true)
 		{
 			flag_set_type = false;
-//			HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 3, 5, 7, 21);
-//			sleep(2);
+//			HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 12, 5, 7, 21);
+//			sleep(1);
 			 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, adr_heartbeat, NULL16,\
 					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
 			 sleep(2);

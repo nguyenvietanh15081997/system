@@ -146,12 +146,7 @@ void GWIF_CheckData (void){
 	else
 	{
 		Timeout_CheckDataBuffer++;
-//		if(Timeout_CheckDataBuffer == 3199){
-//			scanNotFoundDev++;
-//			printf("%d",scanNotFoundDev);
-//		}
 	}
-
 }
 
 /*
@@ -240,7 +235,6 @@ void GWIF_ProcessData (void)
 				}
 				flag_getpro_info = true;
 			}
-//			printf("ADR: %d\n",adr_heartbeat);
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_SEND_ELE_CNT)
 			{
 				flag_getpro_element=true;
@@ -250,14 +244,16 @@ void GWIF_ProcessData (void)
 			{
 				flag_provision =true;
 			}
-//			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE){
-//				adr_heartbeat= vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
-//				printf("ADR= %d",adr_heartbeat);
-//			}
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_KEY_BIND_EVT && vrts_GWIF_IncomeMessage->Message[1] == HCI_GATEWAY_CMD_BIND_SUSCESS)
 			{
 				slog_info("<provision> success");
-				//flag_blink = false;
+
+				// for gpio
+
+				flag_blink = false;
+				pthread_cancel(tmp1);
+				led_pin_on(gpio[LED_BLE_PIN_INDEX]);
+
 			}
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_KEY_BIND_RSP)
 			{
@@ -265,8 +261,8 @@ void GWIF_ProcessData (void)
 //				flag_done=true;
 //				flag_mac=true;
 //				printf("ADADADADAD= %d",adr_heartbeat);
-//				HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 3, 5, 7, 21);
-//				sleep(2);
+				//HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 3, 5, 7, 21);
+				//sleep(2);
 //				 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, 65535, NULL16,\
 //						 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
 //				 sleep(2);
@@ -278,13 +274,16 @@ void GWIF_ProcessData (void)
 /*
  * TODO: process for sensor(light, PIR, remote,...)
  */
-			if(vrts_GWIF_IncomeMessage->Message[5] == (SENSOR_TYPE & 0xFF)){
+			if(vrts_GWIF_IncomeMessage->Message[0]==HCI_GATEWAY_RSP_OP_CODE && vrts_GWIF_IncomeMessage->Message[5] == (SENSOR_TYPE & 0xFF)){
+				uint16_t adr = (vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8));
 				if((vrts_GWIF_IncomeMessage->Message[6] == (REMOTE_MODULE_DC_TYPE & 0xFF)) && \
-				   (vrts_GWIF_IncomeMessage->Message[7] == (REMOTE_MODULE_DC_TYPE>>8) & 0xFF)){
+				   (vrts_GWIF_IncomeMessage->Message[7] == (REMOTE_MODULE_DC_TYPE>>8 & 0xFF))){
 					puts(">>Remote DC");
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
+
 					uint16_t pscenedc = (vrts_Remote_Rsp->senceID[0] <<8) |(vrts_Remote_Rsp->senceID[1]);
 					uint16_t scenrgb = (vrts_Remote_Rsp->futureID[0] <<8) |(vrts_Remote_Rsp->futureID[1]);
+					CreatJson_TypeDev(TP_STATUS, "ADR", "BUTTONID", "MODEID", "SCENEID", adr, vrts_Remote_Rsp->buttonID, vrts_Remote_Rsp->modeID,pscenedc);
 					if(pscenedc!=0)
 					{
 						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
@@ -299,39 +298,40 @@ void GWIF_ProcessData (void)
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (REMOTE_MODULE_AC_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((REMOTE_MODULE_AC_TYPE>>8) & 0xFF))){
 					puts(">>Remote AC");
+					//uint16_t adr = (vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage[2]<<8));
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					uint16_t psceneac = (vrts_Remote_Rsp->senceID[0] <<8) |(vrts_Remote_Rsp->senceID[1]);
 					uint16_t scenrgb = (vrts_Remote_Rsp->futureID[0] <<8) |(vrts_Remote_Rsp->futureID[1]);
+					CreatJson_TypeDev(TP_STATUS, "ADR", "BUTTONID", "MODEID", "SCENEID", adr, vrts_Remote_Rsp->buttonID, vrts_Remote_Rsp->modeID,psceneac);
 					if(psceneac!=0)
 					{
-						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,psceneac, NULL16,NULL16, NULL16, NULL16, 17);
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16,\
+								NULL16,psceneac, NULL16,NULL16, NULL16, NULL16, 17);
 						sleep(1);
 						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
 														NULL16, NULL16,NULL16, NULL16,scenrgb, NULL8, NULL8, NULL8, NULL8,23);
-						/*
-						 * add to call scene RGB
-						 */
 					}
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (POWER_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((POWER_TYPE>>8) & 0xFF))){
 					puts(">>Power");
 					vrts_Battery_Rsp = (batteryRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
-					ProcessBat(vrts_Battery_Rsp);
+					uint16_t power = ProcessBat(vrts_Battery_Rsp);
+					CreatJson(TP_STATUS, "ADR", "POWER", adr, power);
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (LIGHT_SENSOR_MODULE_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((LIGHT_SENSOR_MODULE_TYPE>>8) & 0xFF))){
 					puts(">>Light Sensor");
 					vrts_LighSensor_Rsp = (lightsensorRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
-					uint16_t adrSensorLight= vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+					//uint16_t adrSensorLight= vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 					ProcessLightSensor(vrts_LighSensor_Rsp);
-					CreatJson(TP_STATUS, "ADR", "LUX", adrSensorLight, value_Lux);
+					CreatJson(TP_STATUS, "ADR", "LUX", adr, value_Lux);
 				}
 				else if ((vrts_GWIF_IncomeMessage->Message[6] == (PIR_SENSOR_MODULE_TYPE & 0xFF)) && \
 				   (vrts_GWIF_IncomeMessage->Message[7] == ((PIR_SENSOR_MODULE_TYPE>>8) & 0xFF))){
 					puts(">>PIR MOTION");
-					uint16_t adrSensorPIR= vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
-					CreatJson(TP_STATUS, "ADR", "PIR", adrSensorPIR, 1);
+					//uint16_t adrSensorPIR= vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+					CreatJson(TP_STATUS, "ADR", "PIR", adr, 1);
 				}
 			}
             /*..........................*/
@@ -357,6 +357,7 @@ void GWIF_ProcessData (void)
 						jsonvalue = vrts_GWIF_IncomeMessage->Message[8] & 0xFF;
 					}
 					CreatJson(TP_STATUS,"ADR","ONOFF",jsonadr,jsonvalue);
+
 					break;
 				case LIGHT_CTL_TEMP_STATUS:
 					if(vrui_GWIF_LengthMeassge == 12){
@@ -365,7 +366,7 @@ void GWIF_ProcessData (void)
 					else{
 						jsonvalue = vrts_GWIF_IncomeMessage->Message[11] | (vrts_GWIF_IncomeMessage->Message[12]<<8);
 					}
-					CreatJson(TP_STATUS,"ADR","CCT",jsonadr,jsonvalue);
+					CreatJson(TP_STATUS,"ADR","CCT",jsonadr,Param2PrecentCCT(jsonvalue));
 					break;
 				case LIGHTNESS_STATUS:
 					if(vrui_GWIF_LengthMeassge == 10){
@@ -374,7 +375,7 @@ void GWIF_ProcessData (void)
 					if(vrui_GWIF_LengthMeassge == 13){
 						jsonvalue = vrts_GWIF_IncomeMessage->Message[10] & 0xFF;
 					}
-					CreatJson(TP_STATUS, "ADR", "DIM", jsonadr, jsonvalue);
+					CreatJson(TP_STATUS, "ADR", "DIM", jsonadr, Param2PrecentDIM(jsonvalue));
 					break;
 
 				case LIGHT_HSL_STATUS:
@@ -416,7 +417,7 @@ void GWIF_ProcessData (void)
 					break;
 				case NODE_RESET_STATUS:
 					jsonvalue = 1;
-					CreatJson(TP_STATUS, "ADR", "RESET", jsonadr, jsonvalue);
+					CreatJsonString(TP_STATUS, "CMD", "ADR", "RESETNODE", jsonadr);
 					break;
 				}
 			}
@@ -425,17 +426,20 @@ void GWIF_ProcessData (void)
 					(((vrts_GWIF_IncomeMessage->Message[6])|(vrts_GWIF_IncomeMessage->Message[7]<<8)) == VENDOR_ID))
 			{
 				uint16_t jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
-				puts("check opcode");
+				//puts("check opcode");
 				if(((vrts_GWIF_IncomeMessage->Message[8]|(vrts_GWIF_IncomeMessage->Message[9]<<8)) == HEADER_TYPE_ASK) || \
 						((vrts_GWIF_IncomeMessage->Message[8]|(vrts_GWIF_IncomeMessage->Message[9]<<8)) == HEADER_TYPE_SET)){
 					uint8_t jsonType,jsonAttrubute,jsonApplication;
-					puts("check header");
+					puts("check header type");
 					jsonType = vrts_GWIF_IncomeMessage->Message[10];
 					jsonAttrubute = vrts_GWIF_IncomeMessage->Message[11];
 					jsonApplication = vrts_GWIF_IncomeMessage->Message[12];
-					CreatJson_TypeDev(TP_STATUS, "ADR", "TYPE", "ATTRUBUTE", "APPLICATION", jsonadr, jsonType, jsonAttrubute, jsonApplication);
+					//CreatJson_TypeDev(TP_STATUS, "ADR", "TYPE", "ATTRUBUTE", "APPLICATION", jsonadr, jsonType, jsonAttrubute, jsonApplication);
+					//CreatJson(TP_STATUS, "ADR", "ID",jsonadr , TypeConvertID(jsonType,jsonAttrubute,jsonApplication));
+					CreatJson_New_TypeDev(TP_STATUS, "ADR", "ID", "CMD", "DATA", jsonadr,TypeConvertID(jsonType,jsonAttrubute,jsonApplication),"TYPE_DEVICE");
 				}
 				else if((vrts_GWIF_IncomeMessage->Message[8]|(vrts_GWIF_IncomeMessage->Message[9]<<8)) == HEADER_TYPE_SAVEGW){
+					//puts("check header savegwsavegw");
 					CreatJson(TP_STATUS, "ADR", "SAVEGATEWAY", jsonadr, 1);
 				}
 			}
@@ -445,7 +449,7 @@ void GWIF_ProcessData (void)
 			{
 				uint16_t jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				uint16_t header_scene= vrts_GWIF_IncomeMessage->Message[8]| (vrts_GWIF_IncomeMessage->Message[9]<<8);
-				printf("%x %x",vrts_GWIF_IncomeMessage->Message[8],vrts_GWIF_IncomeMessage->Message[9]);
+				//printf("%x %x",vrts_GWIF_IncomeMessage->Message[8],vrts_GWIF_IncomeMessage->Message[9]);
 				switch(header_scene)
 				{
 				case HEADER_SCENE_CALL_MODE:
@@ -470,8 +474,6 @@ void GWIF_ProcessData (void)
 			}
 	}
 }
-
-
 /*
  * Tien trinh xu ly ban tin giao tiep Gateway bao gom
  * - Nhan ban tin ve

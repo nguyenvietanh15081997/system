@@ -25,6 +25,7 @@ extern bool flag_admitpro;
 extern bool flag_checkadmitpro;
 extern bool flag_set_type;
 
+
 extern unsigned int Timeout_CheckDataBuffer;
 extern unsigned char scanNotFoundDev;
 extern unsigned int adr_heartbeat;

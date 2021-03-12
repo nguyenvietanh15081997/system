@@ -3,14 +3,16 @@
 
 mraa_gpio_context *gpio;
 bool flag_blink = false;
+bool flag_close_gpio = false;
 pthread_t tmp1;
 
+
 void gpio_pin_write_on(mraa_gpio_context gpio){
-    mraa_gpio_write(gpio, 1);
+    mraa_gpio_write(gpio, 0);
 }
 
 void gpio_pin_write_off(mraa_gpio_context gpio){
-    mraa_gpio_write(gpio, 0);
+    mraa_gpio_write(gpio, 1);
 }
 
 void led_pin_init(){
@@ -23,20 +25,30 @@ void led_pin_init(){
         gpio[pins_index[i]] = mraa_gpio_init(pins_map[i]);
         mraa_gpio_dir(gpio[pins_index[i]], MRAA_GPIO_OUT);
     }
+    mraa_gpio_write(gpio[LED_ZIGBEE_PIN_INDEX], 1);
+    mraa_gpio_write(gpio[LED_BLE_PIN_INDEX], 1);
 }
-
+void led_pin_close(){
+	uint8_t pins_map[] = LED_PINS_MAP;
+	int i;
+	for(i = 0; i < sizeof(pins_map)/sizeof(uint8_t); i++){
+		mraa_gpio_close(gpio[i]);
+	}
+}
 void led_pin_on(mraa_gpio_context led_pin){
     gpio_pin_write_on(led_pin);
+    puts("on");
 }
 
 void led_pin_off(mraa_gpio_context led_pin){
     gpio_pin_write_off(led_pin);
+    puts("off");
 }
 
 void led_pin_blink_once(mraa_gpio_context led_pin){
-		led_pin_on(led_pin);puts("on");
+		led_pin_on(led_pin);
 		sleep(1);
-		led_pin_off(led_pin);puts("off");
+		led_pin_off(led_pin);
 		sleep(1);
 }
 
@@ -46,18 +58,10 @@ void* Led_Thread(void* arvg){
     led_pin_init();
     tmp1 = pthread_self();
     while(flag_blink){
-    	//for testing
-        //led_pin_blink_once(gpio[3]);
-        //led_pin_blink_once(gpio[2]);
-        //led_pin_blink_once(gpio[1]);
-    	led_pin_blink_once(gpio[2]);//}
-        /*
-         * user code here
-         *
-         */
+    	led_pin_blink_once(gpio[LED_BLE_PIN_INDEX]);
     }
-    for(i = 0; i < sizeof(pins_map)/sizeof(uint8_t); i++){
-        mraa_gpio_close(gpio[i]);
-    }
+//	for(i = 0; i < sizeof(pins_map)/sizeof(uint8_t); i++){
+//		mraa_gpio_close(gpio[i]);
+//	}
     return NULL;
 }

@@ -19,6 +19,8 @@ pthread_t vrts_System_TestSend;
 bool arr_json = false;
 bool flag_addscene = false;
 bool flag_delscene = false;
+
+bool check_resetnode = false;
 uint16_t adr_dv[100];
 int i, arraylen, lst_count_id;
 
@@ -29,19 +31,27 @@ char flagSecond=0;
  * TODO: xử lý chuỗi json phức tạp không dùng delay
  */
 void JsonControl(json_object *jobj,char *key){
+	if(strcmp(key,"ADR")==0){
+		if(check_resetnode)
+		{
+			check_resetnode = false;
+			 FunctionPer(HCI_CMD_GATEWAY_CMD, ResetNode_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
+		}
+	}
 	if(strcmp(key,"ONOFF")==0){
 		 flagDefineCmd = onoff_enum;
-		 FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,vrts_Json_String.adr ,NULL8, vrts_Json_String.onoff, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
+		 FunctionPer(HCI_CMD_GATEWAY_CMD,CCT_Get_typedef,vrts_Json_String.adr ,NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
+		 //FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,vrts_Json_String.adr ,NULL8, vrts_Json_String.onoff, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
 		 sleep(1);
 	 }
 	 if(strcmp(key,"CCT")==0){
 		 flagDefineCmd = cct_enum;
-		 FunctionPer(HCI_CMD_GATEWAY_CMD, CCT_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16,vrts_Json_String.cct, NULL16, NULL16,NULL16, NULL16, NULL16, 17);
+		 FunctionPer(HCI_CMD_GATEWAY_CMD, CCT_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16,Percent2ParamCCT(vrts_Json_String.cct), NULL16, NULL16,NULL16, NULL16, NULL16, 17);
 		 sleep(1);
 	 }
 	 if(strcmp(key,"DIM")==0){
 		 flagDefineCmd = dim_enum;
-		 FunctionPer(HCI_CMD_GATEWAY_CMD, Lightness_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, vrts_Json_String.dim, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
+		 FunctionPer(HCI_CMD_GATEWAY_CMD, Lightness_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, Percent2ParamDIM(vrts_Json_String.dim), NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
 		 sleep(1);
 	 }
 	 if(strcmp(key,"HOURS")==0){
@@ -119,10 +129,10 @@ void JsonControl(json_object *jobj,char *key){
 		 flagDefineCmd = hue_eum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, HSL_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,vrts_Json_String.lightness, vrts_Json_String.hue, vrts_Json_String.saturation, 19 );
 	 }
-	 if(strcmp(key,"RESET")==0){
-		 flagDefineCmd = resetnode_enum;
-		 FunctionPer(HCI_CMD_GATEWAY_CMD, ResetNode_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
-	 }
+//	 if(strcmp(key,"RESET")==0){
+//		 flagDefineCmd = resetnode_enum;
+//		 FunctionPer(HCI_CMD_GATEWAY_CMD, ResetNode_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
+//	 }
 //	 if(strcmp(key,"START")==0){
 //		flagDefineCmd = start_enum;
 //		slog_print(SLOG_NOTAG, 1, "<provision>Provision start");
@@ -156,10 +166,8 @@ void JsonControl(json_object *jobj,char *key){
 		 if(strcmp(vrts_Json_String.cmd,"STOP")==0){
 			slog_print(SLOG_INFO, 1, "<provision>Provision stop");
 			MODE_PROVISION=false;
-			pthread_cancel(tmp);
-//			flag_blink=false;
-//			pthread_cancel(tmp1);
 			ControlMessage(3, OUTMESSAGE_ScanStop);
+			pthread_cancel(tmp);
 			flag_selectmac     = false;
 			flag_getpro_info   = false;
 			flag_getpro_element= false;
@@ -168,6 +176,13 @@ void JsonControl(json_object *jobj,char *key){
 			flag_check_select_mac  = false;
 			flag_done          = true;
 			flag_set_type = false;
+			//for gpio
+			flag_blink = false;
+			pthread_create(&tmp1,NULL,Led_Thread,NULL);
+			led_pin_off(gpio[LED_BLE_PIN_INDEX]);
+		 }
+		 if(strcmp(vrts_Json_String.cmd,"RESETNODE")==0){
+			 check_resetnode = true;
 		 }
 	 }
 	 if(strcmp(key,"UPDATE")==0){
@@ -347,6 +362,17 @@ void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,
 	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
 	slog_info("(mqtt)Message_send:%s",rsp);
 }
+void CreatJsonString(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,char * par1, uint16_t par2)
+{
+	struct json_object * object;
+	object = json_object_new_object();
+	json_object_object_add(object, objectJsonAdr, json_object_new_string(par1));
+	json_object_object_add(object, objectJsonValue, json_object_new_int(par2));
+	char *rsp;
+	rsp = json_object_to_json_string(object);
+	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
+	slog_info("(mqtt)Message_send:%s",rsp);
+}
 /*
  * TODO:chỉ cho lúc phản hồi bản tin type device
  */
@@ -363,4 +389,19 @@ void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJs
 	rsp = json_object_to_json_string(object);
 	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
 	slog_info("(mqtt)Message_send:%s",rsp);
+}
+void CreatJson_New_TypeDev(uint8_t *topic,uint8_t * key1, uint8_t * key2, uint8_t * key3, uint8_t * key4,\
+		 uint16_t value1, uint16_t value2,uint8_t *value3){
+	struct json_object * object;
+		struct json_object * object1;
+		object = json_object_new_object();
+		object1 = json_object_new_object();
+		json_object_object_add(object1, key1, json_object_new_int(value1));
+		json_object_object_add(object1, key2, json_object_new_int(value2));
+		json_object_object_add(object, key3, json_object_new_string(value3));
+		json_object_object_add(object, key4,object1);
+		char *rsp;
+		rsp = json_object_to_json_string(object);
+		mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
+		slog_info("(mqtt)Message_send:%s",rsp);
 }

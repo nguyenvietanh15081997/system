@@ -109,9 +109,14 @@ int json_parse_array( json_object *jobj, char *key);
 void Json_Parse(json_object * jobj);
 
 void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,uint16_t par1, uint16_t par2);
+
+void CreatJsonString(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,char * par1, uint16_t par2);
+
 void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJsonType, uint8_t *objectJsonAttrubute, \
 		uint8_t *objectJsonApplication,uint16_t parAdr, uint16_t parType, uint16_t parAttrubute, uint16_t parApplication);
 
+void CreatJson_New_TypeDev(uint8_t *topic,uint8_t * key1, uint8_t * key2, uint8_t * key3, uint8_t * key4,\
+		 uint16_t value1, uint16_t value2,uint8_t *value3);
 #ifdef __cplusplus
 }
 #endif

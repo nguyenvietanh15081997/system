@@ -34,6 +34,6 @@ void ProcessLightSensor(lightsensorRsp *rsp)
 {
 	luxReg=rsp->luxValue[1] | (rsp->luxValue[0]<<8);
 	value_Lux = CalculateLux(luxReg);
-	printf ("Lux= %d\n",value_Lux);
+	//printf ("Lux= %d\n",value_Lux);
 }
 
