@@ -274,6 +274,9 @@ extern "C" {
 
 /*for type dev*/
 #define OPCODE_TYPEDEV              	0xA182
+
+/*for heartbeat*/
+#define TSCRIPT_HEARBEAT                0x8f
 typedef enum{
 	RD_MAINTYPE_LAMP   = 0,
 	RD_MAINTYPE_SENCE  = 1,

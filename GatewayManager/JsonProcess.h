@@ -112,6 +112,8 @@ void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,
 
 void CreatJsonString(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,char * par1, uint16_t par2);
 
+void CreatJsonString_2(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue , uint16_t par1, char * par2);
+
 void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJsonType, uint8_t *objectJsonAttrubute, \
 		uint8_t *objectJsonApplication,uint16_t parAdr, uint16_t parType, uint16_t parAttrubute, uint16_t parApplication);
 

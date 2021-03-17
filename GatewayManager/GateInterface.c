@@ -258,17 +258,6 @@ void GWIF_ProcessData (void)
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_KEY_BIND_RSP)
 			{
 				flag_set_type = true;
-//				flag_done=true;
-//				flag_mac=true;
-//				printf("ADADADADAD= %d",adr_heartbeat);
-				//HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 3, 5, 7, 21);
-				//sleep(2);
-//				 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, 65535, NULL16,\
-//						 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
-//				 sleep(2);
-//				 Function_Vendor(HCI_CMD_GATEWAY_CMD, AskTypeDevice_vendor_typedef, NULL16, NULL16,\
-//						 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
-//				 sleep(2);
 			}
             /*...........................................*/
 /*
@@ -426,7 +415,6 @@ void GWIF_ProcessData (void)
 					(((vrts_GWIF_IncomeMessage->Message[6])|(vrts_GWIF_IncomeMessage->Message[7]<<8)) == VENDOR_ID))
 			{
 				uint16_t jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
-				//puts("check opcode");
 				if(((vrts_GWIF_IncomeMessage->Message[8]|(vrts_GWIF_IncomeMessage->Message[9]<<8)) == HEADER_TYPE_ASK) || \
 						((vrts_GWIF_IncomeMessage->Message[8]|(vrts_GWIF_IncomeMessage->Message[9]<<8)) == HEADER_TYPE_SET)){
 					uint8_t jsonType,jsonAttrubute,jsonApplication;
@@ -439,7 +427,6 @@ void GWIF_ProcessData (void)
 					CreatJson_New_TypeDev(TP_STATUS, "ADR", "ID", "CMD", "DATA", jsonadr,TypeConvertID(jsonType,jsonAttrubute,jsonApplication),"TYPE_DEVICE");
 				}
 				else if((vrts_GWIF_IncomeMessage->Message[8]|(vrts_GWIF_IncomeMessage->Message[9]<<8)) == HEADER_TYPE_SAVEGW){
-					//puts("check header savegwsavegw");
 					CreatJson(TP_STATUS, "ADR", "SAVEGATEWAY", jsonadr, 1);
 				}
 			}
@@ -449,7 +436,6 @@ void GWIF_ProcessData (void)
 			{
 				uint16_t jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				uint16_t header_scene= vrts_GWIF_IncomeMessage->Message[8]| (vrts_GWIF_IncomeMessage->Message[9]<<8);
-				//printf("%x %x",vrts_GWIF_IncomeMessage->Message[8],vrts_GWIF_IncomeMessage->Message[9]);
 				switch(header_scene)
 				{
 				case HEADER_SCENE_CALL_MODE:
@@ -471,6 +457,10 @@ void GWIF_ProcessData (void)
 					CreatJson(TP_STATUS, "ADR", "SCENEFORSENSOR", jsonadr, 1);
 					break;
 				}
+			}
+			if(vrts_GWIF_IncomeMessage->Message[0] == TSCRIPT_HEARBEAT){
+				uint16_t adr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+				CreatJsonString_2(TP_STATUS, "ADR", "STATUS", adr,"ONLINE");
 			}
 	}
 }

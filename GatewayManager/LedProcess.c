@@ -37,12 +37,10 @@ void led_pin_close(){
 }
 void led_pin_on(mraa_gpio_context led_pin){
     gpio_pin_write_on(led_pin);
-    puts("on");
 }
 
 void led_pin_off(mraa_gpio_context led_pin){
     gpio_pin_write_off(led_pin);
-    puts("off");
 }
 
 void led_pin_blink_once(mraa_gpio_context led_pin){

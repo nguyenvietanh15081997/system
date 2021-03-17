@@ -90,7 +90,6 @@ void *ProvisionThread (void *argv )
 				pthread_create(&tmp1,NULL, Led_Thread, NULL);
 				flag_blink = true;
 				flag_close_gpio = false;
-				puts("blink");
 			}
 		}
 
@@ -159,8 +158,8 @@ void *ProvisionThread (void *argv )
 		if(flag_set_type == true)
 		{
 			flag_set_type = false;
-//			HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 12, 5, 7, 21);
-//			sleep(1);
+			HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 11, 5, 7, 21);
+			sleep(1);
 			 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, adr_heartbeat, NULL16,\
 					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
 			 sleep(2);
