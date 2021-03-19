@@ -266,7 +266,8 @@ extern "C" {
 #define RD_OPCODE_SCENE_RSP             (0xE3)
 
 #define VENDOR_ID                       0x0211
-#define STATUS_CMD                      0x0000
+#define STATUS_CMD_SCENE                0x00E3
+#define STATUS_CMD_TYPE   				0x00E1
 
 
 /* opcode for light rgb*/

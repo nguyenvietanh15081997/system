@@ -253,18 +253,18 @@ void FunctionPer(uint16_t cmd,\
 	}
 
 	uint8_t *tempDataUart;
-	uint8_t tempDataLog[200]="";
-	uint8_t temp[4];
+//	uint8_t tempDataLog[200]="";
+//	uint8_t temp[4];
 
 	tempDataUart = (uint8_t *)&vrts_CMD_STRUCTURE;
 	ControlMessage(cmdLength, tempDataUart);
-	int i;
-	//strcpy(TempData2,h);
-	for(i=0;i< cmdLength;i++){
-		sprintf(temp,"%x ",tempDataUart[i]);
-		strcat(tempDataLog,temp);
-	}
-	slog_info("(cmd)%s",tempDataLog);
+//	int i;
+//	//strcpy(TempData2,h);
+//	for(i=0;i< cmdLength;i++){
+//		sprintf(temp,"%x ",tempDataUart[i]);
+//		strcat(tempDataLog,temp);
+//	}
+//	slog_info("(cmd)%s",tempDataLog);
 }
 void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8_t countLog, uint8_t periodLog, uint8_t tll, uint16_t feature, uint16_t cmdLength)
 {
@@ -290,18 +290,18 @@ void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8
 	vrts_CMD_STRUCTURE.para[7]= vrts_CMD_STRUCTURE.para[8]= 0;
 
 	uint8_t *tempDataUart;
-	uint8_t tempDataLog[200]="";
-	uint8_t temp[4];
-
+//	uint8_t tempDataLog[200]="";
+//	uint8_t temp[4];
+//
 	tempDataUart = (uint8_t *)&vrts_CMD_STRUCTURE;
 	ControlMessage(cmdLength, tempDataUart);
-	int i;
-	//strcpy(TempData2,h);
-	for(i=0;i< cmdLength;i++){
-		sprintf(temp,"%x ",tempDataUart[i]);
-		strcat(tempDataLog,temp);
-	}
-	slog_info("(cmd)%s",tempDataLog);
+//	int i;
+//	//strcpy(TempData2,h);
+//	for(i=0;i< cmdLength;i++){
+//		sprintf(temp,"%x ",tempDataUart[i]);
+//		strcat(tempDataLog,temp);
+//	}
+//	slog_info("(cmd)%s",tempDataLog);
 }
 
 
@@ -313,8 +313,8 @@ void SetSceneForRemote(uint16_t addressremote, uint8_t buttonId, uint8_t modeId,
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0]= RD_OPCODE_SCENE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1]= (VENDOR_ID) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2]= (VENDOR_ID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_SET) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_SET>>8 & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2]= buttonId;
@@ -337,8 +337,8 @@ void SetSceneForSensor(uint16_t addressSensor, uint8_t stt, uint16_t condition, 
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = (VENDOR_ID) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SENSOR_SET) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SENSOR_SET>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = stt;
@@ -364,8 +364,8 @@ void SetSceneForRGB(uint16_t pAdrRgb, uint16_t pAppID, uint8_t pSrgbID)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] =  RD_OPCODE_SCENE_SEND;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] =  VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SET) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SET>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = pAppID & 0xFF;
@@ -380,8 +380,8 @@ void CallSceneRgb(uint16_t appID)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] =  RD_OPCODE_SCENE_SEND;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] =  VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_CALL_SCENE_RGB) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_CALL_SCENE_RGB>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = appID & 0xFF;
@@ -398,8 +398,8 @@ void CallModeRgb(uint16_t adrCallModeRgb, uint8_t SrgbID)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] =  RD_OPCODE_SCENE_SEND;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] =  VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_CALL_MODE) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_CALL_MODE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = vrts_CMD_STRUCTURE_VENDOR.para[3] = 0x00;
@@ -416,8 +416,8 @@ void DelSceneRgb(uint16_t adrDelSceneRgb, uint16_t appID)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] =  RD_OPCODE_SCENE_SEND;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] =  VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_DEL) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_DEL>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = appID & 0xFF;
@@ -436,8 +436,8 @@ void AskTypeDevice(uint16_t adr)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_TYPE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_TYPE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_TYPE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_ASK) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_ASK>>8) & 0xFF;
 	int i;
@@ -452,8 +452,8 @@ void SetTypeDevice(uint16_t adrSetTypeDevice,uint8_t type, uint8_t attrubute, ui
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_TYPE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_TYPE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_TYPE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_SET) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_SET>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = type & 0xFF;
@@ -471,8 +471,8 @@ void SaveGateway(uint16_t adrSaveGateway)
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_TYPE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_TYPE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_TYPE>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TYPE_SAVEGW) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TYPE_SAVEGW>>8) & 0xFF;
 	int i;
@@ -535,18 +535,18 @@ void Function_Vendor(uint16_t cmd,\
 	}
 
 	uint8_t *tempDataUart;
-	uint8_t tempDataLog[200]="";
-	uint8_t temp[4];
-
+//	uint8_t tempDataLog[200]="";
+//	uint8_t temp[4];
+//
 	tempDataUart = (uint8_t *)&vrts_CMD_STRUCTURE_VENDOR;
 	ControlMessage(cmdLength, tempDataUart);
-	int i;
-	//strcpy(TempData2,h);
-	for(i=0;i< cmdLength;i++){
-		sprintf(temp,"%x ",tempDataUart[i]);
-		strcat(tempDataLog,temp);
-	}
-	slog_info("(cmd)%s",tempDataLog);
+//	int i;
+//	//strcpy(TempData2,h);
+//	for(i=0;i< cmdLength;i++){
+//		sprintf(temp,"%x ",tempDataUart[i]);
+//		strcat(tempDataLog,temp);
+//	}
+//	slog_info("(cmd)%s",tempDataLog);
 }
 uint16_t Percent2ParamCCT(uint8_t percent)
 {
@@ -568,3 +568,4 @@ uint16_t Percent2ParamHSL(uint8_t percent){
 uint8_t Param2PercentHSL(uint16_t param){
 	return((param * 100)/65535);
 }
+

@@ -140,7 +140,9 @@ void JsonControl(json_object *jobj,char *key){
 			slog_print(SLOG_INFO, 1, "<provision>Provision stop");
 			MODE_PROVISION=false;
 			ControlMessage(3, OUTMESSAGE_ScanStop);
-			pthread_cancel(tmp);
+			puts("1");
+			//pthread_cancel(tmp);
+			puts("2");
 			flag_selectmac     = false;
 			flag_getpro_info   = false;
 			flag_getpro_element= false;
@@ -151,8 +153,11 @@ void JsonControl(json_object *jobj,char *key){
 			flag_set_type = false;
 			//for gpio
 			flag_blink = false;
-			pthread_create(&tmp1,NULL,Led_Thread,NULL);
+			puts("3");
+			//pthread_create(&tmp1,NULL,Led_Thread,NULL);
+			puts("4");
 			led_pin_off(gpio[LED_BLE_PIN_INDEX]);
+			puts("5");
 		 }
 		 if(strcmp(vrts_Json_String.cmd,"RESETNODE")==0){
 			 check_resetnode = true;
@@ -375,15 +380,20 @@ void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJs
 	slog_info("(mqtt)Message_send:%s",rsp);
 }
 void CreatJson_New_TypeDev(uint8_t *topic,uint8_t * key1, uint8_t * key2, uint8_t * key3, uint8_t * key4,\
-		 uint16_t value1, uint16_t value2,uint8_t *value3){
+		uint8_t * key5,uint8_t * key6,uint8_t * key7,uint8_t * key8,uint16_t value1, uint8_t *value2,uint8_t *value3,\
+		 uint8_t *value4, uint8_t *value5,uint16_t value6,uint8_t *value7){
 	struct json_object * object;
 		struct json_object * object1;
 		object = json_object_new_object();
 		object1 = json_object_new_object();
 		json_object_object_add(object1, key1, json_object_new_int(value1));
-		json_object_object_add(object1, key2, json_object_new_int(value2));
-		json_object_object_add(object, key3, json_object_new_string(value3));
-		json_object_object_add(object, key4,object1);
+		json_object_object_add(object1, key2, json_object_new_string(value2));
+		json_object_object_add(object1, key3, json_object_new_string(value3));
+		json_object_object_add(object1, key4, json_object_new_string(value4));
+		json_object_object_add(object1, key5, json_object_new_string(value5));
+		json_object_object_add(object1, key6, json_object_new_int(value6));
+		json_object_object_add(object, key7, json_object_new_string(value7));
+		json_object_object_add(object, key8,object1);
 		char *rsp;
 		rsp = json_object_to_json_string(object);
 		mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);

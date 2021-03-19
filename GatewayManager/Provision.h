@@ -13,6 +13,7 @@ extern "C" {
 #include "../GatewayManager/ShareMessage.h"
 #include "../GatewayManager/OpCode.h"
 
+
 extern bool flag_selectmac;
 extern bool flag_getpro_info;
 extern bool flag_getpro_element;

@@ -24,6 +24,13 @@ static bool					vrb_GWIF_UpdateLate = false;
 static bool					vrb_GWIF_CheckNow = false;
 static bool					vrb_GWIF_RestartMessage = true;
 
+uint8_t uuid[50]="";
+uint8_t device_key[50]="";
+uint8_t app_key[50]="";
+uint8_t net_key[50]="";
+uint8_t temp1[2];
+uint16_t j;
+
 /*
  * Khoi tao chuong trinh giao tiep vooi Gateway bao gom:
  * - Khoi tao UART
@@ -190,6 +197,12 @@ void GWIF_ProcessData (void)
 				{
 					OUTMESSAGE_MACSelect[i+3]=vrts_GWIF_IncomeMessage->Message[i+1];
 				}
+				sprintf(uuid,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],\
+						vrts_GWIF_IncomeMessage->Message[12],vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],\
+						vrts_GWIF_IncomeMessage->Message[15],vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17],\
+						vrts_GWIF_IncomeMessage->Message[18],vrts_GWIF_IncomeMessage->Message[19],vrts_GWIF_IncomeMessage->Message[20],\
+						vrts_GWIF_IncomeMessage->Message[21],vrts_GWIF_IncomeMessage->Message[22],vrts_GWIF_IncomeMessage->Message[23],\
+						vrts_GWIF_IncomeMessage->Message[24],vrts_GWIF_IncomeMessage->Message[25]);
 				flag_selectmac=true;
 				flag_check_select_mac= false;
 			}
@@ -233,6 +246,12 @@ void GWIF_ProcessData (void)
 					}
 					adr_heartbeat= OUTMESSAGE_Provision[26] | (OUTMESSAGE_Provision[27]<<8);
 				}
+				sprintf(net_key,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[2],vrts_GWIF_IncomeMessage->Message[3],\
+										vrts_GWIF_IncomeMessage->Message[4],vrts_GWIF_IncomeMessage->Message[5],vrts_GWIF_IncomeMessage->Message[6],\
+										vrts_GWIF_IncomeMessage->Message[7],vrts_GWIF_IncomeMessage->Message[8],vrts_GWIF_IncomeMessage->Message[9],\
+										vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],vrts_GWIF_IncomeMessage->Message[12],\
+										vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],vrts_GWIF_IncomeMessage->Message[15],\
+										vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17]);
 				flag_getpro_info = true;
 			}
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_SEND_ELE_CNT)
@@ -244,6 +263,17 @@ void GWIF_ProcessData (void)
 			{
 				flag_provision =true;
 			}
+
+			/* app key*/
+			if((vrui_GWIF_LengthMeassge == 27) && (vrts_GWIF_IncomeMessage->Message[0] == 0xb5)){
+				sprintf(app_key,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],\
+						vrts_GWIF_IncomeMessage->Message[12],vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],\
+						vrts_GWIF_IncomeMessage->Message[15],vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17],\
+						vrts_GWIF_IncomeMessage->Message[18],vrts_GWIF_IncomeMessage->Message[19],vrts_GWIF_IncomeMessage->Message[20],\
+						vrts_GWIF_IncomeMessage->Message[21],vrts_GWIF_IncomeMessage->Message[22],vrts_GWIF_IncomeMessage->Message[23],\
+						vrts_GWIF_IncomeMessage->Message[24],vrts_GWIF_IncomeMessage->Message[25]);
+			}
+
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_KEY_BIND_EVT && vrts_GWIF_IncomeMessage->Message[1] == HCI_GATEWAY_CMD_BIND_SUSCESS)
 			{
 				slog_info("<provision> success");
@@ -418,13 +448,22 @@ void GWIF_ProcessData (void)
 				if(((vrts_GWIF_IncomeMessage->Message[8]|(vrts_GWIF_IncomeMessage->Message[9]<<8)) == HEADER_TYPE_ASK) || \
 						((vrts_GWIF_IncomeMessage->Message[8]|(vrts_GWIF_IncomeMessage->Message[9]<<8)) == HEADER_TYPE_SET)){
 					uint8_t jsonType,jsonAttrubute,jsonApplication;
-					puts("check header type");
 					jsonType = vrts_GWIF_IncomeMessage->Message[10];
 					jsonAttrubute = vrts_GWIF_IncomeMessage->Message[11];
 					jsonApplication = vrts_GWIF_IncomeMessage->Message[12];
-					//CreatJson_TypeDev(TP_STATUS, "ADR", "TYPE", "ATTRUBUTE", "APPLICATION", jsonadr, jsonType, jsonAttrubute, jsonApplication);
-					//CreatJson(TP_STATUS, "ADR", "ID",jsonadr , TypeConvertID(jsonType,jsonAttrubute,jsonApplication));
-					CreatJson_New_TypeDev(TP_STATUS, "ADR", "ID", "CMD", "DATA", jsonadr,TypeConvertID(jsonType,jsonAttrubute,jsonApplication),"TYPE_DEVICE");
+
+					/*read device key*/
+					FILE * file;
+					if ((file = fopen("/root/device_key.txt","r")) == NULL){
+					       printf("Error! opening file");
+					       exit(1);
+					}
+					fscanf(file,"%[^\n]",device_key);
+					//puts(device_key);
+					fclose(file);
+					/**/
+
+					CreatJson_New_TypeDev(TP_STATUS, "DEVICE_UNICAST", "DEVICE_ID", "DEVICE_KEY", "NET_KEY", "APP_KEY", "CATEGORY_ID", "CMD", "DATA", jsonadr, uuid, device_key, net_key, app_key, TypeConvertID(jsonType,jsonAttrubute,jsonApplication), "TYPE_DEVICE");
 				}
 				else if((vrts_GWIF_IncomeMessage->Message[8]|(vrts_GWIF_IncomeMessage->Message[9]<<8)) == HEADER_TYPE_SAVEGW){
 					CreatJson(TP_STATUS, "ADR", "SAVEGATEWAY", jsonadr, 1);

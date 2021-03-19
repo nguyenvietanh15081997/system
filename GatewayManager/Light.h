@@ -254,7 +254,6 @@ uint16_t Percent2ParamDIM(uint8_t percent);
 uint8_t Param2PrecentDIM(uint16_t param);
 
 
-
 #ifdef __cplusplus
 }
 #endif

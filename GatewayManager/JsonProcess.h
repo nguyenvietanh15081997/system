@@ -117,8 +117,13 @@ void CreatJsonString_2(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJso
 void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJsonType, uint8_t *objectJsonAttrubute, \
 		uint8_t *objectJsonApplication,uint16_t parAdr, uint16_t parType, uint16_t parAttrubute, uint16_t parApplication);
 
+//void CreatJson_New_TypeDev(uint8_t *topic,uint8_t * key1, uint8_t * key2, uint8_t * key3, uint8_t * key4,\
+//		 uint16_t value1, uint16_t value2,uint8_t *value3);
+
 void CreatJson_New_TypeDev(uint8_t *topic,uint8_t * key1, uint8_t * key2, uint8_t * key3, uint8_t * key4,\
-		 uint16_t value1, uint16_t value2,uint8_t *value3);
+		uint8_t * key5,uint8_t * key6,uint8_t * key7,uint8_t * key8,uint16_t value1, uint8_t *value2,uint8_t *value3,\
+		 uint8_t *value4, uint8_t *value5,uint16_t value6,uint8_t *value7);
+
 #ifdef __cplusplus
 }
 #endif

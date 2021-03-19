@@ -24,6 +24,7 @@ uint8_t OUTMESSAGE_BindingALl[22]  = {0xe9, 0xff, 0x0b, 0x00, 0x00, 0x00, 0x60, 
 
 uint8_t setpro_internal[]       =   {0xe9, 0xff, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11, 0x22, 0x33, 0x44, 0x01, 0x00};
 uint8_t admit_pro_internal[]    =   {0xe9, 0xff, 0x0d, 0x01, 0x00, 0xff, 0xfb, 0xeb, 0xbf, 0xea, 0x06, 0x09, 0x00, 0x52, 0x90, 0x49, 0xf1, 0xf1, 0xbb, 0xe9, 0xeb};// trả về unicast tiếp theo của con đèn cần thêm vào
+uint8_t device_key1[50];
 
 bool flag_selectmac     	= false;
 bool flag_getpro_info   	= false;
@@ -45,6 +46,20 @@ void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 	vrui_SHAREMESS_Send2GatewayLength = lengthmessage;
 	memcpy(vrsc_SHAREMESS_Send2GatewayMessage, message, vrui_SHAREMESS_Send2GatewayLength);
 	pthread_mutex_unlock(&vrpth_SHAREMESS_Send2GatewayLock);
+
+	/*slog*/
+//	uint8_t *tempDataUart;
+	uint8_t tempDataLog[200]="";
+	uint8_t temp[4];
+//
+//	tempDataUart = (uint8_t *)mes;
+	int i;
+	//strcpy(TempData2,h);
+	for(i=0;i< lengthmessage;i++){
+		sprintf(temp,"%x ",message[i]);
+		strcat(tempDataLog,temp);
+	}
+	slog_info("(cmd)%s",tempDataLog);
 }
 void *ProvisionThread (void *argv )
 {
@@ -116,20 +131,25 @@ void *ProvisionThread (void *argv )
 				random=rand()%256;
 				setpro_internal[i+3]=random;
 			}
-			//char stringset[200]="";
 			slog_print(SLOG_INFO, 1, "<provision>SETPRO....");
-			for(i=0;i<28;i++)
-				{
-					printf ("%x ",setpro_internal[i]);
-				}
 			ControlMessage(28, setpro_internal);
-			for(i=0;i<21;i++)
-			{
-				printf ("%x ",admit_pro_internal[i]);
-			}
 			slog_print(SLOG_INFO, 1, "<provision>ADMITPRO...");
 			ControlMessage(21, admit_pro_internal);
-			sleep(4);
+			/*add device key to file*/
+			sprintf(device_key1,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",admit_pro_internal[5],admit_pro_internal[6],admit_pro_internal[7],\
+					admit_pro_internal[8],admit_pro_internal[9],admit_pro_internal[10],admit_pro_internal[11],admit_pro_internal[12],admit_pro_internal[13],\
+					admit_pro_internal[14],admit_pro_internal[15],admit_pro_internal[16],admit_pro_internal[17], admit_pro_internal[18],\
+					admit_pro_internal[19],admit_pro_internal[20]);
+			FILE *file=fopen("/root/device_key.txt","w");
+			   if(file == NULL)
+			   {
+			      printf("Error!");
+			      exit(1);
+			   }
+			   fprintf(file,"%s",device_key1);
+			   fclose(file);
+			/**/
+			sleep(3);
 			flag_checkadmitpro = true;
 
 		}
