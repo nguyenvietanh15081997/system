@@ -405,7 +405,7 @@ void GWIF_ProcessData (void)
 					break;
 
 				case CFG_MODEL_SUB_STATUS:
-					jsonvalue = vrts_GWIF_IncomeMessage->Message[10] & 0xFF;
+					jsonvalue = vrts_GWIF_IncomeMessage->Message[10] | (vrts_GWIF_IncomeMessage->Message[11]<<8);
 					if(check_add_or_del_group){
 						CreatJson(TP_STATUS, "ADR", "ADDGROUP", jsonadr, jsonvalue);
 					}
@@ -463,7 +463,7 @@ void GWIF_ProcessData (void)
 					fclose(file);
 					/**/
 
-					CreatJson_New_TypeDev(TP_STATUS, "DEVICE_UNICAST", "DEVICE_ID", "DEVICE_KEY", "NET_KEY", "APP_KEY", "CATEGORY_ID", "CMD", "DATA", jsonadr, uuid, device_key, net_key, app_key, TypeConvertID(jsonType,jsonAttrubute,jsonApplication), "TYPE_DEVICE");
+					CreatJson_New_TypeDev(TP_STATUS, "DEVICE_UNICAST_ID", "DEVICE_ID", "DEVICE_KEY", "NET_KEY", "APP_KEY", "DEVICE_TYPE_ID", "CMD", "DATA", jsonadr, uuid, device_key, net_key, app_key, TypeConvertID(jsonType,jsonAttrubute,jsonApplication), "TYPE_DEVICE");
 				}
 				else if((vrts_GWIF_IncomeMessage->Message[8]|(vrts_GWIF_IncomeMessage->Message[9]<<8)) == HEADER_TYPE_SAVEGW){
 					CreatJson(TP_STATUS, "ADR", "SAVEGATEWAY", jsonadr, 1);

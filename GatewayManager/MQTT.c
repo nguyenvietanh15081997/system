@@ -26,7 +26,7 @@ int mqtt_send(struct mosquitto *mosq, char * topic,char *msg)
 void connect_callback(struct mosquitto *mosq, void *obj, int result)
 {
 	slog_info("(%s)%s: Connect callback, rc=%d",pHeaderMqtt,mqtt_host,result);
-	mqtt_send(mosq,"RD_STATUS","CONNECTED");
+	mqtt_send(mosq,"RD_STATUS","{\"CMD\":\"CONNECTED\"}");
 }
 void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
 {

@@ -62,7 +62,7 @@ void CCT_Set(uint16_t uniAdrSetCCT, uint16_t valueCCT)
 		vrts_CMD_STRUCTURE.para[i] = 0x00;
 	}
 }
-void AddGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup)
+void AddGroup(uint16_t uniAdrAddGroup,uint16_t adrGroup)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrAddGroup & 0xFF;
 	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrAddGroup>>8) & 0xFF;
@@ -70,8 +70,8 @@ void AddGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup)
 	vrts_CMD_STRUCTURE.opCode[1] = (CFG_MODEL_SUB_ADD>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[0] = uniAdrAddGroup & 0xFF;
 	vrts_CMD_STRUCTURE.para[1] = (uniAdrAddGroup>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[2] = adrGroup;
-	vrts_CMD_STRUCTURE.para[3] = 0xC0;
+	vrts_CMD_STRUCTURE.para[2] = adrGroup & 0xFF;
+	vrts_CMD_STRUCTURE.para[3] = (adrGroup>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[4] = 0x00;
 	vrts_CMD_STRUCTURE.para[5] = 0x10;
 }
@@ -186,7 +186,7 @@ void SetTimePoll(uint16_t uniAdrSensor, uint16_t timePoll)
 void FunctionPer(uint16_t cmd,\
 				functionTypeDef Func,\
 				uint16_t unicastAdr,\
-				uint8_t adrGroup,\
+				uint16_t adrGroup,\
 				uint8_t parStatusOnOff,\
 				uint16_t parLightness,\
 				uint16_t parCCT,\

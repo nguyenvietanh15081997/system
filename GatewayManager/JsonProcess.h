@@ -25,7 +25,7 @@ typedef struct jsonstring
 	uint8_t onoff;
 	uint16_t cct;
 	uint16_t dim;
-	uint8_t addgroup;
+	uint16_t addgroup;
 	uint16_t addscene;
 	uint16_t callscene;
 	uint16_t delscene;

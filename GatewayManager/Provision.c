@@ -7,6 +7,8 @@
 #include "../GatewayManager/slog.h"
 #include "../GatewayManager/Light.h"
 #include "../GatewayManager/LedProcess.h"
+#include "../GatewayManager/JsonProcess.h"
+#include "../GatewayManager/MQTT.h"
 
 pthread_t tmp;
 pthread_t vrts_System_Gpio;
@@ -74,6 +76,15 @@ void *ProvisionThread (void *argv )
 				MODE_PROVISION=false;
 				ControlMessage(3, OUTMESSAGE_ScanStop);
 				slog_print(SLOG_INFO, 1, "<provision>Provision stop");
+
+				struct json_object *object;
+				object = json_object_new_object();
+				json_object_object_add(object, "CMD", json_object_new_string("STOP"));
+				char *rsp;
+				rsp = json_object_to_json_string(object);
+				mosquitto_publish(mosq, NULL, "RD_STATUS", strlen(rsp),rsp,  0, 0);
+				slog_info("(mqtt)Message_send:%s",rsp);
+
 				flag_selectmac     = false;
 				flag_getpro_info   = false;
 				flag_getpro_element= false;
@@ -96,7 +107,7 @@ void *ProvisionThread (void *argv )
 			{
 				flag_done = false;
 				Timeout_CheckDataBuffer=0;
-				sleep(1);
+				//usleep(500000);
 				ControlMessage(3, OUTMESSAGE_ScanStart);
 				slog_print(SLOG_INFO, 1, "<provision>SCAN");
 				flag_check_select_mac= true;
@@ -114,7 +125,7 @@ void *ProvisionThread (void *argv )
 			flag_mac=false;
 			ControlMessage(9, OUTMESSAGE_MACSelect);
 			slog_print(SLOG_INFO, 1, "<provision>SELECTMAC");
-			sleep(1);
+			usleep(100000);
 			ControlMessage(3, OUTMESSAGE_GetPro);
 			slog_print(SLOG_INFO, 1, "<provision>GETPRO");
 			flag_checkadmitpro = false;
@@ -149,7 +160,7 @@ void *ProvisionThread (void *argv )
 			   fprintf(file,"%s",device_key1);
 			   fclose(file);
 			/**/
-			sleep(3);
+			//usleep(100000);
 			flag_checkadmitpro = true;
 
 		}
@@ -170,7 +181,7 @@ void *ProvisionThread (void *argv )
 		if(flag_provision == true)
 		{
 			flag_provision = false;
-			sleep(1);
+			//sleep(1);
 			ControlMessage(22, OUTMESSAGE_BindingALl);
 			slog_print(SLOG_INFO, 1, "<provision>BINDING ALL");
 			flag_set_type = false;
@@ -178,14 +189,14 @@ void *ProvisionThread (void *argv )
 		if(flag_set_type == true)
 		{
 			flag_set_type = false;
-			HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 11, 5, 7, 21);
-			sleep(1);
-			 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, adr_heartbeat, NULL16,\
-					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
-			 sleep(2);
-			 Function_Vendor(HCI_CMD_GATEWAY_CMD, AskTypeDevice_vendor_typedef, adr_heartbeat, NULL16,\
-					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
-			 sleep(3);
+//			HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 11, 5, 7, 21);
+//			usleep(400000);
+//			 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, adr_heartbeat, NULL16,\
+//					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
+//			 usleep(400000);
+//			 Function_Vendor(HCI_CMD_GATEWAY_CMD, AskTypeDevice_vendor_typedef, adr_heartbeat, NULL16,\
+//					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
+//			 usleep(400000);
 			flag_done=true;
 			flag_mac=true;
 		}

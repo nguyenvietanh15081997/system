@@ -153,7 +153,7 @@ void CCT_Get(uint16_t adrCCTGet);
 
 void CCT_Set(uint16_t uniAdrSetCCT, uint16_t valueCCT);
 
-void AddGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
+void AddGroup(uint16_t uniAdrAddGroup,uint16_t adrGroup);
 
 void DelGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
 
@@ -196,7 +196,7 @@ void SetTimePoll(uint16_t uniAdrSensor, uint16_t timePoll);
 void FunctionPer(uint16_t cmd,\
 				functionTypeDef Func,\
 				uint16_t unicastAdr,\
-				uint8_t adrGroup,\
+				uint16_t adrGroup,\
 				uint8_t parStatusOnOff,\
 				uint16_t parLightness,\
 				uint16_t parCCT,\
