@@ -40,6 +40,9 @@ bool flag_admitpro          = false;
 bool flag_checkadmitpro     = true;
 
 bool flag_set_type          = false;
+bool flag_checkHB           = false;
+bool flag_checkSaveGW		= false;
+bool flag_checkTypeDEV 		= false;
 
 void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 {
@@ -189,14 +192,26 @@ void *ProvisionThread (void *argv )
 		if(flag_set_type == true)
 		{
 			flag_set_type = false;
-//			HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 11, 5, 7, 21);
-//			usleep(400000);
-//			 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, adr_heartbeat, NULL16,\
-//					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
-//			 usleep(400000);
-//			 Function_Vendor(HCI_CMD_GATEWAY_CMD, AskTypeDevice_vendor_typedef, adr_heartbeat, NULL16,\
-//					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
-//			 usleep(400000);
+			HeartBeat(HCI_CMD_GATEWAY_CMD, adr_heartbeat, 1, 255, 11, 5, 7, 21);
+			flag_checkHB = false;
+			//usleep(500000);
+		}
+		if(flag_checkHB){
+			flag_checkHB = false;
+			 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, adr_heartbeat, NULL16,\
+					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
+			 flag_checkSaveGW = false;
+			 //usleep(500000);
+		}
+		if(flag_checkSaveGW){
+			flag_checkSaveGW = false;
+			Function_Vendor(HCI_CMD_GATEWAY_CMD, AskTypeDevice_vendor_typedef, adr_heartbeat, NULL16,\
+					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
+			flag_checkTypeDEV = false;
+			 //usleep(500000);
+		}
+		if(flag_checkTypeDEV){
+			flag_checkTypeDEV = false;
 			flag_done=true;
 			flag_mac=true;
 		}

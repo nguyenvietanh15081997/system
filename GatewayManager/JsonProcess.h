@@ -14,6 +14,7 @@ extern "C" {
 #include <json-c/json.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 extern uint16_t numObject;
 extern uint16_t valueObject[20];
@@ -99,6 +100,25 @@ typedef enum{
 
 } defineCmd;
 extern defineCmd flagDefineCmd;
+
+typedef struct json_component{
+	uint8_t *key;
+	void  *value;
+}json_component;
+
+void add_component_to_obj(json_object *j, void* com);
+
+void add_obj_to_obj(json_object *j, void* com);
+
+/*
+    @feature: create json_object from model
+    @params:
+        *add_smt_to_obj: point to callback function
+        num_of: number of model
+        ... : model
+    @return: a point to json_object
+*/
+extern json_object* create_json_obj_from(void (*add_smt_to_obj)(json_object*, void*), int num_of, ...);
 
 void JsonControl(json_object *jobj,char *key);
 

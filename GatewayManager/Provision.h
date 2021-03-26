@@ -24,7 +24,11 @@ extern bool flag_done;
 extern bool flag_setpro;
 extern bool flag_admitpro;
 extern bool flag_checkadmitpro;
+
 extern bool flag_set_type;
+extern bool flag_checkHB;
+extern bool flag_checkSaveGW;
+extern bool flag_checkTypeDEV;
 
 
 extern unsigned int Timeout_CheckDataBuffer;

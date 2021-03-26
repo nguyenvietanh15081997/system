@@ -175,12 +175,12 @@ void JsonControl(json_object *jobj,char *key){
 		 flagDefineCmd = update_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
 	 }
-	 if((strcmp(key,"SCENEFORREMOTE")==0)){
+	 if((strcmp(key,"BUTTONID")==0)){
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, vrts_Json_String.buttonid,\
 				vrts_Json_String.modeid, NULL8, NULL16, NULL16, NULL16,\
 				NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8,31);
 	 }
-	 if((strcmp(key,"SCENEFORSENSOR")==0)){
+	 if((strcmp(key,"STT")==0)){
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8,\
 				NULL8, vrts_Json_String.stt, vrts_Json_String.condition, vrts_Json_String.low_lux, vrts_Json_String.hight_lux,\
 				vrts_Json_String.action, vrts_Json_String.sceneID, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8,31);
@@ -406,4 +406,35 @@ void CreatJson_New_TypeDev(uint8_t *topic,uint8_t * key1, uint8_t * key2, uint8_
 		rsp = json_object_to_json_string(object);
 		mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
 		slog_info("(mqtt)Message_send:%s",rsp);
+}
+
+/*new*/
+void add_component_to_obj(json_object *j, void* com){
+    json_component *dt = (json_component*)com;
+    json_object_object_add(j, dt->key, json_object_new_int(dt->value));
+    return;
+}
+
+void add_obj_to_obj(json_object *j, void* com){
+    json_object *jobj = (json_object *)com;
+    json_object_array_add(j, jobj);
+    return;
+}
+
+json_object* create_json_obj_from(void (*modelFunc)(json_object*, void*), int num_of, ...){
+    va_list args_list;
+    json_object *jobj = json_object_new_object();
+    typedef void *com;
+
+    va_start(args_list, num_of);
+    int i;
+    for(i = 0; i< num_of; i++){
+        add_component_to_obj(jobj, va_arg(args_list, com));
+    }
+
+    va_end(args_list);
+    char *str = json_object_to_json_string(jobj);
+	mosquitto_publish(mosq, NULL, TP_STATUS, strlen(str), str, 0, 0);
+	slog_info("(mqtt)Message_send:%s",str);
+    return jobj;
 }

@@ -17,6 +17,9 @@ uint8_t parRetry_cnt = 0x02;
 uint8_t parRsp_Max = 0x01;
 uint8_t parFuture = 0;
 
+bool flag_saveGW 			= false;
+bool flag_typeDEV			= false;
+bool flag_heartbeat			= false;
 
 void ResetNode(uint16_t uniAdrReset)
 {
@@ -253,18 +256,8 @@ void FunctionPer(uint16_t cmd,\
 	}
 
 	uint8_t *tempDataUart;
-//	uint8_t tempDataLog[200]="";
-//	uint8_t temp[4];
-
 	tempDataUart = (uint8_t *)&vrts_CMD_STRUCTURE;
 	ControlMessage(cmdLength, tempDataUart);
-//	int i;
-//	//strcpy(TempData2,h);
-//	for(i=0;i< cmdLength;i++){
-//		sprintf(temp,"%x ",tempDataUart[i]);
-//		strcat(tempDataLog,temp);
-//	}
-//	slog_info("(cmd)%s",tempDataLog);
 }
 void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8_t countLog, uint8_t periodLog, uint8_t tll, uint16_t feature, uint16_t cmdLength)
 {
@@ -290,18 +283,9 @@ void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8
 	vrts_CMD_STRUCTURE.para[7]= vrts_CMD_STRUCTURE.para[8]= 0;
 
 	uint8_t *tempDataUart;
-//	uint8_t tempDataLog[200]="";
-//	uint8_t temp[4];
-//
 	tempDataUart = (uint8_t *)&vrts_CMD_STRUCTURE;
 	ControlMessage(cmdLength, tempDataUart);
-//	int i;
-//	//strcpy(TempData2,h);
-//	for(i=0;i< cmdLength;i++){
-//		sprintf(temp,"%x ",tempDataUart[i]);
-//		strcat(tempDataLog,temp);
-//	}
-//	slog_info("(cmd)%s",tempDataLog);
+	flag_heartbeat = true;
 }
 
 
@@ -525,28 +509,21 @@ void Function_Vendor(uint16_t cmd,\
 		DelSceneRgb(adr, appID);
 	}
 	else if(Func_vendor == SaveGateway_vendor_typedef){
+		flag_saveGW = true;
 		SaveGateway(adr);
 	}
 	else if(Func_vendor == AskTypeDevice_vendor_typedef){
+		flag_typeDEV = true;
 		AskTypeDevice(adr);
 	}
 	else if(Func_vendor == SetTypeDevice_vendor_typedef){
+		flag_typeDEV = true;
 		SetTypeDevice(adr,type,attrubute,application);
 	}
 
 	uint8_t *tempDataUart;
-//	uint8_t tempDataLog[200]="";
-//	uint8_t temp[4];
-//
 	tempDataUart = (uint8_t *)&vrts_CMD_STRUCTURE_VENDOR;
 	ControlMessage(cmdLength, tempDataUart);
-//	int i;
-//	//strcpy(TempData2,h);
-//	for(i=0;i< cmdLength;i++){
-//		sprintf(temp,"%x ",tempDataUart[i]);
-//		strcat(tempDataLog,temp);
-//	}
-//	slog_info("(cmd)%s",tempDataLog);
 }
 uint16_t Percent2ParamCCT(uint8_t percent)
 {

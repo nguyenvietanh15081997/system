@@ -12,6 +12,11 @@ extern "C" {
 #endif
 #include "../GatewayManager/OpCode.h"
 
+
+extern bool flag_saveGW;
+extern bool flag_typeDEV;
+extern bool flag_heartbeat;
+
 /*frame data to control device*/
 typedef struct{
 	uint8_t HCI_CMD_GATEWAY[2];// CMD
