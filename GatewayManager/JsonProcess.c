@@ -141,7 +141,7 @@ void JsonControl(json_object *jobj,char *key){
 			pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
 			//pthread_join(vrts_System_TestSend, NULL);
 		 }
-		 if(strcmp(vrts_Json_String.cmd,"STOP")==0){
+		 else if(strcmp(vrts_Json_String.cmd,"STOP")==0){
 			slog_print(SLOG_INFO, 1, "<provision>Provision stop");
 			MODE_PROVISION=false;
 			ControlMessage(3, OUTMESSAGE_ScanStop);
@@ -167,19 +167,36 @@ void JsonControl(json_object *jobj,char *key){
 			flag_blink = false;
 			led_pin_off(gpio[LED_BLE_PIN_INDEX]);
 		 }
-		 if(strcmp(vrts_Json_String.cmd,"RESETNODE")==0){
+		 else if(strcmp(vrts_Json_String.cmd,"RESETNODE")==0){
 			 check_resetnode = true;
+		 }
+		 else if(strcmp(vrts_Json_String.cmd,"SETSCENEFORREMOTE") == 0){
+			 vrts_Json_String.adr        	= (json_object_get_int(json_object_object_get(jobj,"ADR")));
+			 vrts_Json_String.buttonid      = (json_object_get_int(json_object_object_get(jobj,"BUTTONID")));
+			 vrts_Json_String.modeid        = (json_object_get_int(json_object_object_get(jobj,"MODEID")));
+			 vrts_Json_String.srgbID        = (json_object_get_int(json_object_object_get(jobj,"SRGBID")));
+			 vrts_Json_String.sceneID       = (json_object_get_int(json_object_object_get(jobj,"SCENEID")));
+				Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, vrts_Json_String.buttonid,\
+						vrts_Json_String.modeid, NULL8, NULL16, NULL16, NULL16,\
+						NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8,31);
+		 }
+		 else if(strcmp(vrts_Json_String.cmd,"DELSCENEFORREMOTE") == 0){
+			 vrts_Json_String.adr        	= (json_object_get_int(json_object_object_get(jobj,"ADR")));
+			 vrts_Json_String.buttonid      = (json_object_get_int(json_object_object_get(jobj,"BUTTONID")));
+			 vrts_Json_String.modeid        = (json_object_get_int(json_object_object_get(jobj,"MODEID")));
+				Function_Vendor(HCI_CMD_GATEWAY_CMD, DelSceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, vrts_Json_String.buttonid,\
+						vrts_Json_String.modeid, NULL8, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,31);
 		 }
 	 }
 	 if(strcmp(key,"UPDATE")==0){
 		 flagDefineCmd = update_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
 	 }
-	 if((strcmp(key,"BUTTONID")==0)){
-		Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, vrts_Json_String.buttonid,\
-				vrts_Json_String.modeid, NULL8, NULL16, NULL16, NULL16,\
-				NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8,31);
-	 }
+//	 if((strcmp(key,"BUTTONID")==0)){
+//		Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, vrts_Json_String.buttonid,\
+//				vrts_Json_String.modeid, NULL8, NULL16, NULL16, NULL16,\
+//				NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8,31);
+//	 }
 	 if((strcmp(key,"STT")==0)){
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8,\
 				NULL8, vrts_Json_String.stt, vrts_Json_String.condition, vrts_Json_String.low_lux, vrts_Json_String.hight_lux,\
@@ -331,97 +348,36 @@ void Json_Parse(json_object * jobj)
 			 //JsonControl(key);
 		 }
 }
-/*
- * TODO:cần phản hồi đa dạng hơn
- * - hiện tại mới tách nhiều bản tin
- * - mỗi bản tin chỉ có {"KEY":value}
- * - chờ quyết định dạng bản tin truyền nhận bên trên
- */
-void CreatJson(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,uint16_t par1, uint16_t par2)
-{
-	struct json_object * object;
-	object = json_object_new_object();
-	json_object_object_add(object, objectJsonAdr, json_object_new_int(par1));
-	json_object_object_add(object, objectJsonValue, json_object_new_int(par2));
-	char *rsp;
-	rsp = json_object_to_json_string(object);
-	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
-	slog_info("(mqtt)Message_send:%s",rsp);
-}
-void CreatJsonString(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue ,char * par1, uint16_t par2)
-{
-	struct json_object * object;
-	object = json_object_new_object();
-	json_object_object_add(object, objectJsonAdr, json_object_new_string(par1));
-	json_object_object_add(object, objectJsonValue, json_object_new_int(par2));
-	char *rsp;
-	rsp = json_object_to_json_string(object);
-	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
-	slog_info("(mqtt)Message_send:%s",rsp);
-}
-void CreatJsonString_2(uint8_t *topic,uint8_t * objectJsonAdr,uint8_t *objectJsonValue , uint16_t par1, char * par2)
-{
-	struct json_object * object;
-	object = json_object_new_object();
-	json_object_object_add(object, objectJsonAdr, json_object_new_int(par1));
-	json_object_object_add(object, objectJsonValue, json_object_new_string(par2));
-	char *rsp;
-	rsp = json_object_to_json_string(object);
-	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
-	slog_info("(mqtt)Message_send:%s",rsp);
-}
-/*
- * TODO:chỉ cho lúc phản hồi bản tin type device
- */
-void CreatJson_TypeDev(uint8_t *topic, uint8_t *objectJsonAdr, uint8_t *objectJsonType, uint8_t *objectJsonAttrubute,\
-		uint8_t *objectJsonApplication, uint16_t parAdr, uint16_t parType, uint16_t parAttrubute, uint16_t parApplication)
-{
-	struct json_object * object;
-	object = json_object_new_object();
-	json_object_object_add(object, objectJsonAdr, json_object_new_int(parAdr));
-	json_object_object_add(object, objectJsonType, json_object_new_int(parType));
-	json_object_object_add(object, objectJsonAttrubute, json_object_new_int(parAttrubute));
-	json_object_object_add(object, objectJsonApplication, json_object_new_int(parApplication));
-	char *rsp;
-	rsp = json_object_to_json_string(object);
-	mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
-	slog_info("(mqtt)Message_send:%s",rsp);
-}
-void CreatJson_New_TypeDev(uint8_t *topic,uint8_t * key1, uint8_t * key2, uint8_t * key3, uint8_t * key4,\
-		uint8_t * key5,uint8_t * key6,uint8_t * key7,uint8_t * key8,uint16_t value1, uint8_t *value2,uint8_t *value3,\
-		 uint8_t *value4, uint8_t *value5,uint16_t value6,uint8_t *value7){
-	struct json_object * object;
-		struct json_object * object1;
-		object = json_object_new_object();
-		object1 = json_object_new_object();
-		json_object_object_add(object1, key1, json_object_new_int(value1));
-		json_object_object_add(object1, key2, json_object_new_string(value2));
-		json_object_object_add(object1, key3, json_object_new_string(value3));
-		json_object_object_add(object1, key4, json_object_new_string(value4));
-		json_object_object_add(object1, key5, json_object_new_string(value5));
-		json_object_object_add(object1, key6, json_object_new_int(value6));
-		json_object_object_add(object, key7, json_object_new_string(value7));
-		json_object_object_add(object, key8,object1);
-		char *rsp;
-		rsp = json_object_to_json_string(object);
-		mosquitto_publish(mosq, NULL, topic, strlen(rsp), rsp, 0, 0);
-		slog_info("(mqtt)Message_send:%s",rsp);
-}
 
-/*new*/
+/*
+ * creat a object json with a key and a value (type value: int, string, object)
+ */
 void add_component_to_obj(json_object *j, void* com){
     json_component *dt = (json_component*)com;
-    json_object_object_add(j, dt->key, json_object_new_int(dt->value));
+    switch (dt->type){
+    case json_type_int:
+    	json_object_object_add(j, dt->key, json_object_new_int(dt->value));
+    	break;
+    case json_type_string:
+    	json_object_object_add(j, dt->key, json_object_new_string(dt->value));
+    	break;
+    case json_type_array:
+    	//json_object_object_add(j, dt->key, json_object_new_array(dt->value));
+    	break;
+    case json_type_boolean:
+    	json_object_object_add(j, dt->key, json_object_new_boolean(dt->value));
+    	break;
+    case json_type_object:
+    	json_object_object_add(j, dt->key,(dt->value));
+    	break;
+    }
     return;
 }
-
-void add_obj_to_obj(json_object *j, void* com){
-    json_object *jobj = (json_object *)com;
-    json_object_array_add(j, jobj);
-    return;
-}
-
-json_object* create_json_obj_from(void (*modelFunc)(json_object*, void*), int num_of, ...){
+/*
+ * creat object json, include json_component
+ * Check mqtt push json
+ */
+json_object* create_json_obj_from(void (*modelFunc)(json_object*, void*), int num_of, send_mqtt mqtt,...){
     va_list args_list;
     json_object *jobj = json_object_new_object();
     typedef void *com;
@@ -431,10 +387,11 @@ json_object* create_json_obj_from(void (*modelFunc)(json_object*, void*), int nu
     for(i = 0; i< num_of; i++){
         add_component_to_obj(jobj, va_arg(args_list, com));
     }
-
     va_end(args_list);
-    char *str = json_object_to_json_string(jobj);
-	mosquitto_publish(mosq, NULL, TP_STATUS, strlen(str), str, 0, 0);
-	slog_info("(mqtt)Message_send:%s",str);
+    if(mqtt == mqtt_push){
+		char *str = json_object_to_json_string(jobj);
+		mosquitto_publish(mosq, NULL, TP_STATUS, strlen(str), str, 0, 0);
+		slog_info("(mqtt)Message_send:%s",str);
+    }
     return jobj;
 }

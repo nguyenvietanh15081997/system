@@ -52,6 +52,7 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 #define HEADER_SCENE_CALL_SCENE_RGB  (0x0000)
 
 #define HEADER_SCENE_REMOTE_SET (0x0101)
+#define HEADER_SCENE_REMOTE_DEL (0x0102)
 #define HEADER_SCENE_SENSOR_SET (0x0201)
 
 #define NULL8    0x00
@@ -124,16 +125,17 @@ typedef enum{
 	HSL_Get_typedef 			= 0x0e,
 	HSL_Set_typedef 			= 0x0f,
 
-	SceneForRemote_vendor_typedef = 0x10,
-	SceneForSensor_vendor_typedef = 0x11,
-	SceneForRGB_vendor_typedef 	  = 0x12,
-	CallSceneRgb_vendor_typedef   = 0x13,
-	CallModeRgb_vendor_typedef    = 0x14,
-	DelSceneRgb_vendor_typedef    = 0x15,
+	SceneForRemote_vendor_typedef 		= 0x10,
+	DelSceneForRemote_vendor_typedef 	= 0x11,
+	SceneForSensor_vendor_typedef 		= 0x12,
+	SceneForRGB_vendor_typedef 	  		= 0x13,
+	CallSceneRgb_vendor_typedef   		= 0x14,
+	CallModeRgb_vendor_typedef    		= 0x15,
+	DelSceneRgb_vendor_typedef    		= 0x16,
 
-	SaveGateway_vendor_typedef    = 0x16,
-	AskTypeDevice_vendor_typedef  = 0x17,
-	SetTypeDevice_vendor_typedef  = 0x18
+	SaveGateway_vendor_typedef    = 0x17,
+	AskTypeDevice_vendor_typedef  = 0x18,
+	SetTypeDevice_vendor_typedef  = 0x19,
 } functionTypeDef;
 
 /*
@@ -215,6 +217,8 @@ void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8
 		uint8_t periodLog, uint8_t tll, uint16_t feature, uint16_t cmdLength);
 void SetSceneForRemote(uint16_t addressremote, uint8_t buttonId, \
 		uint8_t modeId, uint16_t sceneId, uint16_t appID, uint8_t SrgbID);
+void DelSceneForRemote(uint16_t addressremote, uint8_t buttonId, uint8_t modeId);
+
 void SetSceneForSensor(uint16_t addressSensor, uint8_t stt, uint16_t condition, uint16_t low_lux, uint16_t hight_lux,\
 		uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID);
 void SetSceneForRGB(uint16_t pAdrRgb, uint16_t pAppID, uint8_t pSrgbID);

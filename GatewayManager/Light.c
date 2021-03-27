@@ -313,6 +313,19 @@ void SetSceneForRemote(uint16_t addressremote, uint8_t buttonId, uint8_t modeId,
 		vrts_CMD_STRUCTURE.para[i+9]= 0;
 	}
 }
+void DelSceneForRemote(uint16_t addressremote, uint8_t buttonId, uint8_t modeId){
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0]= addressremote & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1]= (addressremote>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0]= RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1]= (VENDOR_ID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2]= (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_DEL>>8 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2]= buttonId;
+	vrts_CMD_STRUCTURE_VENDOR.para[3]= modeId;
+}
 void SetSceneForSensor(uint16_t addressSensor, uint8_t stt, uint16_t condition, uint16_t low_lux,\
 		uint16_t hight_lux, uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID)
 {
@@ -495,6 +508,9 @@ void Function_Vendor(uint16_t cmd,\
 	}
 	else if(Func_vendor == SceneForSensor_vendor_typedef){
 		SetSceneForSensor(adr, stt, condition, low_lux, hight_lux, action, sceneID, appID, srgbID);
+	}
+	else if(Func_vendor == DelSceneForRemote_vendor_typedef){
+		DelSceneForRemote(adr, buttonID, modeID);
 	}
 	else if(Func_vendor == SceneForRGB_vendor_typedef){
 		SetSceneForRGB(adr, appID, srgbID);

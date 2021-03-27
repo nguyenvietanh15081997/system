@@ -80,13 +80,15 @@ void *ProvisionThread (void *argv )
 				ControlMessage(3, OUTMESSAGE_ScanStop);
 				slog_print(SLOG_INFO, 1, "<provision>Provision stop");
 
-				struct json_object *object;
-				object = json_object_new_object();
-				json_object_object_add(object, "CMD", json_object_new_string("STOP"));
-				char *rsp;
-				rsp = json_object_to_json_string(object);
-				mosquitto_publish(mosq, NULL, "RD_STATUS", strlen(rsp),rsp,  0, 0);
-				slog_info("(mqtt)Message_send:%s",rsp);
+//				struct json_object *object;
+//				object = json_object_new_object();
+//				json_object_object_add(object, "CMD", json_object_new_string("STOP"));
+//				char *rsp;
+//				rsp = json_object_to_json_string(object);
+//				mosquitto_publish(mosq, NULL, "RD_STATUS", strlen(rsp),rsp,  0, 0);
+//				slog_info("(mqtt)Message_send:%s",rsp);
+				json_component cmd = {"CMD","STOP",json_type_string};
+				create_json_obj_from(add_component_to_obj, 1, mqtt_push, &cmd);
 
 				flag_selectmac     = false;
 				flag_getpro_info   = false;
