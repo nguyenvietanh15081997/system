@@ -276,19 +276,19 @@ void GWIF_ProcessData (void)
 				json_component jsonAdr = {"ADR",adr,json_type_int};
 				if((headerSensor == REMOTE_MODULE_DC_TYPE) || (headerSensor == REMOTE_MODULE_AC_TYPE)){
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
-					uint16_t pscenedc = (vrts_Remote_Rsp->senceID[0] <<8) |(vrts_Remote_Rsp->senceID[1]);
-					uint16_t scenrgb = (vrts_Remote_Rsp->futureID[0] <<8) |(vrts_Remote_Rsp->futureID[1]);
+					uint16_t pscenedc = (vrts_Remote_Rsp->senceID[0]) |(vrts_Remote_Rsp->senceID[1]<<8);
+					uint16_t scenrgb = (vrts_Remote_Rsp->futureID[0]) |(vrts_Remote_Rsp->futureID[1]<<8);
 					json_component button = {"BUTTONID", vrts_Remote_Rsp->buttonID, json_type_int};
 					json_component mode = {"MODEID", vrts_Remote_Rsp->modeID, json_type_int};
-					json_component scene = {"SCENEID", vrts_Remote_Rsp->senceID, json_type_int};
+					json_component scene = {"SCENEID", pscenedc, json_type_int};
 					create_json_obj_from(add_component_to_obj, 4,mqtt_push, &jsonAdr, &button, &mode, &scene);
 					if(pscenedc!=0){
-						/*call scene normal*/
-						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
-						sleep(1);
 						/*call scene RGB*/
 						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
-								NULL16, NULL16,NULL16, NULL16,scenrgb, NULL8, NULL8, NULL8, NULL8,23);
+								NULL16, NULL16,NULL16, NULL16,pscenedc, NULL8, NULL8, NULL8, NULL8,23);
+						sleep(2);
+						/*call scene normal*/
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
 					}
 				}
 				else if (headerSensor == POWER_TYPE){
@@ -396,8 +396,8 @@ void GWIF_ProcessData (void)
 					else{
 						jsonvalue = vrts_GWIF_IncomeMessage->Message[7] | vrts_GWIF_IncomeMessage->Message[8]<<8;
 					}
-					json_component callsence = {"CALLSENCE",jsonvalue,json_type_int};
-					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &adr, &callsence);
+					json_component callscene = {"CALLSCENE",jsonvalue,json_type_int};
+					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &adr, &callscene);
 					break;
 				case NODE_RESET_STATUS:
 					if(1){

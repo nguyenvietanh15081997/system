@@ -106,6 +106,8 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 #define LIGHT_CTL_TEMP_RANGE_SET_NOACK	0x6C82
 #define LIGHT_HSL_STATUS                0x7882
 
+#define ACTION_TIME  60
+
 /* enums to is parameter for void FunctionPer()  */
 typedef enum{
 	null 						= 0x00,
