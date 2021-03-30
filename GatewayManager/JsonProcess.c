@@ -172,11 +172,30 @@ void JsonControl(json_object *jobj,char *key){
 		 }
 		 else if(strcmp(vrts_Json_String.cmd,"SETSCENEFORREMOTE") == 0){
 			 vrts_Json_String.adr        	= (json_object_get_int(json_object_object_get(jobj,"ADR")));
-			 vrts_Json_String.buttonid      = (json_object_get_int(json_object_object_get(jobj,"BUTTONID")));
+			 vrts_Json_String.buttonid      = (json_object_get_string(json_object_object_get(jobj,"BUTTONID")));
+			 uint8_t buttonId_int;
+			 if(strcmp(vrts_Json_String.buttonid,"BUTTON_1")==0){
+				 buttonId_int =1;
+			 }
+			 else if(strcmp(vrts_Json_String.buttonid,"BUTTON_2")==0){
+				 buttonId_int =2;
+			 }
+			 else if(strcmp(vrts_Json_String.buttonid,"BUTTON_3")==0){
+				 buttonId_int =3;
+			 }
+			 else if(strcmp(vrts_Json_String.buttonid,"BUTTON_4")==0){
+				 buttonId_int =4;
+			 }
+			 else if(strcmp(vrts_Json_String.buttonid,"BUTTON_5")==0){
+				 buttonId_int =5;
+			 }
+			 else if(strcmp(vrts_Json_String.buttonid,"BUTTON_6")==0){
+				 buttonId_int =6;
+			 }
 			 vrts_Json_String.modeid        = (json_object_get_int(json_object_object_get(jobj,"MODEID")));
 			 vrts_Json_String.srgbID        = (json_object_get_int(json_object_object_get(jobj,"SRGBID")));
 			 vrts_Json_String.sceneID       = (json_object_get_int(json_object_object_get(jobj,"SCENEID")));
-				Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, vrts_Json_String.buttonid,\
+				Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, buttonId_int,\
 						vrts_Json_String.modeid, NULL8, NULL16, NULL16, NULL16,\
 						NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8,31);
 		 }

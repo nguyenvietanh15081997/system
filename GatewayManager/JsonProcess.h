@@ -44,7 +44,7 @@ typedef struct jsonstring
 	uint16_t header;
 	uint8_t stt;
 	uint16_t condition;
-	uint8_t buttonid;
+	uint8_t *buttonid;
 	uint8_t modeid;
 	uint16_t low_lux;
 	uint16_t hight_lux;

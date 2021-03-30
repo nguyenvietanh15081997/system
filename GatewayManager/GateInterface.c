@@ -278,7 +278,26 @@ void GWIF_ProcessData (void)
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					uint16_t pscenedc = (vrts_Remote_Rsp->senceID[0]) |(vrts_Remote_Rsp->senceID[1]<<8);
 					uint16_t scenrgb = (vrts_Remote_Rsp->futureID[0]) |(vrts_Remote_Rsp->futureID[1]<<8);
-					json_component button = {"BUTTONID", vrts_Remote_Rsp->buttonID, json_type_int};
+					uint8_t *buttonId_String;
+					if(vrts_Remote_Rsp->buttonID == 1){
+						buttonId_String = "BUTTON_1";
+					}
+					else if(vrts_Remote_Rsp->buttonID == 2){
+						buttonId_String = "BUTTON_2";
+					}
+					else if(vrts_Remote_Rsp->buttonID == 3){
+						buttonId_String = "BUTTON_3";
+					}
+					else if(vrts_Remote_Rsp->buttonID == 4){
+						buttonId_String = "BUTTON_4";
+					}
+					else if(vrts_Remote_Rsp->buttonID == 5){
+						buttonId_String = "BUTTON_5";
+					}
+					else if(vrts_Remote_Rsp->buttonID == 6){
+						buttonId_String = "BUTTON_6";
+					}
+					json_component button = {"BUTTONID", buttonId_String, json_type_string};
 					json_component mode = {"MODEID", vrts_Remote_Rsp->modeID, json_type_int};
 					json_component scene = {"SCENEID", pscenedc, json_type_int};
 					create_json_obj_from(add_component_to_obj, 4,mqtt_push, &jsonAdr, &button, &mode, &scene);
@@ -484,7 +503,26 @@ void GWIF_ProcessData (void)
 					json_component setscenergb = {"SETSCENERGB",rspSceneRgb,json_type_int};
 					json_component callscenergb = {"CALLSCENERGB",rspSceneRgb,json_type_int};
 
-					json_component btid = {"BUTTONID",rspButtonId,json_type_int};
+					uint8_t *rspBID_String;
+					if(rspButtonId == 1){
+						rspBID_String = "BUTTON_1";
+					}
+					else if(rspButtonId ==2){
+						rspBID_String = "BUTTON_2";
+					}
+					else if(rspButtonId ==3){
+						rspBID_String = "BUTTON_3";
+					}
+					else if(rspButtonId ==4){
+						rspBID_String = "BUTTON_4";
+					}
+					else if(rspButtonId == 5){
+						rspBID_String = "BUTTON_5";
+					}
+					else if(rspButtonId ==6){
+						rspBID_String = "BUTTON_6";
+					}
+					json_component btid = {"BUTTONID",rspBID_String,json_type_string};
 					json_component modid = {"MODEID",rspModeId,json_type_int};
 					json_component sceneidR = {"SCENEID",rspSceneRemote,json_type_int};
 					json_component srgbidR = {"SRGBID",rspSrgbIdRemote,json_type_int};
