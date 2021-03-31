@@ -25,6 +25,13 @@ typedef struct lightsensorRsp
 	uint8_t  future[4];
 }lightsensorRsp;
 extern lightsensorRsp * vrts_LighSensor_Rsp;
+typedef struct pirsensorRsp
+{
+	uint8_t  typeDev[2];
+	uint8_t  pir[2];
+	uint8_t  future[4];
+}pirsensorRsp;
+extern pirsensorRsp * vrts_PirSensor_Rsp;
 
 /*Define friend_poll*/
 #define SENSOR_DESCRIP_GET     0x3082

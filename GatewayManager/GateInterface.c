@@ -323,10 +323,39 @@ void GWIF_ProcessData (void)
 
 					json_component jsonLux = {"LUX",value_Lux,json_type_int};
 					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &jsonAdr, &jsonLux);
+					uint16_t rspSceneSensor = vrts_LighSensor_Rsp->future[0] | vrts_LighSensor_Rsp->future[1]<<8;
+					if(rspSceneSensor != 0){
+						/*call scene RGB*/
+						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
+								NULL16, NULL16,NULL16, NULL16,rspSceneSensor, NULL8, NULL8, NULL8, NULL8,23);
+						sleep(2);
+						/*call scene normal*/
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,rspSceneSensor, NULL16,NULL16, NULL16, NULL16, 17);
+					}
 				}
 				else if (headerSensor == PIR_SENSOR_MODULE_TYPE){
-					json_component jsonPir = {"PIR",1,json_type_int};
+					vrts_PirSensor_Rsp = (pirsensorRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
+					uint16_t motion = vrts_PirSensor_Rsp->pir[0] | vrts_PirSensor_Rsp->pir[1]<<8;
+					uint8_t jsonMotion;
+					if(motion == 1){
+						jsonMotion = 1;
+					}
+					else if(motion == 2){
+						jsonMotion = 0;
+					}
+					json_component jsonPir = {"PIR",jsonMotion,json_type_int};
 					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &jsonAdr, &jsonPir);
+
+					uint16_t rspSceneSensor = vrts_PirSensor_Rsp->future[0] | vrts_PirSensor_Rsp->future[1]<<8;
+					if(rspSceneSensor != 0){
+						/*call scene RGB*/
+						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
+								NULL16, NULL16,NULL16, NULL16,rspSceneSensor, NULL8, NULL8, NULL8, NULL8,23);
+						sleep(2);
+						/*call scene normal*/
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,rspSceneSensor, NULL16,NULL16, NULL16, NULL16, 17);
+					}
+
 				}
 			}
             /*..........................*/
@@ -528,6 +557,7 @@ void GWIF_ProcessData (void)
 					json_component srgbidR = {"SRGBID",rspSrgbIdRemote,json_type_int};
 
 					json_component jsonStt = {"STT",rspSTT,json_type_int};
+					json_component jsonSceneDel = {"SCENEID",rspSTT,json_type_int};
 					json_component jsonCondition = {"CONDITION",rspCondition,json_type_int};
 					json_component jsonLowLux = {"LOW_LUX",rspLowLux,json_type_int};
 					json_component jsonHighLux = {"HIGHT_LUX",rspHighLux,json_type_int};
@@ -561,8 +591,87 @@ void GWIF_ProcessData (void)
 						break;
 					case HEADER_SCENE_SENSOR_SET:
 						if(1){
-							json_component cmd = {"CMD","SETSCENEFORSENSOR",json_type_string};
-							create_json_obj_from(add_component_to_obj, 9,mqtt_push,&cmd, &adr, &jsonStt, &jsonCondition, &jsonLowLux, &jsonHighLux, &jsonAction, &jsonSceneS, &jsonSrgbidS);
+
+							if(rspCondition == 1280 || rspCondition == 1281 || rspCondition == 1282){
+								json_component cmd = {"CMD","DELSCENEFORSENSOR",json_type_string};
+								create_json_obj_from(add_component_to_obj, 3,mqtt_push, &cmd, &adr, &jsonSceneDel);
+							}
+							else {
+								json_component cmd = {"CMD","SETSCENEFORSENSOR",json_type_string};
+								json_component  jsonPir= {"PIR",vrts_Json_String.motion,json_type_int};
+								json_object *pir_Sensor_object = create_json_obj_from(add_component_to_obj, 1, mqtt_dont_push,&jsonPir);
+								json_component pir_Sensor_push_mqtt = {"PIR_SENSOR",pir_Sensor_object,json_type_object};
+								if (rspCondition == 256){
+									json_component type = {"TYPE",0,json_type_int};
+									json_component condition_push_mqtt = {"CONDITION",4,json_type_int};
+									json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
+									json_object *light_sensor_object = create_json_obj_from(add_component_to_obj, 2,mqtt_dont_push, &condition_push_mqtt,&low_lux_push_mqtt);
+									json_component ligh_sensor_push_mqtt = {"LIGHT_SENSOR",light_sensor_object,json_type_object};
+									create_json_obj_from(add_component_to_obj, 6, mqtt_push, &cmd, &adr, &type, &ligh_sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
+								}
+								else if(rspCondition == 512){
+									json_component type = {"TYPE",0,json_type_int};
+									json_component condition_push_mqtt = {"CONDITION",1,json_type_int};
+									json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
+									json_object *light_sensor_object = create_json_obj_from(add_component_to_obj, 2,mqtt_dont_push, &condition_push_mqtt,&low_lux_push_mqtt);
+									json_component ligh_sensor_push_mqtt = {"LIGHT_SENSOR",light_sensor_object,json_type_object};
+									create_json_obj_from(add_component_to_obj, 6, mqtt_push, &cmd, &adr, &type, &ligh_sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
+								}
+								else if(rspCondition == 768){
+									json_component type = {"TYPE",0,json_type_int};
+									json_component condition_push_mqtt = {"CONDITION",6,json_type_int};
+									json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
+									json_object *light_sensor_object = create_json_obj_from(add_component_to_obj, 2,mqtt_dont_push, &condition_push_mqtt,&low_lux_push_mqtt);
+									json_component ligh_sensor_push_mqtt = {"LIGHT_SENSOR",light_sensor_object,json_type_object};
+									create_json_obj_from(add_component_to_obj, 6, mqtt_push, &cmd, &adr, &type, &ligh_sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
+								}
+								else if(rspCondition == 1024){
+									json_component type = {"TYPE",0,json_type_int};
+									json_component condition_push_mqtt = {"CONDITION",7,json_type_int};
+									json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
+									json_component hight_lux_push_mqtt = {"HIGHT_LUX",rspHighLux,json_type_int};
+									json_object *light_sensor_object = create_json_obj_from(add_component_to_obj, 3,mqtt_dont_push, &condition_push_mqtt,&low_lux_push_mqtt,&hight_lux_push_mqtt);
+									json_component ligh_sensor_push_mqtt = {"LIGHT_SENSOR",light_sensor_object,json_type_object};
+									create_json_obj_from(add_component_to_obj, 6, mqtt_push, &cmd, &adr, &type, &ligh_sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
+								}
+								else if(rspCondition == 1 || rspCondition == 2){
+									json_component type = {"TYPE",1,json_type_int};
+									create_json_obj_from(add_component_to_obj, 6, mqtt_push, &cmd,&adr,&type,&pir_Sensor_push_mqtt,&jsonSceneS,&jsonSrgbidS);
+								}
+								else if(rspCondition == 257 || rspCondition ==258){
+									json_component type = {"TYPE",2,json_type_int};
+									json_component condition_push_mqtt = {"CONDITION",4,json_type_int};
+									json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
+									json_object *light_Sensor_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&condition_push_mqtt,&low_lux_push_mqtt);
+									json_component light_Sensor_push_mqtt = {"LIGHT_SENSOR",light_Sensor_object,json_type_object};
+									create_json_obj_from(add_component_to_obj, 7, mqtt_push,&cmd,&adr,&type,&light_Sensor_push_mqtt,&pir_Sensor_push_mqtt,&jsonSceneS,&jsonSrgbidS);
+								}
+								else if(rspCondition == 513 || rspCondition == 514){
+									json_component type = {"TYPE",2,json_type_int};
+									json_component condition_push_mqtt = {"CONDITION",1,json_type_int};
+									json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
+									json_object *light_Sensor_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&condition_push_mqtt,&low_lux_push_mqtt);
+									json_component light_Sensor_push_mqtt = {"LIGHT_SENSOR",light_Sensor_object,json_type_object};
+									create_json_obj_from(add_component_to_obj, 7, mqtt_push,&cmd,&adr,&type,&light_Sensor_push_mqtt,&pir_Sensor_push_mqtt,&jsonSceneS,&jsonSrgbidS);
+								}
+								else if(rspCondition == 769 || rspCondition == 770){
+									json_component type = {"TYPE",2,json_type_int};
+									json_component condition_push_mqtt = {"CONDITION",6,json_type_int};
+									json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
+									json_object *light_Sensor_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&condition_push_mqtt,&low_lux_push_mqtt);
+									json_component light_Sensor_push_mqtt = {"LIGHT_SENSOR",light_Sensor_object,json_type_object};
+									create_json_obj_from(add_component_to_obj, 7, mqtt_push,&cmd,&adr,&type,&light_Sensor_push_mqtt,&pir_Sensor_push_mqtt,&jsonSceneS,&jsonSrgbidS);
+								}
+								else if(rspCondition == 1025 || rspCondition == 1026){
+									json_component type = {"TYPE",2,json_type_int};
+									json_component condition_push_mqtt = {"CONDITION",7,json_type_int};
+									json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
+									json_component hight_lux_push_mqtt = {"HIGHT_LUX",rspHighLux,json_type_int};
+									json_object *light_Sensor_object = create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push,&condition_push_mqtt,&low_lux_push_mqtt,&hight_lux_push_mqtt);
+									json_component light_Sensor_push_mqtt = {"LIGHT_SENSOR",light_Sensor_object,json_type_object};
+									create_json_obj_from(add_component_to_obj, 7, mqtt_push,&cmd,&adr,&type,&light_Sensor_push_mqtt,&pir_Sensor_push_mqtt,&jsonSceneS,&jsonSrgbidS);
+								}
+							}
 						}
 						break;
 					}

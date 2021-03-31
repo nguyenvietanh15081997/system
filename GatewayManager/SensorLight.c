@@ -7,6 +7,7 @@
 #include "../GatewayManager/Light.h"
 
 lightsensorRsp * vrts_LighSensor_Rsp;
+pirsensorRsp * vrts_PirSensor_Rsp;
 //bool flag_sensor_light_rsp = false;
 uint16_t  value_Lux = 0;
 static uint16_t luxReg;

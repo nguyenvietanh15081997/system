@@ -107,6 +107,10 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 #define LIGHT_HSL_STATUS                0x7882
 
 #define ACTION_TIME  60
+#define SENSOR_CONDITION_BIGGER         6
+#define SENSOR_CONDITION_LESS			4
+#define SENSOR_CONDITION_EQUAL          1
+#define SENSOR_CONDITION_BOTH			7
 
 /* enums to is parameter for void FunctionPer()  */
 typedef enum{
