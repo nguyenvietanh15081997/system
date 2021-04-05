@@ -265,6 +265,13 @@ void GWIF_ProcessData (void)
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_KEY_BIND_RSP){
 				flag_set_type = true;
 			}
+			if(vrts_GWIF_IncomeMessage->Message[0] == TSCRIPT_HEARBEAT){
+				uint16_t adr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+				json_component jsonAdr = {"ADR",adr,json_type_int};
+				json_component status = {"STATUS","ONLINE",json_type_string};
+				create_json_obj_from(add_component_to_obj, 2,mqtt_push, &jsonAdr, &status);
+				flag_checkHB = true;
+			}
             /*...........................................*/
 /*
  * TODO: process for sensor(light, PIR, remote,...)
@@ -277,7 +284,7 @@ void GWIF_ProcessData (void)
 				if((headerSensor == REMOTE_MODULE_DC_TYPE) || (headerSensor == REMOTE_MODULE_AC_TYPE)){
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					uint16_t pscenedc = (vrts_Remote_Rsp->senceID[0]) |(vrts_Remote_Rsp->senceID[1]<<8);
-					uint16_t scenrgb = (vrts_Remote_Rsp->futureID[0]) |(vrts_Remote_Rsp->futureID[1]<<8);
+					uint16_t srgbid = (vrts_Remote_Rsp->futureID[0]) |(vrts_Remote_Rsp->futureID[1]<<8);
 					uint8_t *buttonId_String;
 					if(vrts_Remote_Rsp->buttonID == 1){
 						buttonId_String = "BUTTON_1";
@@ -297,10 +304,12 @@ void GWIF_ProcessData (void)
 					else if(vrts_Remote_Rsp->buttonID == 6){
 						buttonId_String = "BUTTON_6";
 					}
+					json_component cmd = {"CMD","BUTTON",json_type_string};
 					json_component button = {"BUTTONID", buttonId_String, json_type_string};
 					json_component mode = {"MODEID", vrts_Remote_Rsp->modeID, json_type_int};
 					json_component scene = {"SCENEID", pscenedc, json_type_int};
-					create_json_obj_from(add_component_to_obj, 4,mqtt_push, &jsonAdr, &button, &mode, &scene);
+					json_component srgbid_push = {"SRGBID",srgbid,json_type_int};
+					create_json_obj_from(add_component_to_obj, 6,mqtt_push,&cmd, &jsonAdr, &button, &mode, &scene, &srgbid_push);
 					if(pscenedc!=0){
 						/*call scene RGB*/
 						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
@@ -676,13 +685,6 @@ void GWIF_ProcessData (void)
 						break;
 					}
 				}
-			}
-			if(vrts_GWIF_IncomeMessage->Message[0] == TSCRIPT_HEARBEAT){
-				uint16_t adr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
-				json_component jsonAdr = {"ADR",adr,json_type_int};
-				json_component status = {"STATUS","ONLINE",json_type_string};
-				create_json_obj_from(add_component_to_obj, 2,mqtt_push, &jsonAdr, &status);
-				flag_checkHB = true;
 			}
 	}
 }

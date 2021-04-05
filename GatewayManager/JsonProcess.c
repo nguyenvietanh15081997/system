@@ -42,17 +42,17 @@ void JsonControl(json_object *jobj,char *key){
 		 flagDefineCmd = onoff_enum;
 		 //FunctionPer(HCI_CMD_GATEWAY_CMD,CCT_Get_typedef,vrts_Json_String.adr ,NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
 		 FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,vrts_Json_String.adr ,NULL8, vrts_Json_String.onoff, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
-		 sleep(1);
+		 usleep(400000);
 	 }
 	 if(strcmp(key,"CCT")==0){
 		 flagDefineCmd = cct_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, CCT_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16,Percent2ParamCCT(vrts_Json_String.cct), NULL16, NULL16,NULL16, NULL16, NULL16, 17);
-		 sleep(1);
+		 usleep(400000);
 	 }
 	 if(strcmp(key,"DIM")==0){
 		 flagDefineCmd = dim_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, Lightness_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, Percent2ParamDIM(vrts_Json_String.dim), NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 14);
-		 sleep(1);
+		 usleep(400000);
 	 }
 	 if(strcmp(key,"HOURS")==0){
 		 flagDefineCmd = hours_enum;
@@ -64,12 +64,6 @@ void JsonControl(json_object *jobj,char *key){
 		 flagDefineCmd = seconds_enum;
 		 flagSecond= 1;
 	 }
-//	 if(strcmp(key,"ADDGROUP")==0){
-//		 flagDefineCmd = addgroup_enum;
-//		 check_add_or_del_group=true;
-//		 FunctionPer(HCI_CMD_GATEWAY_CMD, AddGroup_typedef, vrts_Json_String.adr, vrts_Json_String.addgroup , NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
-//		 sleep(1);
-//	 }
 	 if(strcmp(key,"ADDGROUP")==0){
 		 flagDefineCmd = addgroup_enum;
 		 check_add_or_del_group= true;
@@ -77,29 +71,19 @@ void JsonControl(json_object *jobj,char *key){
 		 {
 			 FunctionPer(HCI_CMD_GATEWAY_CMD, AddGroup_typedef, adr_dv[i], vrts_Json_String.addgroup , NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
 			 //printf("adr_dv: %d\n",adr_dv[i]);
-			 usleep(500000);
+			 //sleep(1);
+			 usleep(400000);
 		 }
 	 }
-//	 if(strcmp(key,"DELGROUP")==0){
-//		 flagDefineCmd = delgroup_enum;
-//		 check_add_or_del_group=false;
-//		 FunctionPer(HCI_CMD_GATEWAY_CMD, DelGroup_typedef, vrts_Json_String.adr, vrts_Json_String.delgroup, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
-//		 sleep(1);
-//	 }
 	 if(strcmp(key,"DELGROUP")==0){
 		 flagDefineCmd = delgroup_enum;
 		 check_add_or_del_group= false;
 		 for(i=0; i<arraylen; i++)
 		 {
 			 FunctionPer(HCI_CMD_GATEWAY_CMD, DelGroup_typedef, adr_dv[i], vrts_Json_String.delgroup, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
-			 usleep(500000);
+			 usleep(400000);
 		 }
 	 }
-//	 if(strcmp(key,"ADDSCENE")==0){
-//		 flagDefineCmd = addscene_enum;
-//		 FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.addscene, NULL16,NULL16, NULL16, NULL16, 14);
-//		 sleep(1);
-//	 }
 	 if(strcmp(key,"ADDSCENE")==0){
 		 flagDefineCmd = addscene_enum;
 		 scene_id = vrts_Json_String.addscene;
@@ -108,31 +92,27 @@ void JsonControl(json_object *jobj,char *key){
 		 for(i=0;i<arraylen;i++){
 			 //FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr_dv[i], vrts_Json_String.delgroup, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
 			 FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, scene_id, NULL16,NULL16, NULL16, NULL16, 14);//sleep(1);
-			 usleep(500000);
+			 usleep(400000);
 	 	 }
 	 }
 	 if(strcmp(key,"CALLSCENE")==0){
 		 flagDefineCmd = callscene_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.callscene, NULL16,NULL16, NULL16, NULL16, 17);
-		 sleep(1);
+		 usleep(400000);
 	 }
-//	 if(strcmp(key,"DELSCENE")==0){
-//		 flagDefineCmd = delscene_enum;
-//		 FunctionPer(HCI_CMD_GATEWAY_CMD, DelSence_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.delscene, NULL16,NULL16, NULL16, NULL16, 14);
-//		 sleep(1);
-//	 }
 	 if(strcmp(key,"DELSCENE")==0){
 		 flagDefineCmd = delscene_enum;
 		 check_add_or_del_scene= false;
 		 for(i=0; i<arraylen; i++)
 		 {
 			 FunctionPer(HCI_CMD_GATEWAY_CMD, DelSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, vrts_Json_String.delscene, NULL16,NULL16, NULL16, NULL16, 14);
-			 usleep(500000);
+			 usleep(400000);
 		 }
 	 }
 	 if(strcmp(key,"HUE")==0){
 		 flagDefineCmd = hue_eum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, HSL_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,vrts_Json_String.lightness, vrts_Json_String.hue, vrts_Json_String.saturation, 19 );
+		 usleep(400000);
 	 }
 	 if(strcmp(key,"CMD")==0){
 		 if(strcmp(vrts_Json_String.cmd,"SCAN")==0){
@@ -160,7 +140,7 @@ void JsonControl(json_object *jobj,char *key){
 			json_object_object_add(object, "CMD", json_object_new_string("STOP"));
 			char *rsp;
 			rsp = json_object_to_json_string(object);
-			mosquitto_publish(mosq, NULL, "RD_STATUS", strlen(rsp),rsp,  0, 0);
+			mosquitto_publish(mosq, NULL, "RD_STATUS", strlen(rsp),rsp,  qos, 0);
 			slog_info("(mqtt)Message_send:%s",rsp);
 
 			//for gpio
@@ -198,6 +178,7 @@ void JsonControl(json_object *jobj,char *key){
 				Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, buttonId_int,\
 						vrts_Json_String.modeid, NULL8, NULL16, NULL16, NULL16,\
 						NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8,31);
+				usleep(400000);
 		 }
 		 else if(strcmp(vrts_Json_String.cmd,"DELSCENEFORREMOTE") == 0){
 			 vrts_Json_String.adr        	= (json_object_get_int(json_object_object_get(jobj,"ADR")));
@@ -205,6 +186,7 @@ void JsonControl(json_object *jobj,char *key){
 			 vrts_Json_String.modeid        = (json_object_get_int(json_object_object_get(jobj,"MODEID")));
 				Function_Vendor(HCI_CMD_GATEWAY_CMD, DelSceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, vrts_Json_String.buttonid,\
 						vrts_Json_String.modeid, NULL8, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,31);
+				usleep(400000);
 		 }
 		 else if(strcmp(vrts_Json_String.cmd,"SETSCENEFORSENSOR")==0){
 			 vrts_Json_String.adr        		= (json_object_get_int(json_object_object_get(jobj,"ADR")));
@@ -219,12 +201,14 @@ void JsonControl(json_object *jobj,char *key){
 					 vrts_Json_String.low_lux 	= (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"LOW_LUX")));
 					 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 							 parCondition, vrts_Json_String.low_lux, NULL16, NULL16, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+					 usleep(400000);
 				 }
 				 else if (vrts_Json_String.condition == 5 || vrts_Json_String.condition == 6){
 					 uint16_t parCondition = 768;
 					 vrts_Json_String.low_lux = (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"LOW_LUX")));
 					 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 					 		parCondition, vrts_Json_String.low_lux, NULL16 , NULL16, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+					 usleep(400000);
 				 }
 				 else if(vrts_Json_String.condition == 7){
 					 uint16_t parCondition = 1024;
@@ -232,12 +216,14 @@ void JsonControl(json_object *jobj,char *key){
 					 vrts_Json_String.hight_lux = (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"HIGHT_LUX")));
 					 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 							parCondition, vrts_Json_String.low_lux, vrts_Json_String.hight_lux, NULL16, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+					 usleep(400000);
 				 }
 				 else if(vrts_Json_String.condition == 1){
 					 uint16_t parCondition = 512;
 					 vrts_Json_String.low_lux 	= (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"LOW_LUX")));
 					 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 							 parCondition, vrts_Json_String.low_lux, NULL16, NULL16, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+					 usleep(400000);
 				 }
 			 }
 			 else if(vrts_Json_String.type == 1){
@@ -247,11 +233,13 @@ void JsonControl(json_object *jobj,char *key){
 					 uint16_t parCondition = 1;
 					 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 				 					parCondition, NULL16, NULL16, ACTION_TIME, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+					 usleep(400000);
 				 }
 				 if(vrts_Json_String.motion == 0){
 					 uint16_t parCondition = 2;
 					 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 				 					parCondition, NULL16, NULL16, ACTION_TIME, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+					 usleep(400000);
 				 }
 			 }
 			 else if(vrts_Json_String.type == 2){
@@ -265,41 +253,49 @@ void JsonControl(json_object *jobj,char *key){
 					 uint16_t parCondition = 258;
 				 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 				 		 					parCondition, vrts_Json_String.low_lux, NULL16, ACTION_TIME, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+				 	usleep(400000);
 				 }
 				 else if((vrts_Json_String.condition == 5 || vrts_Json_String.condition == 6) && (vrts_Json_String.motion == 0)){
 					 uint16_t parCondition = 770;
 				 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 				 		 					parCondition,vrts_Json_String.low_lux , NULL16, ACTION_TIME, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+				 	usleep(400000);
 				 }
 				 else if(vrts_Json_String.motion == 0 && (vrts_Json_String.condition == 1)){
 					 uint16_t parCondition = 514;
 				 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 				 		 					parCondition,vrts_Json_String.low_lux , NULL16, ACTION_TIME, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+				 	usleep(400000);
 				 }
 				 else if(vrts_Json_String.motion == 0 && vrts_Json_String.condition == 7){
 					 uint16_t parCondition = 1026;
 					 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 											parCondition,vrts_Json_String.low_lux , vrts_Json_String.hight_lux, ACTION_TIME, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+					 usleep(400000);
 				 }
 				 else if((vrts_Json_String.condition == 3 || vrts_Json_String.condition == 4) && (vrts_Json_String.motion == 1)){
 					 uint16_t parCondition = 257;
 				 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 				 		 					parCondition, vrts_Json_String.low_lux, NULL16, ACTION_TIME, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+				 	usleep(400000);
 				 }
 				 else if((vrts_Json_String.condition == 5 || vrts_Json_String.condition == 6) && (vrts_Json_String.motion == 1)){
 					 uint16_t parCondition = 769;
 				 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 				 		 					parCondition,vrts_Json_String.low_lux , NULL16, ACTION_TIME, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+				 	usleep(400000);
 				 }
 				 else if(vrts_Json_String.motion == 1 && (vrts_Json_String.condition == 1)){
 					 uint16_t parCondition = 513;
 				 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 				 		 					parCondition,vrts_Json_String.low_lux , NULL16, ACTION_TIME, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+				 	usleep(400000);
 				 }
 				 else if(vrts_Json_String.motion == 1 && vrts_Json_String.condition == 7){
 					 uint16_t parCondition = 1025;
 					 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.sceneforsensor, \
 											parCondition,vrts_Json_String.low_lux , vrts_Json_String.hight_lux, ACTION_TIME, vrts_Json_String.sceneforsensor, vrts_Json_String.sceneforsensor, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 31);
+					 usleep(400000);
 				 }
 			 }
 		 }
@@ -309,50 +305,55 @@ void JsonControl(json_object *jobj,char *key){
 			 uint16_t parCondition = 1280;
 			 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,vrts_Json_String.stt, \
 		 					parCondition, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, 31);
+			 usleep(400000);
 		 }
 	 }
 	 if(strcmp(key,"UPDATE")==0){
 		 flagDefineCmd = update_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
+		 usleep(400000);
 	 }
-//	 if((strcmp(key,"BUTTONID")==0)){
-//		Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, vrts_Json_String.buttonid,\
-//				vrts_Json_String.modeid, NULL8, NULL16, NULL16, NULL16,\
-//				NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8,31);
-//	 }
 	 if((strcmp(key,"STT")==0)){
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8,\
 				NULL8, vrts_Json_String.stt, vrts_Json_String.condition, vrts_Json_String.low_lux, vrts_Json_String.hight_lux,\
 				vrts_Json_String.action, vrts_Json_String.sceneID, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8,31);
+		usleep(400000);
 	 }
 	 if((strcmp(key,"SETSCENERGB")==0)){
 		 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRGB_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
 				 NULL16, NULL16, NULL16, NULL16, NULL16, vrts_Json_String.appID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, 23);
+		 usleep(400000);
 	 }
 	 if((strcmp(key,"CALLSCENERGB")==0)){
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
 				NULL16, NULL16,NULL16, NULL16, vrts_Json_String.callsceneRGB, NULL8, NULL8, NULL8, NULL8,23);
+		usleep(400000);
 	 }
 	 if((strcmp(key,"CALLMODERGB")==0)){
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, CallModeRgb_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8,NULL8, NULL8, NULL16,\
 				NULL16, NULL16,NULL16, NULL16, NULL16, vrts_Json_String.callmodeRGB, NULL8, NULL8, NULL8,23);
+		usleep(400000);
 	 }
 	 if((strcmp(key,"DELSCENERGB")==0)){
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, DelSceneRgb_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8,NULL8, NULL8, NULL16,\
 				NULL16, NULL16,NULL16, NULL16, vrts_Json_String.delsceneRGB, NULL8, NULL8, NULL8, NULL8,23);
+		usleep(400000);
 	 }
 	 if((strcmp(key,"SAVEGATEWAY")==0)){
 		 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, vrts_Json_String.adr, NULL16,\
 				 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
+		 usleep(400000);
 	 }
 	 if((strcmp(key,"TYPEDEVICESCAN")==0)){
 		 Function_Vendor(HCI_CMD_GATEWAY_CMD, AskTypeDevice_vendor_typedef, vrts_Json_String.adr, NULL16,\
 				 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
+		 usleep(400000);
 	 }
 	 if((strcmp(key,"SETTYPEDEVICE")==0)){
 		 Function_Vendor(HCI_CMD_GATEWAY_CMD, SetTypeDevice_vendor_typedef, vrts_Json_String.adr, NULL16, \
 				 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8,\
 				 vrts_Json_String.type, vrts_Json_String.attrubute, vrts_Json_String.application,28);
+		 usleep(400000);
 	 }
 }
 void json_value(json_object *jobj)
@@ -513,7 +514,7 @@ json_object* create_json_obj_from(void (*modelFunc)(json_object*, void*), int nu
     va_end(args_list);
     if(mqtt == mqtt_push){
 		char *str = json_object_to_json_string(jobj);
-		mosquitto_publish(mosq, NULL, TP_STATUS, strlen(str), str, 0, 0);
+		mosquitto_publish(mosq, NULL, TP_STATUS, strlen(str), str, qos, 0);
 		slog_info("(mqtt)Message_send:%s",str);
     }
     return jobj;

@@ -51,26 +51,21 @@ void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 	vrui_SHAREMESS_Send2GatewayLength = lengthmessage;
 	memcpy(vrsc_SHAREMESS_Send2GatewayMessage, message, vrui_SHAREMESS_Send2GatewayLength);
 	pthread_mutex_unlock(&vrpth_SHAREMESS_Send2GatewayLock);
-
-	/*slog*/
-//	uint8_t *tempDataUart;
 	uint8_t tempDataLog[200]="";
 	uint8_t temp[4];
-//
-//	tempDataUart = (uint8_t *)mes;
 	int i;
-	//strcpy(TempData2,h);
 	for(i=0;i< lengthmessage;i++){
 		sprintf(temp,"%x ",message[i]);
 		strcat(tempDataLog,temp);
 	}
 	slog_info("(cmd)%s",tempDataLog);
+	//sleep(1);
 }
 void *ProvisionThread (void *argv )
 {
 	tmp = pthread_self();
 	while(MODE_PROVISION){
-		if((flag_done == true) || (Timeout_CheckDataBuffer == 20000))
+		if((flag_done == true) || (Timeout_CheckDataBuffer == 32000))
 		{
 			scanNotFoundDev++;
 			if(scanNotFoundDev==3)
@@ -80,13 +75,6 @@ void *ProvisionThread (void *argv )
 				ControlMessage(3, OUTMESSAGE_ScanStop);
 				slog_print(SLOG_INFO, 1, "<provision>Provision stop");
 
-//				struct json_object *object;
-//				object = json_object_new_object();
-//				json_object_object_add(object, "CMD", json_object_new_string("STOP"));
-//				char *rsp;
-//				rsp = json_object_to_json_string(object);
-//				mosquitto_publish(mosq, NULL, "RD_STATUS", strlen(rsp),rsp,  0, 0);
-//				slog_info("(mqtt)Message_send:%s",rsp);
 				json_component cmd = {"CMD","STOP",json_type_string};
 				create_json_obj_from(add_component_to_obj, 1, mqtt_push, &cmd);
 
@@ -113,6 +101,17 @@ void *ProvisionThread (void *argv )
 				flag_done = false;
 				Timeout_CheckDataBuffer=0;
 				//usleep(500000);
+				flag_selectmac     = false;
+				flag_getpro_info   = false;
+				flag_getpro_element= false;
+				flag_provision     = false;
+				flag_mac           = true;
+				flag_check_select_mac  = false;
+				//flag_done          = true;
+				flag_setpro  = false;
+				flag_admitpro = false;
+				flag_checkadmitpro = true;
+				flag_set_type = false;
 				ControlMessage(3, OUTMESSAGE_ScanStart);
 				slog_print(SLOG_INFO, 1, "<provision>SCAN");
 				flag_check_select_mac= true;
@@ -217,7 +216,6 @@ void *ProvisionThread (void *argv )
 			flag_done=true;
 			flag_mac=true;
 		}
-
 	}
 	return NULL;
 }

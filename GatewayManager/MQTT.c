@@ -12,6 +12,7 @@
 char *pHeaderMqtt = "mqtt";
 pthread_t vrts_System_TestSend;
 struct mosquitto *mosq;
+unsigned char qos =2;
 int run = 1;
 void handle_signal(int s)
 {
@@ -19,7 +20,7 @@ void handle_signal(int s)
 }
 int mqtt_send(struct mosquitto *mosq, char * topic,char *msg)
 {
-	mosquitto_publish(mosq, NULL,topic, strlen(msg), msg, 0, 0);
+	mosquitto_publish(mosq, NULL,topic, strlen(msg), msg, qos, 0);
 	slog_info("(%s)Message_send: %s",pHeaderMqtt,msg);
 	return 0;
 }
@@ -60,7 +61,7 @@ void * MQTT_Thread(void *argv)
 			abc = mosquitto_username_pw_set(mosq, mqtt_username, mqtt_password);
 			rc = mosquitto_connect(mosq, mqtt_host, mqtt_port, 60);
 
-			mosquitto_subscribe(mosq,NULL, "RD_CONTROL",0);
+			mosquitto_subscribe(mosq,NULL, "RD_CONTROL",qos);
 			while(run){
 				rc= abc = mosquitto_loop(mosq, -1, 1);
 				if(run && rc){
