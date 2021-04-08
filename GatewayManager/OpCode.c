@@ -102,6 +102,7 @@
 bool MODE_PROVISION = false;
 bool check_add_or_del_group = false ;
 bool check_add_or_del_scene = false ;
+bool flag_SendCmd_Done = true;
 
 
 uint16_t TypeConvertID(uint8_t type, uint8_t attrubute, uint8_t application){

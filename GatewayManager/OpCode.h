@@ -99,12 +99,22 @@ extern "C" {
 /*opcode of sensor*/
 #define SENSOR_TYPE						0x52
 
-/*define type device*/
+/*define type sensor*/
 #define POWER_TYPE  					0x0001
 #define REMOTE_MODULE_DC_TYPE			0x0002
 #define REMOTE_MODULE_AC_TYPE			0x0003
 #define LIGHT_SENSOR_MODULE_TYPE		0x0004
 #define PIR_SENSOR_MODULE_TYPE 			0x0005
+
+/*define header, typevalue for PM sensor*/
+#define PM_SENSOR_HEADER                0x0104
+#define PM10_SENSOR_TYPEVALUE			1
+#define PM2_5_SENSOR_TYPEVALUE			2
+#define PM1_0_SENSOR_TYPEVALUE			3
+#define TEMP_SENSOR_TYPEVALUE			4
+#define HUMIDITY_SENSOR_TYPEVALUE		5
+#define HCHO_SENSOR_TYPEVALUE			6
+#define CO2_SENSOR_TYPEVALUE			7
 
 /* appkey*/
 #define APPKEY_DEL		                0x0080
@@ -326,6 +336,7 @@ extern uint8_t OUTMESSAGE_BindingALl[22];
 extern bool check_add_or_del_group;
 extern bool check_add_or_del_scene;
 extern bool MODE_PROVISION;
+extern bool flag_SendCmd_Done;
 
 uint16_t TypeConvertID(uint8_t type, uint8_t attrubute, uint8_t application);
 #ifdef __cplusplus

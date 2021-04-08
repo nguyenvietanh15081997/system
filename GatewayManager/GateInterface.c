@@ -29,7 +29,7 @@ uint8_t device_key[50]="";
 uint8_t app_key[50]="";
 uint8_t net_key[50]="";
 uint8_t temp1[2];
-uint16_t j;
+//uint16_t j;
 
 /*
  * Khoi tao chuong trinh giao tiep vooi Gateway bao gom:
@@ -364,7 +364,17 @@ void GWIF_ProcessData (void)
 						/*call scene normal*/
 						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,rspSceneSensor, NULL16,NULL16, NULL16, NULL16, 17);
 					}
-
+				}
+				else if(headerSensor == PM_SENSOR_HEADER){
+					vrts_PMSensor_Rsp = (pmsensorRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
+					switch (vrts_PMSensor_Rsp->typeValue){
+					case PM10_SENSOR_TYPEVALUE:
+						break;
+					case PM2_5_SENSOR_TYPEVALUE:
+						break;
+					case PM1_0_SENSOR_TYPEVALUE:
+						break;
+					}
 				}
 			}
             /*..........................*/

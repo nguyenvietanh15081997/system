@@ -25,6 +25,7 @@ typedef struct lightsensorRsp
 	uint8_t  future[4];
 }lightsensorRsp;
 extern lightsensorRsp * vrts_LighSensor_Rsp;
+
 typedef struct pirsensorRsp
 {
 	uint8_t  typeDev[2];
@@ -32,6 +33,15 @@ typedef struct pirsensorRsp
 	uint8_t  future[4];
 }pirsensorRsp;
 extern pirsensorRsp * vrts_PirSensor_Rsp;
+
+typedef struct pmsensorRsp
+{
+	uint8_t header[2];
+	uint8_t typeValue;
+	uint8_t value[4];
+	uint8_t future;
+}pmsensorRsp;
+extern pmsensorRsp * vrts_PMSensor_Rsp;
 
 /*Define friend_poll*/
 #define SENSOR_DESCRIP_GET     0x3082
@@ -55,12 +65,6 @@ unsigned int CalculateLux(unsigned int rsp_lux);
  */
 void ProcessLightSensor(lightsensorRsp *rsp);
 
-/*
- * Build message set scene for sensor
- *TODO: to review
- */
-void SetScenceForSensor(uint16_t addressSensor, uint16_t header, uint8_t stt, uint16_t condition, uint16_t low_lux, uint16_t hight_lux, \
-		uint16_t action, uint16_t sceneID, uint16_t appID, uint8_t srgbID);
 #ifdef __cplusplus
 }
 #endif

@@ -3,7 +3,6 @@
  */
 
 #include "../GatewayManager/Provision.h"
-#include "../GatewayManager/LedProcess.h"
 #include "../GatewayManager/slog.h"
 #include "../GatewayManager/Light.h"
 #include "../GatewayManager/LedProcess.h"
@@ -59,7 +58,8 @@ void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 		strcat(tempDataLog,temp);
 	}
 	slog_info("(cmd)%s",tempDataLog);
-	//sleep(1);
+	//usleep(400000);
+	//usleep(500000);
 }
 void *ProvisionThread (void *argv )
 {

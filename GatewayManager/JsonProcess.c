@@ -67,19 +67,18 @@ void JsonControl(json_object *jobj,char *key){
 	 if(strcmp(key,"ADDGROUP")==0){
 		 flagDefineCmd = addgroup_enum;
 		 check_add_or_del_group= true;
-		 for(i=0; i<arraylen; i++)
-		 {
-			 FunctionPer(HCI_CMD_GATEWAY_CMD, AddGroup_typedef, adr_dv[i], vrts_Json_String.addgroup , NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
-			 //printf("adr_dv: %d\n",adr_dv[i]);
-			 //sleep(1);
-			 usleep(400000);
+		 uint8_t time_Send = 0;
+		 for(i=0; i<arraylen; i++){
+			 //if(flag_SendCmd_Done){
+				 FunctionPer(HCI_CMD_GATEWAY_CMD, AddGroup_typedef, adr_dv[i], vrts_Json_String.addgroup , NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
+				 usleep(400000);
+			 //}
 		 }
 	 }
 	 if(strcmp(key,"DELGROUP")==0){
 		 flagDefineCmd = delgroup_enum;
 		 check_add_or_del_group= false;
-		 for(i=0; i<arraylen; i++)
-		 {
+		 for(i=0; i<arraylen; i++){
 			 FunctionPer(HCI_CMD_GATEWAY_CMD, DelGroup_typedef, adr_dv[i], vrts_Json_String.delgroup, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
 			 usleep(400000);
 		 }
@@ -90,21 +89,20 @@ void JsonControl(json_object *jobj,char *key){
 		 flag_addscene = true;
 		 check_add_or_del_scene= true;
 		 for(i=0;i<arraylen;i++){
-			 //FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr_dv[i], vrts_Json_String.delgroup, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 18);
-			 FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, scene_id, NULL16,NULL16, NULL16, NULL16, 14);//sleep(1);
+			 FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, scene_id, NULL16,NULL16, NULL16, NULL16, 14);
 			 usleep(400000);
-	 	 }
+			 usleep(600000);
+		 }
 	 }
 	 if(strcmp(key,"CALLSCENE")==0){
 		 flagDefineCmd = callscene_enum;
 		 FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.callscene, NULL16,NULL16, NULL16, NULL16, 17);
-		 usleep(400000);
+		 //usleep(400000);
 	 }
 	 if(strcmp(key,"DELSCENE")==0){
 		 flagDefineCmd = delscene_enum;
 		 check_add_or_del_scene= false;
-		 for(i=0; i<arraylen; i++)
-		 {
+		 for(i=0; i<arraylen; i++){
 			 FunctionPer(HCI_CMD_GATEWAY_CMD, DelSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, vrts_Json_String.delscene, NULL16,NULL16, NULL16, NULL16, 14);
 			 usleep(400000);
 		 }
