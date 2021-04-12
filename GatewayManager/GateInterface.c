@@ -29,7 +29,8 @@ uint8_t device_key[50]="";
 uint8_t app_key[50]="";
 uint8_t net_key[50]="";
 uint8_t temp1[2];
-//uint16_t j;
+bool checkcallscene = false;
+uint16_t sceneForCCt;
 
 /*
  * Khoi tao chuong trinh giao tiep vooi Gateway bao gom:
@@ -309,15 +310,21 @@ void GWIF_ProcessData (void)
 					json_component mode = {"MODEID", vrts_Remote_Rsp->modeID, json_type_int};
 					json_component scene = {"SCENEID", pscenedc, json_type_int};
 					json_component srgbid_push = {"SRGBID",srgbid,json_type_int};
-					create_json_obj_from(add_component_to_obj, 6,mqtt_push,&cmd, &jsonAdr, &button, &mode, &scene, &srgbid_push);
+					//create_json_obj_from(add_component_to_obj, 6,mqtt_push,&cmd, &jsonAdr, &button, &mode, &scene, &srgbid_push);
 					if(pscenedc!=0){
+						/*call scene normal*/
+//						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
+//						sleep(1);
 						/*call scene RGB*/
 						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
 								NULL16, NULL16,NULL16, NULL16,pscenedc, NULL8, NULL8, NULL8, NULL8,23);
-						sleep(2);
-						/*call scene normal*/
-						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
+//						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
+//						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
+//														NULL16, NULL16,NULL16, NULL16,pscenedc, NULL8, NULL8, NULL8, NULL8,23);
+						sceneForCCt = pscenedc;
+						checkcallscene = true;
 					}
+					create_json_obj_from(add_component_to_obj, 6,mqtt_push,&cmd, &jsonAdr, &button, &mode, &scene, &srgbid_push);
 				}
 				else if (headerSensor == POWER_TYPE){
 					vrts_Battery_Rsp = (batteryRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
@@ -334,13 +341,13 @@ void GWIF_ProcessData (void)
 					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &jsonAdr, &jsonLux);
 					uint16_t rspSceneSensor = vrts_LighSensor_Rsp->future[0] | vrts_LighSensor_Rsp->future[1]<<8;
 					if(rspSceneSensor != 0){
+						/*call scene normal*/
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,rspSceneSensor, NULL16,NULL16, NULL16, NULL16, 17);
+						sleep(1);
 						/*call scene RGB*/
 						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
 								NULL16, NULL16,NULL16, NULL16,rspSceneSensor, NULL8, NULL8, NULL8, NULL8,23);
-						sleep(2);
-						/*call scene normal*/
-						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,rspSceneSensor, NULL16,NULL16, NULL16, NULL16, 17);
-					}
+						}
 				}
 				else if (headerSensor == PIR_SENSOR_MODULE_TYPE){
 					vrts_PirSensor_Rsp = (pirsensorRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
@@ -357,13 +364,13 @@ void GWIF_ProcessData (void)
 
 					uint16_t rspSceneSensor = vrts_PirSensor_Rsp->future[0] | vrts_PirSensor_Rsp->future[1]<<8;
 					if(rspSceneSensor != 0){
+						/*call scene normal*/
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,rspSceneSensor, NULL16,NULL16, NULL16, NULL16, 17);
+						sleep(1);
 						/*call scene RGB*/
 						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
 								NULL16, NULL16,NULL16, NULL16,rspSceneSensor, NULL8, NULL8, NULL8, NULL8,23);
-						sleep(2);
-						/*call scene normal*/
-						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,rspSceneSensor, NULL16,NULL16, NULL16, NULL16, 17);
-					}
+						}
 				}
 				else if(headerSensor == PM_SENSOR_HEADER){
 					vrts_PMSensor_Rsp = (pmsensorRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
@@ -595,6 +602,10 @@ void GWIF_ProcessData (void)
 						break;
 					case HEADER_SCENE_CALL_SCENE_RGB:
 						create_json_obj_from(add_component_to_obj, 2,mqtt_push, &adr, &callscenergb);
+						if(checkcallscene){
+							checkcallscene = false;
+							FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,sceneForCCt, NULL16,NULL16, NULL16, NULL16, 17);
+						}
 						break;
 					case HEADER_SCENE_REMOTE_SET:
 						if(1){

@@ -15,6 +15,7 @@
 #include "GatewayManager/Ds1307.h"
 #include "GatewayManager/slog.h"
 #include "GatewayManager/LedProcess.h"
+#include "GatewayManager/Light.h"
 
 pthread_t vrts_System_ThreadGWIF;
 pthread_t vrts_System_TestSend;
@@ -22,7 +23,9 @@ pthread_t vrts_System_MQTT;
 pthread_t vrts_System_Time;
 pthread_t vrts_System_Gpio;
 
+
 SLogConfig slgCfg;
+
 
 /*z
  * Ham xu ly chinh. Thuc thi:
@@ -46,6 +49,7 @@ int main(void) {
     pthread_create(&vrts_System_MQTT,   NULL,   MQTT_Thread,    NULL);
     //pthread_create(&vrts_System_Time,NULL,Time_Thread, NULL);
     pthread_create(&tmp1,NULL,Led_Thread,NULL);
+
 
 	//pthread_join(vrts_System_TestSend, NULL);
     pthread_join(vrts_System_ThreadGWIF, NULL);

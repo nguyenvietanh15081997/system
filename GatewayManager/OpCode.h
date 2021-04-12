@@ -288,42 +288,6 @@ extern "C" {
 
 /*for heartbeat*/
 #define TSCRIPT_HEARBEAT                0x8f
-typedef enum{
-	RD_MAINTYPE_LAMP   = 0,
-	RD_MAINTYPE_SENCE  = 1,
-	RD_MAINTYPE_SENSOR = 2
-} RD_TYPE_MAINDEVICE;
-
-typedef enum{
-	RD_TYPE_LAMP_ONOFF   	= 0,
-	RD_TYPE_LAMP_CCT  		= 1,
-	RD_TYPE_LAMP_RGB 		= 2,
-	RD_TYPE_LAMP_CCT_RGB 	= 3
-} RD_TYPE_LAMP;
-
-typedef enum{
-	RD_TYPE_SENCE_AC   		= 0,
-	RD_TYPE_SENCE_DC  		= 1
-} RD_TYPE_SENCE;
-
-typedef enum{
-	RD_TYPE_SENSOR_PIR   		= 0,
-	RD_TYPE_SENSOR_LIGHT 		= 1
-} RD_TYPE_SENSOR;
-
-typedef enum{
-	RD_TYPE_POWER_NONE   		= 0,
-	RD_TYPE_POWER_3W   			= 1,
-	RD_TYPE_POWER_5W   			= 2,
-	RD_TYPE_POWER_7W   			= 3,
-	RD_TYPE_POWER_9W   			= 4,
-	RD_TYPE_POWER_15W   		= 5,
-	RD_TYPE_POWER_20W			= 6,
-	RD_TYPE_POWER_25W			= 7,
-	RD_TYPE_POWER_30W			= 8,
-	RD_TYPE_POWER_35W			= 9,
-	RD_TYPE_POWER_40W			= 10
-} RD_TYPE_POWER;
 
 /*message control provision*/
 extern uint8_t OUTMESSAGE_ScanStop[3];

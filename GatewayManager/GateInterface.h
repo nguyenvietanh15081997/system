@@ -20,6 +20,8 @@ extern "C" {
 #include "../GatewayManager/ShareMessage.h"
 #include "../GatewayManager/OpCode.h"
 
+
+
 #define RINGBUFFER_LEN 		(2048)
 
 #define UART_INTERFACE		(1)

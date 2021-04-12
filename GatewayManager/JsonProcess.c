@@ -91,7 +91,6 @@ void JsonControl(json_object *jobj,char *key){
 		 for(i=0;i<arraylen;i++){
 			 FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, scene_id, NULL16,NULL16, NULL16, NULL16, 14);
 			 usleep(400000);
-			 usleep(600000);
 		 }
 	 }
 	 if(strcmp(key,"CALLSCENE")==0){
@@ -117,7 +116,6 @@ void JsonControl(json_object *jobj,char *key){
 			slog_print(SLOG_INFO, 1, "<provision>Provision start");
 			MODE_PROVISION=true;
 			pthread_create(&vrts_System_TestSend,NULL, ProvisionThread, NULL);
-			//pthread_join(vrts_System_TestSend, NULL);
 		 }
 		 else if(strcmp(vrts_Json_String.cmd,"STOP")==0){
 			slog_print(SLOG_INFO, 1, "<provision>Provision stop");
@@ -182,7 +180,26 @@ void JsonControl(json_object *jobj,char *key){
 			 vrts_Json_String.adr        	= (json_object_get_int(json_object_object_get(jobj,"ADR")));
 			 vrts_Json_String.buttonid      = (json_object_get_int(json_object_object_get(jobj,"BUTTONID")));
 			 vrts_Json_String.modeid        = (json_object_get_int(json_object_object_get(jobj,"MODEID")));
-				Function_Vendor(HCI_CMD_GATEWAY_CMD, DelSceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, vrts_Json_String.buttonid,\
+			 uint8_t buttonId_int;
+			 if(strcmp(vrts_Json_String.buttonid,"BUTTON_1")==0){
+				 buttonId_int =1;
+			 }
+			 else if(strcmp(vrts_Json_String.buttonid,"BUTTON_2")==0){
+				 buttonId_int =2;
+			 }
+			 else if(strcmp(vrts_Json_String.buttonid,"BUTTON_3")==0){
+				 buttonId_int =3;
+			 }
+			 else if(strcmp(vrts_Json_String.buttonid,"BUTTON_4")==0){
+				 buttonId_int =4;
+			 }
+			 else if(strcmp(vrts_Json_String.buttonid,"BUTTON_5")==0){
+				 buttonId_int =5;
+			 }
+			 else if(strcmp(vrts_Json_String.buttonid,"BUTTON_6")==0){
+				 buttonId_int =6;
+			 }
+				Function_Vendor(HCI_CMD_GATEWAY_CMD, DelSceneForRemote_vendor_typedef, vrts_Json_String.adr, NULL16, buttonId_int,\
 						vrts_Json_String.modeid, NULL8, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,31);
 				usleep(400000);
 		 }
@@ -516,4 +533,5 @@ json_object* create_json_obj_from(void (*modelFunc)(json_object*, void*), int nu
 		slog_info("(mqtt)Message_send:%s",str);
     }
     return jobj;
+
 }
