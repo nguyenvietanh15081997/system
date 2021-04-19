@@ -13,6 +13,14 @@ extern "C" {
 #include "../GatewayManager/ShareMessage.h"
 #include "../GatewayManager/OpCode.h"
 
+/*message control provision*/
+extern uint8_t OUTMESSAGE_ScanStop[3];
+extern uint8_t OUTMESSAGE_ScanStart[3];
+extern uint8_t OUTMESSAGE_MACSelect[9];
+extern uint8_t OUTMESSAGE_GetPro[3];
+extern uint8_t OUTMESSAGE_Provision[28];
+extern uint8_t OUTMESSAGE_BindingALl[22];
+extern uint8_t reset_GW[];
 
 extern bool flag_selectmac;
 extern bool flag_getpro_info;

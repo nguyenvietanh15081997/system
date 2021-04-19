@@ -106,9 +106,11 @@ extern "C" {
 #define LIGHT_SENSOR_MODULE_TYPE		0x0004
 #define PIR_SENSOR_MODULE_TYPE 			0x0005
 #define TEMP_HUM_MODULE_TYPE 			0x0007
+#define DOOR_SENSOR_MODULE_TYPE 		0x0009
+#define PM_SENSOR_MODULE_TYPE           0x0006
 
 /*define header, typevalue for PM sensor*/
-#define PM_SENSOR_MODULE_TYPE           0x0104
+
 #define PM10_SENSOR_TYPEVALUE			1
 #define PM2_5_SENSOR_TYPEVALUE			2
 #define PM1_0_SENSOR_TYPEVALUE			3
@@ -290,13 +292,7 @@ extern "C" {
 /*for heartbeat*/
 #define TSCRIPT_HEARBEAT                0x8f
 
-/*message control provision*/
-extern uint8_t OUTMESSAGE_ScanStop[3];
-extern uint8_t OUTMESSAGE_ScanStart[3];
-extern uint8_t OUTMESSAGE_MACSelect[9];
-extern uint8_t OUTMESSAGE_GetPro[3];
-extern uint8_t OUTMESSAGE_Provision[28];
-extern uint8_t OUTMESSAGE_BindingALl[22];
+
 
 extern bool check_add_or_del_group;
 extern bool check_add_or_del_scene;

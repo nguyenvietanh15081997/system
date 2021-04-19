@@ -50,7 +50,7 @@ void TimeForDs1307()
 		sprintf(tempTime,"%d ",dataDecTimeDs1307[i]);
 		strcat(arrayTime,tempTime);
 	}
-	slog_trace("%s",arrayTime);
+	//slog_trace("%s",arrayTime);
 }
 
 /*

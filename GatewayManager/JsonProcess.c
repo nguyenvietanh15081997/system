@@ -322,6 +322,14 @@ void JsonControl(json_object *jobj,char *key){
 		 					parCondition, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, 31);
 			 usleep(400000);
 		 }
+		 else if(strcmp(vrts_Json_String.cmd,"DELHC") ==0 ){
+			 ControlMessage(3, reset_GW);
+			 FILE *file;
+			 char filename[]= "device_key.txt";
+			 if((file = fopen(filename,"r"))){
+				 remove(filename);
+			 }
+		 }
 	 }
 	 if(strcmp(key,"UPDATE")==0){
 		 flagDefineCmd = update_enum;
