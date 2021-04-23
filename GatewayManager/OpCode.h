@@ -105,12 +105,12 @@ extern "C" {
 #define REMOTE_MODULE_AC_TYPE			0x0003
 #define LIGHT_SENSOR_MODULE_TYPE		0x0004
 #define PIR_SENSOR_MODULE_TYPE 			0x0005
-#define TEMP_HUM_MODULE_TYPE 			0x0007
+#define TEMP_HUM_MODULE_TYPE 			0x0006
+#define PM_SENSOR_MODULE_TYPE           0x0107
+#define SMOKE_SENSOR_MODULE_TYPE  		0x0008
 #define DOOR_SENSOR_MODULE_TYPE 		0x0009
-#define PM_SENSOR_MODULE_TYPE           0x0006
 
 /*define header, typevalue for PM sensor*/
-
 #define PM10_SENSOR_TYPEVALUE			1
 #define PM2_5_SENSOR_TYPEVALUE			2
 #define PM1_0_SENSOR_TYPEVALUE			3
