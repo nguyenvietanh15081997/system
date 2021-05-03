@@ -107,7 +107,7 @@ extern "C" {
 #define PIR_SENSOR_MODULE_TYPE 			0x0005
 #define TEMP_HUM_MODULE_TYPE 			0x0006
 #define PM_SENSOR_MODULE_TYPE           0x0107
-#define SMOKE_SENSOR_MODULE_TYPE  		0x0008
+#define SMOKE_SENSOR_MODULE_TYPE  		0x0108
 #define DOOR_SENSOR_MODULE_TYPE 		0x0009
 
 /*define header, typevalue for PM sensor*/

@@ -67,7 +67,7 @@ void * MQTT_Thread(void *argv)
 				if(run && rc){
 					slog_warn("Connection mqtt error");
 					sleep(4);
-					mosquitto_reconnect(mosq);
+					mosquitto_reconnect_async(mosq);
 				}
 			}
 			mosquitto_destroy(mosq);

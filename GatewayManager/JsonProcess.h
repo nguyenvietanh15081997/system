@@ -48,6 +48,7 @@ typedef struct jsonstring
 	uint8_t modeid;
 	uint16_t low_lux;
 	uint16_t hight_lux;
+	uint8_t door_value;
 	uint8_t motion;
 	uint16_t action;
 	uint16_t appID;
@@ -71,6 +72,7 @@ typedef struct jsonstring
 	uint8_t application;
 	json_object *lightsensor;
 	json_object *pir;
+	json_object *doorsensor;
 } jsonstring;
 extern jsonstring vrts_Json_String;
 extern char flagSecond;
