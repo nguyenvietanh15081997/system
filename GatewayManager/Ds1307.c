@@ -153,34 +153,12 @@ void SetTimeForDs1307(uint8_t seconds, uint8_t minutes, uint8_t hours, uint8_t d
 void * Time_Thread(void *argv)
 {
 	Ds1307_Init();
-	bool checkTime = false;
 	while(1)
 	{
 		TimeForInternet();
-		if(dataTimeInternet[1]!=0 && dataTimeInternet[1]!=15 &&\
-					dataTimeInternet[1]!=30 && dataTimeInternet[1]!=45)
-		{
-			checkTime = false;
-		}
-		if(checkTime == false)
-		{
-			if(dataTimeInternet[1]==0 || dataTimeInternet[1]==15 ||\
-					dataTimeInternet[1]==30 || dataTimeInternet[1]== 45)
-			{
-				FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, 65535, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
-				checkTime = true;
-			}
-		}
-
-//		if((dataTimeInternet[2] == 15) && checkTime==false)
-//		{
-//			FunctionPer(HCI_CMD_GATEWAY_CMD, UpdateLight_typedef, 65535, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, 12);
-//			checkTime=true;
-//		}
-//		if((dataTimeInternet[2] != 15))
-//		{
-//			checkTime=false;
-//		}
+		Function_Vendor(HCI_CMD_GATEWAY_CMD, SendTimeForScreenT_vendor_typedef, 65535, NULL16, NULL8, NULL8, NULL8, NULL16, NULL16, \
+				NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, dataTimeInternet[0], dataTimeInternet[1], NULL8, NULL16, 23);
+		sleep(20);
 	}
 	return NULL;
 }

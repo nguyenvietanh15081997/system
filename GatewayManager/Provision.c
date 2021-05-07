@@ -59,8 +59,6 @@ void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 		strcat(tempDataLog,temp);
 	}
 	slog_info("(cmd)%s",tempDataLog);
-	//usleep(400000);
-	//usleep(500000);
 }
 void *ProvisionThread (void *argv )
 {
@@ -157,13 +155,12 @@ void *ProvisionThread (void *argv )
 					admit_pro_internal[14],admit_pro_internal[15],admit_pro_internal[16],admit_pro_internal[17], admit_pro_internal[18],\
 					admit_pro_internal[19],admit_pro_internal[20]);
 			FILE *file=fopen("/root/device_key.txt","w");
-			   if(file == NULL)
-			   {
-			      printf("Error!");
-			      exit(1);
-			   }
-			   fprintf(file,"%s",device_key1);
-			   fclose(file);
+			if(file == NULL){
+				printf("Error!");
+				exit(1);
+			}
+			fprintf(file,"%s",device_key1);
+			fclose(file);
 			/**/
 			//usleep(100000);
 			flag_checkadmitpro = true;
@@ -201,14 +198,14 @@ void *ProvisionThread (void *argv )
 		if(flag_checkHB){
 			flag_checkHB = false;
 			 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, adr_heartbeat, NULL16,\
-					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
+					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
 			 flag_checkSaveGW = false;
 			 //usleep(500000);
 		}
 		if(flag_checkSaveGW){
 			flag_checkSaveGW = false;
 			Function_Vendor(HCI_CMD_GATEWAY_CMD, AskTypeDevice_vendor_typedef, adr_heartbeat, NULL16,\
-					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
+					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
 			flag_checkTypeDEV = false;
 			 //usleep(500000);
 		}

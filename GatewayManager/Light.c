@@ -195,9 +195,10 @@ void FunctionPer(uint16_t cmd,\
 				uint16_t parCCT,\
 				uint16_t parSenceId,\
 				uint16_t parTimePoll,\
-				uint16_t parL,
-				uint16_t parH,
-				uint16_t parS,
+				uint16_t parL,\
+				uint16_t parH,\
+				uint16_t parS,\
+				uint16_t transition_par_t,\
 				uint8_t cmdLength)
 {
 	vrts_CMD_STRUCTURE.HCI_CMD_GATEWAY[0] = cmd & 0xFF;
@@ -290,17 +291,17 @@ void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8
 
 
 /*Cmd control use opcode vendor*/
-void SetSceneForRemote(uint16_t addressremote, uint8_t buttonId, uint8_t modeId, uint16_t sceneId, uint16_t appID, uint8_t SrgbID)
+void SetSceneForRemote_DC(uint16_t adrRemote_DC, uint8_t buttonId, uint8_t modeId, uint16_t sceneId, uint16_t appID, uint8_t SrgbID)
 {
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0]= addressremote & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1]= (addressremote>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0]= adrRemote_DC & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1]= (adrRemote_DC>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0]= RD_OPCODE_SCENE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1]= (VENDOR_ID) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2]= (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_SET) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_SET>>8 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_DC_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_DC_SET>>8 & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2]= buttonId;
 	vrts_CMD_STRUCTURE_VENDOR.para[3]= modeId;
 	vrts_CMD_STRUCTURE_VENDOR.para[4]= sceneId & 0xFF;
@@ -313,31 +314,68 @@ void SetSceneForRemote(uint16_t addressremote, uint8_t buttonId, uint8_t modeId,
 		vrts_CMD_STRUCTURE.para[i+9]= 0;
 	}
 }
-void DelSceneForRemote(uint16_t addressremote, uint8_t buttonId, uint8_t modeId){
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0]= addressremote & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1]= (addressremote>>8) & 0xFF;
+void SetSceneForRemote_AC(uint16_t adrRemote_AC, uint8_t buttonId, uint8_t modeId, uint16_t sceneId, uint16_t appID, uint8_t SrgbID)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0]= adrRemote_AC & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1]= (adrRemote_AC>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0]= RD_OPCODE_SCENE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1]= (VENDOR_ID) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2]= (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_DEL) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_DEL>>8 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_AC_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_AC_SET>>8 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2]= buttonId;
+	vrts_CMD_STRUCTURE_VENDOR.para[3]= modeId;
+	vrts_CMD_STRUCTURE_VENDOR.para[4]= sceneId & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[5]= (sceneId>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[6]= appID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[7]= (appID >>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[8]= SrgbID;
+	int i;
+	for(i=0; i<7; i++){
+		vrts_CMD_STRUCTURE.para[i+9]= 0;
+	}
+}
+void DelSceneForRemote_DC(uint16_t adrRemote_DC, uint8_t buttonId, uint8_t modeId){
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0]= adrRemote_DC & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1]= (adrRemote_DC>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0]= RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1]= (VENDOR_ID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2]= (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_DC_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_DC_DEL>>8 & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2]= buttonId;
 	vrts_CMD_STRUCTURE_VENDOR.para[3]= modeId;
 }
-void SetSceneForSensor(uint16_t addressSensor, uint16_t sceneID, uint16_t condition, uint16_t low_lux,\
+void DelSceneForRemote_AC(uint16_t adrRemote_AC, uint8_t buttonId, uint8_t modeId){
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0]= adrRemote_AC & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1]= (adrRemote_AC>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0]= RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1]= (VENDOR_ID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2]= (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0]= (HEADER_SCENE_REMOTE_AC_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1]= HEADER_SCENE_REMOTE_AC_DEL>>8 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2]= buttonId;
+	vrts_CMD_STRUCTURE_VENDOR.para[3]= modeId;
+}
+//todo:afternoon
+void SetSceneForSensor_LightPir(uint16_t adrLightPir, uint16_t sceneID, uint16_t condition, uint16_t low_lux,\
 		uint16_t hight_lux, uint8_t srgbID)
 {
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = addressSensor & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (addressSensor>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrLightPir & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrLightPir>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = (VENDOR_ID) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SENSOR_SET) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SENSOR_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_LIGHT_PIR_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_LIGHT_PIR_SET>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = sceneID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[3] = (sceneID >>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[4] = (condition>>8) & 0xFF;
@@ -348,23 +386,90 @@ void SetSceneForSensor(uint16_t addressSensor, uint16_t sceneID, uint16_t condit
 	vrts_CMD_STRUCTURE_VENDOR.para[9] = (hight_lux>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[10] = srgbID;
 }
-void DelSceneForSensor(uint16_t addressSensor, uint16_t sceneID)
+void DelSceneForSensor_LightPir(uint16_t adrLightPir, uint16_t sceneID)
 {
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = addressSensor & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (addressSensor>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrLightPir & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrLightPir>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SENSOR_DEL) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SENSOR_DEL>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_LIGHT_PIR_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_LIGHT_PIR_DEL>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = sceneID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[3] =(sceneID>>8) & 0xFF;
 }
-void SetSceneForDoorSensor(uint16_t addressDoorSensor, uint16_t sceneID, uint8_t status, uint8_t srgbID){
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = addressDoorSensor & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (addressDoorSensor>>8) & 0xFF;
+void SetSceneForSensor_Light(uint16_t adrLirght, uint16_t sceneID, uint16_t condition, uint16_t low_lux,\
+		uint16_t hight_lux, uint8_t srgbID)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrLirght & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrLirght>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = (VENDOR_ID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_LIGHT_SENSOR_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_LIGHT_SENSOR_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = sceneID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = (sceneID >>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[4] = (condition>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[5] = condition & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[6] = low_lux & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[7] = (low_lux>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[8] = hight_lux & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[9] = (hight_lux>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[10] = srgbID;
+}
+void DelSceneForSensor_Light(uint16_t adrLight, uint16_t sceneID)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrLight & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrLight>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = (VENDOR_ID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_LIGHT_SENSOR_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_LIGHT_SENSOR_DEL>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = sceneID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = (sceneID >>8) & 0xFF;
+}
+void SetSceneForSensor_Pir(uint16_t adrPir, uint16_t sceneID, uint16_t condition, uint8_t srgbID)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrPir & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrPir>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = (VENDOR_ID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_PIR_SENSOR_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_PIR_SENSOR_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = sceneID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = (sceneID >>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[4] = (condition>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[5] = condition & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[10] = srgbID;
+}
+void DelSceneForSensor_Pir(uint16_t adrPir, uint16_t sceneID)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrPir & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrPir>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = (VENDOR_ID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_PIR_SENSOR_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_PIR_SENSOR_DEL>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = sceneID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = (sceneID >>8) & 0xFF;
+}
+void SetSceneForDoorSensor(uint16_t adrDoorSensor, uint16_t sceneID, uint8_t statusDoor, uint8_t srgbID){
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrDoorSensor & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrDoorSensor>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
@@ -374,12 +479,12 @@ void SetSceneForDoorSensor(uint16_t addressDoorSensor, uint16_t sceneID, uint8_t
 	vrts_CMD_STRUCTURE_VENDOR.para[1] 	= 	(HEADER_SCENE_DOOR_SENSOR_SET>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2]	=	sceneID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[3]	= 	(sceneID>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[4]	=	status & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[4]	=	statusDoor & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[5]	=	srgbID & 0xFF;
 }
-void DelSceneForDoorSensor(uint16_t addressDoorSensor, uint16_t sceneID){
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = addressDoorSensor & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (addressDoorSensor>>8) & 0xFF;
+void DelSceneForDoorSensor(uint16_t adrDoorSensor, uint16_t sceneID){
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrDoorSensor & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrDoorSensor>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
@@ -390,21 +495,99 @@ void DelSceneForDoorSensor(uint16_t addressDoorSensor, uint16_t sceneID){
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = sceneID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[3] =(sceneID>>8) & 0xFF;
 }
-void SetSceneForTempHumSensor()
+void SetSceneForSwitch4(uint16_t adrSwitch4, uint16_t switch1_2, uint16_t switch3_4, uint16_t sceneID)
 {
-
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrSwitch4 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrSwitch4>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SWITCH4_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SWITCH4_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = (switch1_2>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = switch1_2 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[4] = (switch3_4>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[5] = switch3_4 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[6] = sceneID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[7] =(sceneID>>8) & 0xFF;
 }
-void DelSceneForTempHumSensor()
+void DelSceneForSwitch4(uint16_t adrSwitch4, uint16_t sceneID)
 {
-
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrSwitch4 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrSwitch4>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SWITCH4_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SWITCH4_DEL>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = (sceneID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = (sceneID>>8) & 0xFF;
 }
-void SetSceneForSwitch4()
+void SetSceneForSocket1(uint16_t adrSocket1, uint16_t socket1_2, uint16_t socket3_4, uint16_t sceneID)
 {
-
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrSocket1 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrSocket1>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SOCKET1_SET) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SOCKET1_SET>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = (socket1_2>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = socket1_2 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[4] = (socket3_4>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[5] = socket3_4 & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[6] = sceneID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[7] =(sceneID>>8) & 0xFF;
 }
-void DelSceneForSwitch4()
+void DelSceneForSocket1(uint16_t adrSocket, uint16_t sceneID)
 {
-
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrSocket & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrSocket>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_SCENE_SOCKET1_DEL) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_SOCKET1_DEL>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = (sceneID) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = (sceneID>>8) & 0xFF;
+}
+void SendTempHumForScreenT(uint16_t adrScreenT, uint16_t temp, uint16_t hum)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrScreenT & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrScreenT>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TEMPHUM_SCREENTOUCH) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TEMPHUM_SCREENTOUCH>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = (temp>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = temp & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[4] = (hum>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[5] = hum & 0xFF;
+}
+void SendTimeForScreenT(uint16_t adrScreenT, uint8_t hours, uint8_t minute)
+{
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrScreenT & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrScreenT>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_TIME_SCREENTOUCH) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_TIME_SCREENTOUCH>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = hours & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = minute & 0xFF;
 }
 void SetSceneForRGB(uint16_t pAdrRgb, uint16_t pAppID, uint8_t pSrgbID)
 {
@@ -535,17 +718,19 @@ void Function_Vendor(uint16_t cmd,\
 		uint16_t header,\
 		uint8_t buttonID,\
 		uint8_t modeID,\
-		uint8_t stt,\
+		uint8_t status_door,\
 		uint16_t condition,\
-		uint16_t low_lux,\
-		uint16_t hight_lux,\
-		uint16_t action,\
+		uint16_t low_lux_switch1_2_socket1_2,\
+		uint16_t hight_lux_switch3_4_socket3_4,\
+		uint16_t temp,\
+		uint16_t hum,\
 		uint16_t sceneID,\
 		uint16_t appID,\
 		uint8_t srgbID,\
-		uint8_t type,\
-		uint8_t attrubute,\
-		uint8_t application,\
+		uint8_t type_hours,\
+		uint8_t attrubute_minute,\
+		uint8_t application_second,\
+		uint16_t transition_par_t,\
 		uint16_t cmdLength
 		)
 {
@@ -555,24 +740,61 @@ void Function_Vendor(uint16_t cmd,\
 			vrts_CMD_STRUCTURE_VENDOR.opCode00[2]= vrts_CMD_STRUCTURE_VENDOR.opCode00[3]=0;
 	vrts_CMD_STRUCTURE_VENDOR.retry_cnt = parRetry_cnt;
 	vrts_CMD_STRUCTURE_VENDOR.rsp_max = 0;
-	if(Func_vendor == SceneForRemote_vendor_typedef){
-		SetSceneForRemote(adr, buttonID, modeID, sceneID, appID, srgbID);
+	if(Func_vendor == SceneForRemote_DC_vendor_typedef){
+		SetSceneForRemote_DC(adr, buttonID, modeID, sceneID, appID, srgbID);
 	}
-	else if(Func_vendor == DelSceneForRemote_vendor_typedef){
-		DelSceneForRemote(adr, buttonID, modeID);
+	else if(Func_vendor == DelSceneForRemote_DC_vendor_typedef){
+		DelSceneForRemote_DC(adr, buttonID, modeID);
 	}
-	else if(Func_vendor == SceneForSensor_vendor_typedef){
-		SetSceneForSensor(adr,sceneID, condition, low_lux, hight_lux, srgbID);
+	else if(Func_vendor == SceneForRemote_AC_vendor_typedef){
+		SetSceneForRemote_AC(adr, buttonID, modeID, sceneID, appID, srgbID);
 	}
-	else if(Func_vendor == DelSceneForSensor_vendor_typedef){
-		DelSceneForSensor(adr, sceneID);
+	else if(Func_vendor == DelSceneForRemote_AC_vendor_typedef){
+		DelSceneForRemote_AC(adr, buttonID, modeID);
+	}
+	else if(Func_vendor == SceneForSensor_LightPir_vendor_typedef){
+		SetSceneForSensor_LightPir(adr,sceneID, condition, low_lux_switch1_2_socket1_2, hight_lux_switch3_4_socket3_4, srgbID);
+	}
+	else if(Func_vendor == DelSceneForSensor_LightPir_vendor_typedef){
+		DelSceneForSensor_LightPir(adr, sceneID);
+	}
+	else if(Func_vendor == SceneForSensor_Light_vendor_typedef){
+		SetSceneForSensor_Light(adr,sceneID, condition, low_lux_switch1_2_socket1_2, hight_lux_switch3_4_socket3_4, srgbID);
+	}
+	else if(Func_vendor == DelSceneForSensor_Light_vendor_typedef){
+		DelSceneForSensor_Light(adr, sceneID);
+	}
+	else if(Func_vendor == SceneForSensor_Pir_vendor_typedef){
+		SetSceneForSensor_Pir(adr,sceneID, condition, srgbID);
+	}
+	else if(Func_vendor == DelSceneForSensor_Pir_vendor_typedef){
+		DelSceneForSensor_Pir(adr, sceneID);
 	}
 	else if(Func_vendor == SceneForDoorSensor_vendor_typedef){
-		SetSceneForDoorSensor(adr, sceneID, stt, srgbID);
+		SetSceneForDoorSensor(adr, sceneID, status_door, srgbID);
 	}
 	else if(Func_vendor == DelSceneForDoorSensor_vendor_typedef){
 		DelSceneForDoorSensor(adr, sceneID);
 	}
+	else if(Func_vendor == SetSceneForSwitch4_vendor_typedef){
+		SetSceneForSwitch4(adr, low_lux_switch1_2_socket1_2, hight_lux_switch3_4_socket3_4, sceneID);
+	}
+	else if(Func_vendor == DelSceneForSwitch4_vendor_typedef){
+		DelSceneForSwitch4(adr, sceneID);
+	}
+	else if(Func_vendor == SetSceneForSocket1_vendor_typedef){
+		SetSceneForSocket1(adr, low_lux_switch1_2_socket1_2, hight_lux_switch3_4_socket3_4, sceneID);
+	}
+	else if(Func_vendor == DelSceneForSocket1_vendor_typedef){
+		DelSceneForSocket1(adr, sceneID);
+	}
+	else if(Func_vendor == SendTempHumForScreenT_vendor_typedef){
+		SendTempHumForScreenT(adr, temp, hum);
+	}
+	else if(Func_vendor == SendTimeForScreenT_vendor_typedef){
+		SendTimeForScreenT(adr, type_hours, attrubute_minute);
+	}
+
 	else if(Func_vendor == SceneForRGB_vendor_typedef){
 		SetSceneForRGB(adr, appID, srgbID);
 	}
@@ -595,7 +817,7 @@ void Function_Vendor(uint16_t cmd,\
 	}
 	else if(Func_vendor == SetTypeDevice_vendor_typedef){
 		flag_typeDEV = true;
-		SetTypeDevice(adr,type,attrubute,application);
+		SetTypeDevice(adr, type_hours, attrubute_minute, application_second);
 	}
 
 	uint8_t *tempDataUart;

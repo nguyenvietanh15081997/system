@@ -36,6 +36,7 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 	if(json_tokener_parse(msg)!= NULL)
 	{
 		struct json_obj* jobj = json_tokener_parse(msg);
+		//Json_Parse(jobj);
 		Json_Parse(jobj);
 	}
 }

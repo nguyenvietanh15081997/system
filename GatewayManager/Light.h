@@ -12,7 +12,6 @@ extern "C" {
 #endif
 #include "../GatewayManager/OpCode.h"
 
-
 extern bool flag_saveGW;
 extern bool flag_typeDEV;
 extern bool flag_heartbeat;
@@ -53,21 +52,22 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 #define HEADER_SCENE_CALL_MODE 			(0x0003)
 #define HEADER_SCENE_CALL_SCENE_RGB  	(0x0000)
 
-
+/*
 #define HEADER_SCENE_REMOTE_SET  		(0x0101)
 #define HEADER_SCENE_REMOTE_DEL  		(0x0102)
 #define HEADER_SCENE_SENSOR_SET  		(0x0201)
 #define HEADER_SCENE_SENSOR_DEL  		(0x0202)
 #define HEADER_SCENE_DOOR_SENSOR_SET 			(0x0901)
 #define HEADER_SCENE_DOOR_SENSOR_DEL 			(0x0902)
+*/
 /*
  * TODO:AFTER 28/4
  */
 /*header store scene for remote AD, DC*/
-#define HEADER_SCENE_REMOTE_AC_SET (0x0103)
-#define HEADER_SCENE_REMOTE_AC_DEL (0x0203)
-#define HEADER_SCENE_REMOTE_DC_SET (0x0102)
-#define HEADER_SCENE_REMOTE_DC_DEL (0x0202)
+#define HEADER_SCENE_REMOTE_AC_SET 				(0x0103)
+#define HEADER_SCENE_REMOTE_AC_DEL 				(0x0203)
+#define HEADER_SCENE_REMOTE_DC_SET 				(0x0102)
+#define HEADER_SCENE_REMOTE_DC_DEL 				(0x0202)
 
 /*header store scene for lightsensor*/
 #define HEADER_SCENE_LIGHT_SENSOR_SET 			(0x0104)
@@ -79,17 +79,30 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 #define HEADER_SCENE_PIR_SENSOR_DEL 			(0x0205)
 #define HEADER_SCENE_PIR_SENSOR_SET_SPECIAL 	(0x0305)
 
-/*header store scene for TempHum sensor*/
-#define HEADER_SCENE_TEMPHUM_SENSOR_SET 			(0x0106)
-#define HEADER_SCENE_TEMPHUM_SENSOR_DEL 			(0x0206)
+/*header store scene for LightPir sensor*/
+#define HEADER_SCENE_LIGHT_PIR_SET				(0x0145)
+#define HEADER_SCENE_LIGHT_PIR_DEL				(0x0245)
+#define HEADER_SCENE_LIGHT_PIR_SET_SPECIAL		(0x0345)
 
 /*header store scene for door sensor*/
-#define HEADER_SCENE_DOOR_SENSOR_SET_2804 			(0x0109)
-#define HEADER_SCENE_DOOR_SENSOR_DEL_2804 			(0x0209)
+#define HEADER_SCENE_DOOR_SENSOR_SET			(0x0109)
+#define HEADER_SCENE_DOOR_SENSOR_DEL 			(0x0209)
 
 /*header store scene for switch touch 4 channel*/
-#define HEADER_SCENE_SWITCH4_SET 			(0x010b)
-#define HEADER_SCENE_SWITCH4_DEL 			(0x020b)
+#define HEADER_SCENE_SWITCH4_SET 				(0x010b)
+#define HEADER_SCENE_SWITCH4_DEL 				(0x020b)
+
+/*header store scene for Sockets1*/
+#define HEADER_SCENE_SOCKET1_SET				(0x010F)
+#define HEADER_SCENE_SOCKET1_DEL                (0x020F)
+
+/*header store scene for Sockets4*/
+#define HEADER_SCENE_SOCKET4_SET				(0x0110)
+#define HEADER_SCENE_SOCKET4_DEL                (0x0210)
+
+/*header send temp/hum time for screen touch*/
+#define HEADER_TEMPHUM_SCREENTOUCH    			(0x010A)
+#define HEADER_TIME_SCREENTOUCH					(0x020A)
 
 #define NULL8    0x00
 #define NULL16   0x0000
@@ -142,13 +155,11 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 #define LIGHT_CTL_TEMP_RANGE_SET_NOACK	0x6C82
 #define LIGHT_HSL_STATUS                0x7882
 
-#define ACTION_TIME  60
 #define SENSOR_CONDITION_PUSH_BIGGER        6
 #define SENSOR_CONDITION_PUSH_LESS			4
 #define SENSOR_CONDITION_PUSH_EQUAL         1
 #define SENSOR_CONDITION_PUSH_BOTH			7
 
-#define SENSOR_CONDITION_SET_
 
 /* enums to is parameter for void FunctionPer()  */
 typedef enum{
@@ -169,12 +180,25 @@ typedef enum{
 	HSL_Get_typedef 			,
 	HSL_Set_typedef 			,
 
-	SceneForRemote_vendor_typedef 		,
-	DelSceneForRemote_vendor_typedef 	,
-	SceneForSensor_vendor_typedef 		,
-	DelSceneForSensor_vendor_typedef    ,
-	SceneForDoorSensor_vendor_typedef	,
-	DelSceneForDoorSensor_vendor_typedef,
+	SceneForRemote_DC_vendor_typedef 			,
+	SceneForRemote_AC_vendor_typedef 			,
+	DelSceneForRemote_DC_vendor_typedef 		,
+	DelSceneForRemote_AC_vendor_typedef 		,
+	SceneForSensor_LightPir_vendor_typedef 		,
+	DelSceneForSensor_LightPir_vendor_typedef   ,
+	SceneForSensor_Light_vendor_typedef 		,
+	DelSceneForSensor_Light_vendor_typedef    	,
+	SceneForSensor_Pir_vendor_typedef 			,
+	DelSceneForSensor_Pir_vendor_typedef    	,
+	SceneForDoorSensor_vendor_typedef			,
+	DelSceneForDoorSensor_vendor_typedef		,
+	SetSceneForSwitch4_vendor_typedef			,
+	DelSceneForSwitch4_vendor_typedef			,
+	SetSceneForSocket1_vendor_typedef			,
+	DelSceneForSocket1_vendor_typedef			,
+	SendTempHumForScreenT_vendor_typedef		,
+	SendTimeForScreenT_vendor_typedef			,
+
 	SceneForRGB_vendor_typedef 	  		,
 	CallSceneRgb_vendor_typedef   		,
 	CallModeRgb_vendor_typedef    		,
@@ -184,49 +208,6 @@ typedef enum{
 	AskTypeDevice_vendor_typedef  ,
 	SetTypeDevice_vendor_typedef  ,
 } functionTypeDef;
-
-/*
- * This functions to build important parameter of frame data control node in ble mesh
- * - ResetNode(): delete node from ble mesh
- * - Lightness_Get(): get value lightness of node
- * - Lightness_Set(): set lightness for node
- * - CCT_Set(): set cct for node
- * - AddGroup(): add node into group
- * - DelGroup(): delete node from group
- * - AddSence(),CallSence(),DelSence(): add, call and delete scene
- * - ControlOnOff(): on/off node
- * - SetTimePoll(): set timepoll for sensor
- */
-/*void ResetNode(uint16_t uniAdrReset);
-
-void Lightness_Get(uint16_t adrLightnessGet);
-
-void Lightness_Set(uint16_t uniAdrSetDim, uint16_t valueLightness);
-
-void CCT_Get(uint16_t adrCCTGet);
-
-void CCT_Set(uint16_t uniAdrSetCCT, uint16_t valueCCT);
-
-void AddGroup(uint16_t uniAdrAddGroup,uint16_t adrGroup);
-
-void DelGroup(uint16_t uniAdrAddGroup,uint8_t adrGroup);
-
-void AddSence(uint16_t uniAdrSence, uint16_t senceID);
-
-void CallSence(uint16_t senceId);
-
-void DelSence(uint16_t uniAdrDelSence, uint16_t senceId);
-
-void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff);
-
-void HSL_Get(uint16_t adrHSLGet);
-
-void HSL_Set(uint16_t uniAdrHSL, uint16_t h, uint16_t s, uint16_t l);
-
-void UpdateLight();
-
-void SetTimePoll(uint16_t uniAdrSensor, uint16_t timePoll);
-*/
 
 /*
  * Main function: build frame data control node, and transmit uart
@@ -257,60 +238,43 @@ void FunctionPer(uint16_t cmd,\
 				uint16_t parCCT,\
 				uint16_t parSenceId,\
 				uint16_t parTimePoll,\
-				uint16_t parL,
-				uint16_t parH,
-				uint16_t parS,
+				uint16_t parL,\
+				uint16_t parH,\
+				uint16_t parS,\
+				uint16_t transition_par_t,\
 				uint8_t cmdLength);
+
+/*heartbeat*/
 void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8_t countLog,\
 		uint8_t periodLog, uint8_t tll, uint16_t feature, uint16_t cmdLength);
 
-/*void SetSceneForRemote(uint16_t addressremote, uint8_t buttonId, \
-		uint8_t modeId, uint16_t sceneId, uint16_t appID, uint8_t SrgbID);
-void DelSceneForRemote(uint16_t addressremote, uint8_t buttonId, uint8_t modeId);
-
-void SetSceneForSensor(uint16_t addressSensor, uint16_t sceneID, uint16_t condition, uint16_t low_lux,\
-		uint16_t hight_lux, uint8_t srgbID);
-void DelSceneForSensor(uint16_t addressSensor, uint16_t sceneID);
-
-void SetSceneForRGB(uint16_t pAdrRgb, uint16_t pAppID, uint8_t pSrgbID);
-
-void CallSceneRgb(uint16_t appID);
-
-void CallModeRgb(uint16_t adrCallModeRgb, uint8_t SrgbID);
-
-void DelSceneRgb(uint16_t adrDelSceneRgb, uint16_t appID);
-
-void AskTypeDevice(uint16_t adr);
-
-void SetTypeDevice(uint16_t adrSetTypeDevice,uint8_t type, uint8_t attrubute, uint8_t application);
-
-void SaveGateway(uint16_t adrSaveGateway);
-*/
+/*Control opcode vendor*/
 void Function_Vendor(uint16_t cmd,\
 		functionTypeDef Func_vendor,\
 		uint16_t adr,\
 		uint16_t header,\
 		uint8_t buttonID,\
 		uint8_t modeID,\
-		uint8_t stt,\
+		uint8_t status_door,\
 		uint16_t condition,\
-		uint16_t low_lux,\
-		uint16_t hight_lux,\
-		uint16_t action,\
+		uint16_t low_lux_switch1_2_socket1_2,\
+		uint16_t hight_lux_switch3_4_socket3_4,\
+		uint16_t temp,\
+		uint16_t hum,\
 		uint16_t sceneID,\
 		uint16_t appID,\
 		uint8_t srgbID,\
-		uint8_t mainType,\
-		uint8_t feature,\
-		uint8_t application,\
+		uint8_t type_hours,\
+		uint8_t attrubute_minute,\
+		uint8_t application_second,\
+		uint16_t transition_par_t,\
 		uint16_t cmdLength
 		);
+
+/*Convert para*/
 uint16_t Percent2ParamCCT(uint8_t percent);
-
 uint8_t Param2PrecentCCT(uint16_t param);
-
 uint16_t Percent2ParamDIM(uint8_t percent);
-
 uint8_t Param2PrecentDIM(uint16_t param);
 
 

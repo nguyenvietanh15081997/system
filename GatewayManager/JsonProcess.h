@@ -21,58 +21,46 @@ extern uint16_t valueObject[20];
 extern uint16_t adr_dv[100], j;
 typedef struct jsonstring
 {
-	uint16_t id;
-	uint16_t adr;
-	uint8_t onoff;
-	uint16_t cct;
-	uint16_t dim;
+	uint16_t adr;//
+	uint8_t onoff;//
+	uint16_t cct;//
+	uint16_t dim;//
+
 	uint16_t addgroup;
-	uint16_t addscene;
-	uint16_t callscene;
-	uint16_t delscene;
 	uint16_t delgroup;
+	uint16_t delscene;
 	uint16_t hours;
 	uint16_t minutes;
 	uint16_t seconds;
-	uint16_t hue;
-	uint16_t saturation;
-	uint16_t lightness;
+	uint16_t hue;//
+	uint16_t saturation;//
+	uint16_t lightness;//
 	uint8_t resetnode;
-	uint8_t start;
-	uint8_t stop;
-	uint8_t update;
-	uint16_t header;
-	uint8_t stt;
-	uint16_t condition;
-	uint8_t *buttonid;
-	uint8_t modeid;
-	uint16_t low_lux;
-	uint16_t hight_lux;
+
+	uint16_t condition;//
+	uint8_t *buttonid;//
+	uint8_t modeid;//
+	uint16_t low_lux;//
+	uint16_t hight_lux;//
 	uint8_t door_value;
-	uint8_t motion;
+	uint8_t motion;//
 	uint16_t action;
-	uint16_t appID;
-	uint8_t srgbID;
-	uint16_t sceneID;
-	uint8_t *cmd;
+	uint16_t appID;//
+	uint8_t srgbID;//
+	uint16_t sceneID;//
 
-	uint8_t sceneforremote;
-	uint8_t sceneforsensor;
+	uint8_t type;//
+	uint8_t attrubute;//
+	uint8_t application;//
 
-	uint8_t setsceneRGB;
-	uint8_t callsceneRGB;
-	uint8_t callmodeRGB;
-	uint8_t delsceneRGB;
-
-	uint8_t savegateway;
-	uint8_t settypedevice;
-	uint8_t typedevicescan;
-	uint8_t type;
-	uint8_t attrubute;
-	uint8_t application;
 	json_object *lightsensor;
 	json_object *pir;
 	json_object *doorsensor;
+	json_object *switch4;
+
+	json_object *data;//
+	uint8_t *cmd;//
+
 } jsonstring;
 extern jsonstring vrts_Json_String;
 extern char flagSecond;
@@ -110,11 +98,15 @@ extern defineCmd flagDefineCmd;
 
 void JsonControl(json_object *jobj,char *key);
 
-void json_value(json_object *jobj);
+//void JsonControl_New(json_object *jobj,char *key);
+
+//void json_value(json_object *jobj);
 
 int json_parse_array( json_object *jobj, char *key);
 
 void Json_Parse(json_object * jobj);
+
+//void Json_Parse_2804(json_object * jobj);
 
 // create json
 typedef enum {
