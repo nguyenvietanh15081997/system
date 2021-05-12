@@ -153,12 +153,15 @@ void SetTimeForDs1307(uint8_t seconds, uint8_t minutes, uint8_t hours, uint8_t d
 void * Time_Thread(void *argv)
 {
 	Ds1307_Init();
+	int time = 0 ;
+	int value_Dim =100;
 	while(1)
 	{
 		TimeForInternet();
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, SendTimeForScreenT_vendor_typedef, 65535, NULL16, NULL8, NULL8, NULL8, NULL16, NULL16, \
 				NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, dataTimeInternet[0], dataTimeInternet[1], NULL8, NULL16, 23);
-		sleep(20);
+		sleep(30);
+		//if(dataTimeInternet)
 	}
 	return NULL;
 }

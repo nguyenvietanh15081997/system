@@ -30,7 +30,7 @@ extern "C" {
 #define mqtt_username 		"RD"//"insklndl"//"jpcvzwgj"//"RD"//
 #define mqtt_password 		"1"//"x9aBwks70kmQ"//"JCCSw9dYngMF"//"2k756Wus2bJE"//"1"//
 
-#define TP_STATUS            "RD_STATUS"
+#define TP_STATUS           "RD_STATUS"
 
 extern int run;
 extern struct mosquitto *mosq;

@@ -16,9 +16,7 @@ extern "C" {
 #include <stdlib.h>
 #include <stdarg.h>
 
-extern uint16_t numObject;
-extern uint16_t valueObject[20];
-extern uint16_t adr_dv[100], j;
+//extern uint16_t adr_dv[100];
 typedef struct jsonstring
 {
 	uint16_t adr;//
@@ -63,63 +61,33 @@ typedef struct jsonstring
 
 } jsonstring;
 extern jsonstring vrts_Json_String;
-extern char flagSecond;
 
-extern _Bool arr_json, flag_addscene, flag_delscene;
-extern int i, arraylen, lst_count_id;
-
-typedef enum{
-	onoff_enum		=1,
-	cct_enum		=2,
-	dim_enum		=3,
-	addgroup_enum	=4,
-	delgroup_enum	=5,
-	addscene_enum	=6,
-	callscene_enum	=7,
-	delscene_enum	=8,
-	hours_enum		=9,
-	minutes_enum	=10,
-	seconds_enum	=11,
-	hue_eum			=12,
-	saturation_enum	=13,
-	lightness_enum	=14,
-	start_enum		=15,
-	stop_enum		=16,
-	update_enum		=17,
-	resetnode_enum	=18,
-	setsceneforremote_enum=19,
-	buttonid_enum         =20,
-	modeid_enum           =21,
-
-} defineCmd;
-extern defineCmd flagDefineCmd;
-
-
+extern _Bool flag_addscene, flag_delscene;
+extern int i, arraylen;
 
 void JsonControl(json_object *jobj,char *key);
-
-//void JsonControl_New(json_object *jobj,char *key);
-
-//void json_value(json_object *jobj);
 
 int json_parse_array( json_object *jobj, char *key);
 
 void Json_Parse(json_object * jobj);
 
-//void Json_Parse_2804(json_object * jobj);
-
-// create json
 typedef enum {
 	mqtt_push,
 	mqtt_dont_push
 }send_mqtt;
 
+/*
+ * ingredient of a json data
+ */
 typedef struct json_component{
 	uint8_t *key;
 	void  *value;
 	json_type type;
 }json_component;
 
+/*
+ * add component to object json
+ */
 void add_component_to_obj(json_object *j, void* com);
 
 /*

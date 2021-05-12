@@ -47,19 +47,11 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 #define HEADER_TYPE_ASK  	(0x0003)
 
 /*header control scene and mode RGB*/
-#define HEADER_SCENE_SET 				(0x0001)
-#define HEADER_SCENE_DEL       			(0x0002)
-#define HEADER_SCENE_CALL_MODE 			(0x0003)
+#define HEADER_SCENE_SET 				(0x0100)
+#define HEADER_SCENE_DEL       			(0x0200)
+#define HEADER_SCENE_CALL_MODE 			(0x0300)
 #define HEADER_SCENE_CALL_SCENE_RGB  	(0x0000)
 
-/*
-#define HEADER_SCENE_REMOTE_SET  		(0x0101)
-#define HEADER_SCENE_REMOTE_DEL  		(0x0102)
-#define HEADER_SCENE_SENSOR_SET  		(0x0201)
-#define HEADER_SCENE_SENSOR_DEL  		(0x0202)
-#define HEADER_SCENE_DOOR_SENSOR_SET 			(0x0901)
-#define HEADER_SCENE_DOOR_SENSOR_DEL 			(0x0902)
-*/
 /*
  * TODO:AFTER 28/4
  */
@@ -72,7 +64,7 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 /*header store scene for lightsensor*/
 #define HEADER_SCENE_LIGHT_SENSOR_SET 			(0x0104)
 #define HEADER_SCENE_LIGHT_SENSOR_DEL 			(0x0204)
-#define HEADER_SCENE_LIGHT_SENSOR_SET_SPECIAL 	(0x0304)
+#define HEADER_SCENE_LIGHT_SENSOR_SET_BALANCE 	(0x0304)
 
 /*header store scene for PirSensor*/
 #define HEADER_SCENE_PIR_SENSOR_SET 			(0x0105)
@@ -89,6 +81,7 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 #define HEADER_SCENE_DOOR_SENSOR_DEL 			(0x0209)
 
 /*header store scene for switch touch 4 channel*/
+#define HEADER_CONTROL_SWITCH4					(0x000b)
 #define HEADER_SCENE_SWITCH4_SET 				(0x010b)
 #define HEADER_SCENE_SWITCH4_DEL 				(0x020b)
 
@@ -101,8 +94,10 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 #define HEADER_SCENE_SOCKET4_DEL                (0x0210)
 
 /*header send temp/hum time for screen touch*/
-#define HEADER_TEMPHUM_SCREENTOUCH    			(0x010A)
-#define HEADER_TIME_SCREENTOUCH					(0x020A)
+#define HEADER_SCENE_SCREENT_SET				(0x010A)
+#define HEADER_SCENE_SCREENT_DEL				(0x020A)
+#define HEADER_TEMPHUM_SCREENTOUCH    			(0x030A)
+#define HEADER_TIME_SCREENTOUCH					(0x040A)
 
 #define NULL8    0x00
 #define NULL16   0x0000
@@ -184,18 +179,31 @@ typedef enum{
 	SceneForRemote_AC_vendor_typedef 			,
 	DelSceneForRemote_DC_vendor_typedef 		,
 	DelSceneForRemote_AC_vendor_typedef 		,
+
 	SceneForSensor_LightPir_vendor_typedef 		,
 	DelSceneForSensor_LightPir_vendor_typedef   ,
+
 	SceneForSensor_Light_vendor_typedef 		,
+	Balance_Lightness_vendor_typedef			,
+	DelBalance_Lightness_vendor_typedef         ,
 	DelSceneForSensor_Light_vendor_typedef    	,
+
 	SceneForSensor_Pir_vendor_typedef 			,
 	DelSceneForSensor_Pir_vendor_typedef    	,
+
 	SceneForDoorSensor_vendor_typedef			,
 	DelSceneForDoorSensor_vendor_typedef		,
+
+	ControlSwitch4_vendor_typedef				,
 	SetSceneForSwitch4_vendor_typedef			,
 	DelSceneForSwitch4_vendor_typedef			,
+
+	ControlSocket1_vendor_typedef				,
 	SetSceneForSocket1_vendor_typedef			,
 	DelSceneForSocket1_vendor_typedef			,
+
+	SceneForScreenT_vendor_typedef				,
+	DelSceneForScreenT_vendor_typedef			,
 	SendTempHumForScreenT_vendor_typedef		,
 	SendTimeForScreenT_vendor_typedef			,
 
@@ -252,11 +260,11 @@ void HeartBeat(uint16_t cmd, uint16_t drsHeartbeat, uint16_t srcHeartbeat, uint8
 void Function_Vendor(uint16_t cmd,\
 		functionTypeDef Func_vendor,\
 		uint16_t adr,\
-		uint16_t header,\
+		uint16_t header_destination,\
 		uint8_t buttonID,\
 		uint8_t modeID,\
 		uint8_t status_door,\
-		uint16_t condition,\
+		uint16_t condition_lightness,\
 		uint16_t low_lux_switch1_2_socket1_2,\
 		uint16_t hight_lux_switch3_4_socket3_4,\
 		uint16_t temp,\

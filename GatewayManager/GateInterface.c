@@ -28,7 +28,6 @@ uint8_t uuid[50]="";
 uint8_t device_key[50]="";
 uint8_t app_key[50]="";
 uint8_t net_key[50]="";
-uint8_t temp1[2];
 bool checkcallscene = false;
 uint16_t sceneForCCt;
 
@@ -290,7 +289,7 @@ void GWIF_ProcessData (void)
 				if((headerSensor == REMOTE_MODULE_DC_TYPE) || (headerSensor == REMOTE_MODULE_AC_TYPE)){
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					uint16_t pscenedc = (vrts_Remote_Rsp->senceID[0]) |(vrts_Remote_Rsp->senceID[1]<<8);
-					uint16_t srgbid = (vrts_Remote_Rsp->futureID[0]) |(vrts_Remote_Rsp->futureID[1]<<8);
+					uint16_t srgbid = (vrts_Remote_Rsp->futureID[0])  |(vrts_Remote_Rsp->futureID[1]<<8);
 					uint8_t *buttonId_String;
 					if(vrts_Remote_Rsp->buttonID == 1){
 						buttonId_String = "BUTTON_1";
@@ -753,7 +752,7 @@ void GWIF_ProcessData (void)
 						break;
 					case HEADER_SCENE_DEL:
 						if(1){
-							json_component cmd = {"CMD","DELSCENE", json_type_string};
+							json_component cmd = {"CMD","DELSCENE_RGB", json_type_string};
 							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &sceneid_Json);
 							json_component data_Json = {"DATA", data_object, json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &data_Json);
@@ -761,7 +760,7 @@ void GWIF_ProcessData (void)
 						break;
 					case HEADER_SCENE_SET:
 						if(1){
-							json_component cmd = {"CMD", "ADDSCENE", json_type_string};
+							json_component cmd = {"CMD", "ADDSCENE_RGB", json_type_string};
 							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &sceneid_Json);
 							json_component data_Json = {"DATA",data_object, json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &data_Json);
@@ -769,7 +768,7 @@ void GWIF_ProcessData (void)
 						break;
 					case HEADER_SCENE_CALL_SCENE_RGB:
 						if(1){
-							json_component cmd = {"CMD","CALLSCENE", json_type_string};
+							json_component cmd = {"CMD","CALLSCENE_RGB", json_type_string};
 							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &sceneid_Json);
 							json_component data_Json = {"DATA",data_object, json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &data_Json);
@@ -780,7 +779,7 @@ void GWIF_ProcessData (void)
 							json_component cmd = {"CMD","ADDSCENE_REMOTE_DC",json_type_string};
 							json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, &device_unicast_id_json, &btid, &modid, &sceneidR, &srgbidR);
 							json_component data_Json = {"DATA",data_object, json_type_object};
-							create_json_obj_from(add_component_to_obj, 6,mqtt_push,&cmd, &data_Json);
+							create_json_obj_from(add_component_to_obj, 2,mqtt_push,&cmd, &data_Json);
 						}
 						break;
 					case HEADER_SCENE_REMOTE_DC_DEL:
@@ -930,9 +929,107 @@ void GWIF_ProcessData (void)
 							create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
 						}
 						break;
+					case HEADER_CONTROL_SWITCH4:
+						if(1){
+							json_component cmd = {"CMD", "CONTROL_SWITCH4", json_type_string};
+							uint8_t numRelay_Rsp = vrts_GWIF_IncomeMessage->Message[10];
+							uint8_t valRelay_Rsp = vrts_GWIF_IncomeMessage->Message[11];
+							if(numRelay_Rsp ==1){
+								json_component relay_json = {"RELAY1",valRelay_Rsp, json_type_int};
+								json_object *switch4_object = create_json_obj_from(add_component_to_obj, 1, mqtt_dont_push, &relay_json);
+								json_component switch4_json = {"SWITCH_STATUS",switch4_object, json_type_object};
+								json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &switch4_json);
+								json_component data_Json = {"DATA", data_object, json_type_object};
+								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+							}
+							else if(numRelay_Rsp ==2){
+								json_component relay_json = {"RELAY2",valRelay_Rsp, json_type_int};
+								json_object *switch4_object = create_json_obj_from(add_component_to_obj, 1, mqtt_dont_push, &relay_json);
+								json_component switch4_json = {"SWITCH_STATUS",switch4_object, json_type_object};
+								json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &switch4_json);
+								json_component data_Json = {"DATA", data_object, json_type_object};
+								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+							}
+							else if(numRelay_Rsp ==3){
+								json_component relay_json = {"RELAY3",valRelay_Rsp, json_type_int};
+								json_object *switch4_object = create_json_obj_from(add_component_to_obj, 1, mqtt_dont_push, &relay_json);
+								json_component switch4_json = {"SWITCH_STATUS",switch4_object, json_type_object};
+								json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &switch4_json);
+								json_component data_Json = {"DATA", data_object, json_type_object};
+								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+							}
+							else if(numRelay_Rsp ==4){
+								json_component relay_json = {"RELAY4",valRelay_Rsp, json_type_int};
+								json_object *switch4_object = create_json_obj_from(add_component_to_obj, 1, mqtt_dont_push, &relay_json);
+								json_component switch4_json = {"SWITCH_STATUS",switch4_object, json_type_object};
+								json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &switch4_json);
+								json_component data_Json = {"DATA", data_object, json_type_object};
+								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+							}
+						}
+						break;
 					case HEADER_SCENE_SWITCH4_SET:
 						if(1){
-
+							json_component cmd = {"CMD","ADDSCENE_SWITCH4", json_type_string};
+							json_component sceneId_json = {"SCENEID",vrts_GWIF_IncomeMessage->Message[10] | (vrts_GWIF_IncomeMessage->Message[11]<<8), json_type_int} ;
+							uint8_t relay1 = vrts_GWIF_IncomeMessage->Message[12];
+							uint8_t relay2 = vrts_GWIF_IncomeMessage->Message[13];
+							uint8_t relay3 = vrts_GWIF_IncomeMessage->Message[14];
+							uint8_t relay4 = vrts_GWIF_IncomeMessage->Message[15];
+							json_component relay1_json = {"RELAY1",relay1, json_type_int};
+							json_component relay2_json = {"RELAY2",relay2, json_type_int};
+							json_component relay3_json = {"RELAY3",relay3, json_type_int};
+							json_component relay4_json = {"RELAY4",relay4, json_type_int};
+							json_object *switch4_object = create_json_obj_from(add_component_to_obj, 4, mqtt_dont_push, &relay1_json, &relay2_json, &relay3_json, &relay4_json);
+							json_component switch4_json = {"SWITCH_STATUS",switch4_object, json_type_object};
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push, &device_unicast_id_json, &switch4_json, &sceneId_json);
+							json_component data_Json = {"DATA", data_object, json_type_object};
+							create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+						}
+						break;
+					case HEADER_SCENE_SWITCH4_DEL:
+						if(1){
+							json_component cmd = {"CMD","DELSCENE_SWITCH4", json_type_string};
+							json_component sceneId_json = {"SCENEID",vrts_GWIF_IncomeMessage->Message[10] | (vrts_GWIF_IncomeMessage->Message[11]<<8), json_type_int} ;
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &sceneId_json);
+							json_component data_Json = {"DATA", data_object, json_type_object};
+							create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+						}
+						break;
+					case HEADER_SCENE_LIGHT_SENSOR_SET_BALANCE:
+						if(1){
+							uint16_t lightness = (vrts_GWIF_IncomeMessage->Message[10]) | (vrts_GWIF_IncomeMessage->Message[11]<<8);
+							uint16_t destinantion = (vrts_GWIF_IncomeMessage->Message[12]) | (vrts_GWIF_IncomeMessage->Message[13]<<8);
+							json_component cmd = {"CMD","SET_BALANCE_LIGHT_SENSOR",json_type_string};
+							json_component lightness_json = {"LIGHTNESS", lightness, json_type_int};
+							json_component destination_json = {"DESTINATION", destinantion, json_type_int};
+							json_object *light_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &lightness_json, &destination_json);
+							json_component light_json = {"LIGHT_SENSOR",light_object, json_type_object};
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &light_json);
+							json_component data_Json = {"DATA",data_object, json_type_object};
+							create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+						}
+						break;
+					case HEADER_SCENE_LIGHT_SENSOR_DEL:
+						if(1){
+							json_component cmd = {"CMD","DEL_BALANCE_LIGHT_SENSOR",json_type_string};
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 1, mqtt_dont_push, &device_unicast_id_json);
+							json_component data_Json = {"DATA",data_object, json_type_object};
+							create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+						}
+						break;
+					case HEADER_SCENE_SCREENT_SET:
+						if(1){
+							uint8_t button_screen 	= vrts_GWIF_IncomeMessage->Message[10] & 0xFF;
+							uint16_t sceneID_screen = vrts_GWIF_IncomeMessage->Message[11] | (vrts_GWIF_IncomeMessage->Message[12]<<8);
+							uint8_t srgbid_screen  	= vrts_GWIF_IncomeMessage->Message[13];
+							json_component cmd = {"CMD","ADDSCENE_SCREEN_TOUCH", json_type_string};
+							json_component button_json = {"BUTTONID", button_screen, json_type_int};
+							json_component sceneid_json = {"SCENEID", sceneID_screen, json_type_int};
+							json_component srgb_json = {"SRGBID", srgbid_screen , json_type_int};
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 4, mqtt_dont_push, &device_unicast_id_json, &button_json, &sceneid_Json, &srgb_json);
+							json_component data_Json = {"DATA", data_object, json_type_object};
+							create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
 						}
 					}
 				}
