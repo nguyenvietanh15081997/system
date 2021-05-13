@@ -578,7 +578,7 @@ void GWIF_ProcessData (void)
 					}
 					else {
 						json_component cmd = {"CMD","DELGROUP",json_type_string};
-						json_component delgroup = {"DELGROUP", jsonvalue,json_type_int};
+						json_component delgroup = {"GROUP_UNICAST_ID", jsonvalue,json_type_int};
 						json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &adr, &delgroup);
 						json_component data_Json = {"DATA",data_object,json_type_object};
 						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
@@ -744,10 +744,9 @@ void GWIF_ProcessData (void)
 					case HEADER_SCENE_CALL_MODE:
 						if(1){
 							json_component cmd = {"CMD", "CALLMODE_RGB", json_type_string};
-							json_object *data_object = create_json_obj_from(add_component_to_obj, 1, mqtt_dont_push, &srgbid_Json);
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &srgbid_Json);
 							json_component data_Json = {"DATA",data_object, json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &data_Json);
-//							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &callmodergb);
 						}
 						break;
 					case HEADER_SCENE_DEL:
@@ -761,7 +760,7 @@ void GWIF_ProcessData (void)
 					case HEADER_SCENE_SET:
 						if(1){
 							json_component cmd = {"CMD", "ADDSCENE_RGB", json_type_string};
-							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &sceneid_Json);
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push, &device_unicast_id_json, &srgbid_Json, &sceneid_Json);
 							json_component data_Json = {"DATA",data_object, json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &data_Json);
 						}
