@@ -12,6 +12,7 @@
 #include "../GatewayManager/JsonProcess.h"
 #include "../GatewayManager/slog.h"
 #include "../GatewayManager/LedProcess.h"
+#include "../GatewayManager/Ds1307.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -327,6 +328,37 @@ void GWIF_ProcessData (void)
 						sceneForCCt = pscenedc;
 						checkcallscene = true;
 					}
+				}
+				else if(headerSensor == SCREEN_TOUCH_MODULE_TYPE){
+					vrts_ScreenT_Rsp = (screenTouch *)(&vrts_GWIF_IncomeMessage->Message[6]);
+					uint16_t psceneScreenT = (vrts_ScreenT_Rsp->sceneID[0]) |(vrts_ScreenT_Rsp->sceneID[1]<<8);
+					uint8_t *buttonId_String;
+					if(vrts_ScreenT_Rsp->buttonID == 1){
+						buttonId_String = "BUTTON_1";
+					}
+					else if(vrts_ScreenT_Rsp->buttonID == 2){
+						buttonId_String = "BUTTON_2";
+					}
+					else if(vrts_ScreenT_Rsp->buttonID == 3){
+						buttonId_String = "BUTTON_3";
+					}
+					else if(vrts_ScreenT_Rsp->buttonID == 4){
+						buttonId_String = "BUTTON_4";
+					}
+					else if(vrts_ScreenT_Rsp->buttonID == 5){
+						buttonId_String = "BUTTON_5";
+					}
+					else if(vrts_ScreenT_Rsp->buttonID == 6){
+						buttonId_String = "BUTTON_6";
+					}
+					if(vrts_ScreenT_Rsp->aksTime == 0x01){
+						Function_Vendor(HCI_CMD_GATEWAY_CMD, SendTimeForScreenT_vendor_typedef, 65535, NULL16, NULL8, NULL8, NULL8, NULL16, NULL16, \
+								NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, dataTimeInternet[0], dataTimeInternet[1], NULL8, NULL16, 23);
+					}
+					json_component button = {"BUTTON_VALUE", buttonId_String, json_type_string};
+					json_object *data_Remote = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr, &button);
+					json_component data_Remote_Json = {"DATA",data_Remote,json_type_object};
+					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Sensor_Json, &data_Remote_Json);
 				}
 				else if (headerSensor == POWER_TYPE){
 					vrts_Battery_Rsp = (batteryRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
@@ -671,7 +703,10 @@ void GWIF_ProcessData (void)
 							json_object *data = create_json_obj_from(add_component_to_obj, 6,mqtt_dont_push, &device_unicast_id_json, &json_id, &json_device_key, &json_net_key, &json_app_key, &json_type_id);
 							json_component jsondata = {"DATA",data,json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &jsondata);
-
+							if(TypeConvertID(jsonType, jsonAttrubute, jsonApplication) == 23003){
+								Function_Vendor(HCI_CMD_GATEWAY_CMD, SendTimeForScreenT_vendor_typedef, 65535, NULL16, NULL8, NULL8, NULL8, NULL16, NULL16, \
+										NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, dataTimeInternet[0], dataTimeInternet[1], NULL8, NULL16, 23);
+							}
 						}
 					}
 					else if(header == HEADER_TYPE_SAVEGW){
@@ -1030,6 +1065,17 @@ void GWIF_ProcessData (void)
 							json_component data_Json = {"DATA", data_object, json_type_object};
 							create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
 						}
+						break;
+					case HEADER_SCENE_SCREENT_DEL:
+						if(1){
+							uint8_t button_screen 	= vrts_GWIF_IncomeMessage->Message[10] & 0xFF;
+							json_component cmd = {"CMD","DELSCENE_SCREEN_TOUCH", json_type_string};
+							json_component button_json = {"BUTTONID", button_screen, json_type_int};
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &button_json);
+							json_component data_Json = {"DATA", data_object, json_type_object};
+							create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+						}
+						break;
 					}
 				}
 			}

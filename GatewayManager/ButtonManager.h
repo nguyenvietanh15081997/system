@@ -28,6 +28,16 @@ typedef struct remotersp
 }remotersp;
 extern remotersp * vrts_Remote_Rsp;
 
+typedef struct screenTouch
+{
+	uint8_t header[2];
+	uint8_t buttonID;
+	uint8_t sceneID[2];
+	uint8_t aksTime;
+	uint8_t future[4];
+}screenTouch;
+extern screenTouch *vrts_ScreenT_Rsp;
+
 #define BUTTONID0           0x00
 #define BUTTONID1           0x01
 #define BUTTONID2           0x02
