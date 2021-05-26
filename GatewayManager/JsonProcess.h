@@ -55,9 +55,12 @@ typedef struct jsonstring
 	json_object *pir;
 	json_object *doorsensor;
 	json_object *switch4;
+	json_object *cct_object;
+	json_object *rgb_cct_object;
 
 	json_object *data;//
 	uint8_t *cmd;//
+
 
 } jsonstring;
 extern jsonstring vrts_Json_String;

@@ -24,6 +24,7 @@ static uint16_t				vrui_GWIF_LengthMeassge;
 static bool					vrb_GWIF_UpdateLate = false;
 static bool					vrb_GWIF_CheckNow = false;
 static bool					vrb_GWIF_RestartMessage = true;
+static bool 				message_Update = false;
 
 uint8_t uuid[50]="";
 uint8_t device_key[50]="";
@@ -82,77 +83,91 @@ void GWIF_Read2Buffer (void){
  */
 void GWIF_CheckData (void){
 	unsigned int vrui_Count;
-	// Neu co du lieu trong Buffer
-	if(vrts_ringbuffer_Data.count >= 1){
-		scanNotFoundDev = 0;
-		Timeout_CheckDataBuffer=0;
-		if(vrb_GWIF_UpdateLate == false){
+		// Neu co du lieu trong Buffer
+		if(vrts_ringbuffer_Data.count >= 1){
+			scanNotFoundDev = 0;
+			Timeout_CheckDataBuffer=0;
+			if(vrb_GWIF_UpdateLate == false){
 
-			// Doc du lieu vao Buffer roi chuyen du lieu di tiep
-			if(vrb_GWIF_RestartMessage == true){
-				if(vrts_ringbuffer_Data.count >= 3){
-					ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[0]);
-					ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[1]);
-					ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[2]);
-					vrb_GWIF_RestartMessage = false;
-					vrui_GWIF_LengthMeassge = (vrts_GWIF_IncomeMessage->Length[0]) | (vrts_GWIF_IncomeMessage->Length[1]<<8);
-				}
-			}
-			else{
-				ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[MESSAGE_HEADLENGTH - 1]);
-				vrui_GWIF_LengthMeassge = (vrts_GWIF_IncomeMessage->Length[0]) | (vrts_GWIF_IncomeMessage->Length[1]<<8);
-			}
-
-			if((vrui_GWIF_LengthMeassge) >= MESSAGE_HEADLENGTH){
-				if(	(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_MESH_RX)          || \
-					(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_MESH_RX_NW)       || \
-					(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_GATEWAY_DIR_RSP)  || \
-					(vrts_GWIF_IncomeMessage->Opcode == HCI_GATEWAY_CMD_SAR_MSG)  || \
-					(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_CMD_VC_DEBUG) ){
-					// Truong hop dung format ban tin
-					if(vrts_ringbuffer_Data.count >= (vrui_GWIF_LengthMeassge - 1)){
-						for(vrui_Count = 0; vrui_Count < (vrui_GWIF_LengthMeassge - 1); vrui_Count++){
-							ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[MESSAGE_HEADLENGTH + vrui_Count]);
-						}
-						// Ban tin da trung khop cau truc, bat co xu ly ban tin
-						vrb_GWIF_UpdateLate = false;
-						vrb_GWIF_CheckNow = true;
-						vrb_GWIF_RestartMessage = true;
-						//GWIF_ProcessData();
-					}
-					else{
-						// Neu du lieu den chua duoc chua trong Buffer, tien hanh quet vao lan sau
-						vrb_GWIF_UpdateLate = true;
+				// Doc du lieu vao Buffer roi chuyen du lieu di tiep
+				if(vrb_GWIF_RestartMessage == true){
+					if(vrts_ringbuffer_Data.count >= 3){
+						ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[0]);
+						ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[1]);
+						ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[2]);
+						vrb_GWIF_RestartMessage = false;
+						vrui_GWIF_LengthMeassge = (vrts_GWIF_IncomeMessage->Length[0]) | (vrts_GWIF_IncomeMessage->Length[1]<<8);
+						message_Update = true;
 					}
 				}
 				else{
-					// Truong hop khong dung format ban tin
-					// dich di 1 Byte va tiep tuc kiem tra
-					vrsc_GWIF_TempBuffer[0] = vrsc_GWIF_TempBuffer[1];
-					vrsc_GWIF_TempBuffer[1] = vrsc_GWIF_TempBuffer[2];
-					vrb_GWIF_RestartMessage = false;
+					ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[MESSAGE_HEADLENGTH - 1]);
 					vrui_GWIF_LengthMeassge = (vrts_GWIF_IncomeMessage->Length[0]) | (vrts_GWIF_IncomeMessage->Length[1]<<8);
+					message_Update = true;
+				}
+				if(message_Update){
+					message_Update = false;
+					if((vrui_GWIF_LengthMeassge) >= MESSAGE_HEADLENGTH){
+						if(	(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_MESH_RX)          || \
+							(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_MESH_RX_NW)       || \
+							(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_GATEWAY_DIR_RSP)  || \
+							(vrts_GWIF_IncomeMessage->Opcode == HCI_GATEWAY_CMD_SAR_MSG)  || \
+							(vrts_GWIF_IncomeMessage->Opcode == TSCRIPT_CMD_VC_DEBUG) ){
+							// Truong hop dung format ban tin
+							if(vrts_ringbuffer_Data.count >= (vrui_GWIF_LengthMeassge - 1)){
+								for(vrui_Count = 0; vrui_Count < (vrui_GWIF_LengthMeassge - 1); vrui_Count++){
+									ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[MESSAGE_HEADLENGTH + vrui_Count]);
+								}
+								// Ban tin da trung khop cau truc, bat co xu ly ban tin
+								vrb_GWIF_UpdateLate = false;
+								vrb_GWIF_CheckNow = true;
+								vrb_GWIF_RestartMessage = true;
+								//GWIF_ProcessData();
+							}
+							else{
+								// Neu du lieu den chua duoc chua trong Buffer, tien hanh quet vao lan sau
+								vrb_GWIF_UpdateLate = true;
+								vrb_GWIF_RestartMessage = false;
+							}
+						}
+						else{
+							// Truong hop khong dung format ban tin
+							// dich di 1 Byte va tiep tuc kiem tra
+							vrsc_GWIF_TempBuffer[0] = vrsc_GWIF_TempBuffer[1];
+							vrsc_GWIF_TempBuffer[1] = vrsc_GWIF_TempBuffer[2];
+							vrb_GWIF_RestartMessage = false;
+							vrb_GWIF_UpdateLate = true;
+							vrui_GWIF_LengthMeassge = (vrts_GWIF_IncomeMessage->Length[0]) | (vrts_GWIF_IncomeMessage->Length[1]<<8);
+						}
+					}
+					else{
+						// Truong hop khong dung format ban tin
+						// dich di 1 Byte va tiep tuc kiem tra
+						vrsc_GWIF_TempBuffer[0] = vrsc_GWIF_TempBuffer[1];
+						vrsc_GWIF_TempBuffer[1] = vrsc_GWIF_TempBuffer[2];
+						vrb_GWIF_RestartMessage = false;
+						vrui_GWIF_LengthMeassge = (vrts_GWIF_IncomeMessage->Length[0]) | (vrts_GWIF_IncomeMessage->Length[1]<<8);
+					}
+				}
+			}
+			else{
+				if(vrts_ringbuffer_Data.count >= (vrui_GWIF_LengthMeassge - 1)){
+					for(vrui_Count = 0; vrui_Count < (vrui_GWIF_LengthMeassge - 1); vrui_Count++){
+						ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[MESSAGE_HEADLENGTH + vrui_Count]);
+					}
+					vrui_GWIF_LengthMeassge = (vrts_GWIF_IncomeMessage->Length[0]) | (vrts_GWIF_IncomeMessage->Length[1]<<8);
+					// Ban tin da trung khop cau truc, bat co xu ly ban tin
+					vrb_GWIF_UpdateLate = false;
+					vrb_GWIF_CheckNow = true;
+					vrb_GWIF_RestartMessage = true;
+					//GWIF_ProcessData();
 				}
 			}
 		}
 		else{
-			if(vrts_ringbuffer_Data.count >= (vrui_GWIF_LengthMeassge - 1)){
-				for(vrui_Count = 0; vrui_Count < (vrui_GWIF_LengthMeassge - 1); vrui_Count++){
-					ring_pop_tail(&vrts_ringbuffer_Data, (void*)&vrsc_GWIF_TempBuffer[MESSAGE_HEADLENGTH + vrui_Count]);
-				}
-				vrui_GWIF_LengthMeassge = (vrts_GWIF_IncomeMessage->Length[0]) | (vrts_GWIF_IncomeMessage->Length[1]<<8);
-				// Ban tin da trung khop cau truc, bat co xu ly ban tin
-				vrb_GWIF_UpdateLate = false;
-				vrb_GWIF_CheckNow = true;
-				vrb_GWIF_RestartMessage = true;
-				//GWIF_ProcessData();
-			}
+			Timeout_CheckDataBuffer++;
 		}
 	}
-	else{
-		Timeout_CheckDataBuffer++;
-	}
-}
 
 /*
  * Ham xu ly du lieu den sau khi da duoc kiem tra
@@ -394,7 +409,7 @@ void GWIF_ProcessData (void)
 					if(motion == 1){
 						jsonMotion = 1;
 					}
-					else if(motion == 2){
+					else if(motion == 0){
 						jsonMotion = 0;
 					}
 					json_component jsonPir = {"PIR_VALUE",jsonMotion,json_type_int};
@@ -811,7 +826,7 @@ void GWIF_ProcessData (void)
 					case HEADER_SCENE_REMOTE_DC_SET:
 						if(1){
 							json_component cmd = {"CMD","ADDSCENE_REMOTE_DC",json_type_string};
-							json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, &device_unicast_id_json, &btid, &modid, &sceneidR, &srgbidR);
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 4, mqtt_dont_push, &device_unicast_id_json, &btid, &modid, &sceneidR);
 							json_component data_Json = {"DATA",data_object, json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push,&cmd, &data_Json);
 						}
@@ -821,15 +836,15 @@ void GWIF_ProcessData (void)
 							json_component cmd = {"CMD","DELSCENE_REMOTE_DC",json_type_string};
 							json_object *data_object = create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push, &device_unicast_id_json, &btid, &modid);
 							json_component data_Json = {"DATA",data_object, json_type_object};
-							create_json_obj_from(add_component_to_obj, 4, mqtt_push, &cmd, &data_Json);
+							create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
 						}
 						break;
 					case HEADER_SCENE_REMOTE_AC_SET:
 						if(1){
 							json_component cmd = {"CMD","ADDSCENE_REMOTE_AC",json_type_string};
-							json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, &device_unicast_id_json, &btid, &modid, &sceneidR, &srgbidR);
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 4, mqtt_dont_push, &device_unicast_id_json, &btid, &modid, &sceneidR);
 							json_component data_Json = {"DATA",data_object, json_type_object};
-							create_json_obj_from(add_component_to_obj, 6,mqtt_push,&cmd, &data_Json);
+							create_json_obj_from(add_component_to_obj, 2,mqtt_push,&cmd, &data_Json);
 						}
 						break;
 					case HEADER_SCENE_REMOTE_AC_DEL:
@@ -837,7 +852,7 @@ void GWIF_ProcessData (void)
 							json_component cmd = {"CMD","DELSCENE_REMOTE_AC",json_type_string};
 							json_object *data_object = create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push, &device_unicast_id_json, &btid, &modid);
 							json_component data_Json = {"DATA",data_object, json_type_object};
-							create_json_obj_from(add_component_to_obj, 4, mqtt_push, &cmd, &data_Json);
+							create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
 						}
 						break;
 					case HEADER_SCENE_LIGHT_PIR_SET:

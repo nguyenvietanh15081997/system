@@ -38,7 +38,7 @@ int main(void) {
 	slog_init("logfile", SLOG_FLAGS_ALL, 1);
 	slog_config_get(&slgCfg);
 	slgCfg.eColorFormat = SLOG_COLOR_DISABLE;
-	slgCfg.nToFile = 0;
+	slgCfg.nToFile = 1;
 //	slgCfg.nToScreen = 0;
 	slgCfg.nTraceTid = 1;
 	slog_config_set(&slgCfg);
@@ -59,4 +59,3 @@ int main(void) {
 	}
 	return EXIT_SUCCESS;
 }
-

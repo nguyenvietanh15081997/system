@@ -16,10 +16,13 @@ bool flag_addscene = false;
 bool flag_delscene = false;
 static bool flag_check_device_unicast_id = false;
 static bool flag_check_device_rgb_unicast_id = false;
+static bool flag_scene_cct = false;
+static bool flag_scene_rgbcct = false;
 
 static uint16_t adr_dv[100];
+static uint16_t adr_rgb_cct_dv[100];
 static uint16_t adr_rgb_dv[100];
-int i, arraylen, arraylen_rgb;
+int i, arraylen, arraylen_rgb, arraylen_rgb_cct;
 
 int json_parse_array( json_object *jobj, char *key)
 {
@@ -50,6 +53,24 @@ int json_parse_array( json_object *jobj, char *key)
 			}
 		}
 	}
+	if(strcmp(key, "RGB_CCT") ==0 ){
+		flag_scene_rgbcct = true;
+		//puts("check array rgb_cct");
+//		json_object *jarray_rgb = json_object_object_get(jobj, key);
+//		arraylen_rgb = json_object_array_length(jarray_rgb);
+//		printf("number: %d\n",arraylen_rgb);
+//		for (i=0; i< arraylen_rgb; i++){
+//			json_object *jvalue_rgb = json_object_array_get_idx(jarray_rgb, i);
+//			type = json_object_get_type(jvalue_rgb);
+//			if(type == json_type_object){
+//				vrts_Json_String.adr 	= json_object_get_int(json_object_object_get(jvalue_rgb,"DEVICE_UNICAST_ID"));
+//				vrts_Json_String.srgbID = json_object_get_int(json_object_object_get(jvalue_rgb,"SRGBID"));
+//				Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRGB_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
+//						NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 23);
+//				usleep(400000);
+//			}
+//		}
+	}
 	return 1;
 }
 
@@ -72,6 +93,10 @@ void JsonControl(json_object *jobj,char *key){
 				json_parse_array(vrts_Json_String.data, key_data);
 				break;
 			 case json_type_object:
+				if(strcmp(key_data,"CCT") ==0 ){
+					flag_scene_cct = true;
+					vrts_Json_String.cct_object = json_object_object_get(vrts_Json_String.data, "CCT");
+				}
 				break;
 			 }
 		 }
@@ -176,26 +201,83 @@ void JsonControl(json_object *jobj,char *key){
 	}
 	else if(strcmp(vrts_Json_String.cmd,"ADDSCENE") == 0){
 		check_add_or_del_scene = true;
-		vrts_Json_String.srgbID		= json_object_get_int(json_object_object_get(vrts_Json_String.data,"SRGBID"));
 		vrts_Json_String.sceneID 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"SCENEID"));
-		if(flag_check_device_unicast_id){
-			flag_check_device_unicast_id = false;
-			for(i=0;i<arraylen;i++){
-				FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, \
-						vrts_Json_String.sceneID, NULL16,NULL16, NULL16, NULL16, NULL16, 14);
-				usleep(400000);
+		if(flag_scene_cct){
+			flag_scene_cct = false;
+			json_object_object_foreach(vrts_Json_String.cct_object, key_cct, val_cct){
+				if(strcmp(key_cct,"DEVICE_UNICAST_ID") == 0){
+					json_parse_array( vrts_Json_String.cct_object, key_cct);
+				}
+				if(flag_check_device_unicast_id){
+					flag_check_device_unicast_id = false;
+					for(i=0;i<arraylen;i++){
+						FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, \
+								vrts_Json_String.sceneID, NULL16,NULL16, NULL16, NULL16, NULL16, 14);
+						usleep(400000);
+					}
+				}
+				arraylen = 0;
 			}
 		}
-		arraylen=0;
-		if(flag_check_device_rgb_unicast_id){
-			flag_check_device_rgb_unicast_id = false;
-			for(i=0; i<arraylen_rgb; i++){
-				Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRGB_vendor_typedef, adr_rgb_dv[i], NULL16, NULL8, NULL8, NULL8, \
-						NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 23);
-				usleep(400000);
+		if(flag_scene_rgbcct){
+			flag_scene_rgbcct = false;
+			json_object *jarray_rgb_cct = json_object_object_get(vrts_Json_String.data, "RGB_CCT");
+			arraylen_rgb_cct = json_object_array_length(jarray_rgb_cct);
+			for (i=0; i< arraylen_rgb_cct; i++){
+				json_object *jvalue_rgb_cct = json_object_array_get_idx(jarray_rgb_cct, i);
+				enum json_type type = json_object_get_type(jvalue_rgb_cct);
+				if (type == json_type_object){
+					vrts_Json_String.srgbID = json_object_get_int(json_object_object_get(jvalue_rgb_cct,"SRGBID"));
+					vrts_Json_String.adr = json_object_get_int(json_object_object_get(jvalue_rgb_cct,"DEVICE_UNICAST_ID"));
+					Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRGB_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
+							NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 23);
+					usleep(400000);
+				}
+			}
+			arraylen_rgb_cct = 0;
+		}
+	}
+	else if(strcmp(vrts_Json_String.cmd,"EDITSCENE") == 0){
+		vrts_Json_String.sceneID 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"SCENEID"));
+		if(flag_scene_cct){
+			flag_scene_cct = false;
+			json_object_object_foreach(vrts_Json_String.cct_object, key_cct, val_cct){
+				if(strcmp(key_cct,"DEVICE_UNICAST_ID") == 0){
+					json_parse_array( vrts_Json_String.cct_object, key_cct);
+				}
+				if(flag_check_device_unicast_id){
+					flag_check_device_unicast_id = false;
+					for(i=0;i<arraylen;i++){
+						FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, \
+								vrts_Json_String.sceneID, NULL16,NULL16, NULL16, NULL16, NULL16, 14);
+						usleep(400000);
+					}
+				}
+				arraylen = 0;
 			}
 		}
-		arraylen_rgb=0;
+		if(flag_scene_rgbcct){
+			flag_scene_rgbcct = false;
+			json_object *jarray_rgb_cct = json_object_object_get(vrts_Json_String.data, "RGB_CCT");
+			arraylen_rgb_cct = json_object_array_length(jarray_rgb_cct);
+			for (i=0; i< arraylen_rgb_cct; i++){
+				json_object *jvalue_rgb_cct = json_object_array_get_idx(jarray_rgb_cct, i);
+				enum json_type type = json_object_get_type(jvalue_rgb_cct);
+				if (type == json_type_object){
+					vrts_Json_String.srgbID = json_object_get_int(json_object_object_get(jvalue_rgb_cct,"SRGBID"));
+					vrts_Json_String.adr = json_object_get_int(json_object_object_get(jvalue_rgb_cct,"DEVICE_UNICAST_ID"));
+
+					FunctionPer(HCI_CMD_GATEWAY_CMD, DelSence_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, \
+					vrts_Json_String.sceneID, NULL16,NULL16, NULL16, NULL16, NULL16, 14);
+					usleep(400000);
+
+					Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForRGB_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
+							NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 23);
+					usleep(400000);
+				}
+			}
+			arraylen_rgb_cct = 0;
+		}
 	}
 	else if(strcmp(vrts_Json_String.cmd,"DELSCENE") == 0){
 		check_add_or_del_scene = false;
@@ -230,9 +312,15 @@ void JsonControl(json_object *jobj,char *key){
 	}
 	else if(strcmp(vrts_Json_String.cmd,"CALLMODE_RGB") == 0){
 		vrts_Json_String.srgbID = json_object_get_int(json_object_object_get(vrts_Json_String.data,"SRGBID"));
-		Function_Vendor(HCI_CMD_GATEWAY_CMD, CallModeRgb_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8,NULL8, NULL8, NULL16,\
-				NULL16, NULL16,NULL16, NULL16, NULL16, NULL16, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 23);
-		usleep(400000);
+		if(flag_check_device_unicast_id){
+			flag_check_device_unicast_id = false;
+			for(i=0; i<arraylen; i++){
+				Function_Vendor(HCI_CMD_GATEWAY_CMD, CallModeRgb_vendor_typedef, adr_dv[i], NULL16, NULL8,NULL8, NULL8, NULL16,\
+						NULL16, NULL16,NULL16, NULL16, NULL16, NULL16, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 23);
+				usleep(400000);
+			}
+		}
+		arraylen=0;
 	}
 //	else if(strcmp(vrts_Json_String.cmd,"ADDSCENE_RGB") == 0){
 //		vrts_Json_String.sceneID 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"SCENEID"));
@@ -570,7 +658,7 @@ void JsonControl(json_object *jobj,char *key){
 		buttonId_int =6;
 		}
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, DelSceneForScreenT_vendor_typedef, vrts_Json_String.adr, NULL16, \
-				buttonId_int, NULL8, NULL8 , NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
+				buttonId_int, NULL8, NULL8 , NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 18);
 		usleep(400000);
 	}
 	else if(strcmp(vrts_Json_String.cmd,"SET_BALANCE_LIGHT_SENSOR") == 0){
