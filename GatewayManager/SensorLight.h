@@ -43,6 +43,20 @@ typedef struct pmsensorRsp
 }pmsensorRsp;
 extern pmsensorRsp * vrts_PMSensor_Rsp;
 
+typedef struct{
+	union{
+		uint32_t data;
+		struct{
+			uint32_t store				:8;//8 bit not use
+			uint32_t Lux_hi				:10;//10 bit lux hi
+			uint32_t Lux_low			:10;//10 bit lux low
+			uint32_t Light_Conditon		:3; // 7 bit low
+			uint32_t Pir_Conditon		:1; // 1 bit hight
+		};
+	};
+}RD_Sensor_data_tdef;
+
+
 /*Define friend_poll*/
 #define SENSOR_DESCRIP_GET     0x3082
 #define SENSOR_DESCRIP_STATUS  0x51

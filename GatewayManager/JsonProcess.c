@@ -481,130 +481,39 @@ void JsonControl(json_object *jobj,char *key){
 		usleep(400000);
 	}
 	else if(strcmp(vrts_Json_String.cmd,"ADDSCENE_LIGHT_PIR_SENSOR") == 0){
-		vrts_Json_String.sceneID 	= (json_object_get_int(json_object_object_get(vrts_Json_String.data,"SCENEID")));
-		vrts_Json_String.srgbID 	= (json_object_get_int(json_object_object_get(vrts_Json_String.data,"SRGBID")));
-		vrts_Json_String.type 		= (json_object_get_int(json_object_object_get(vrts_Json_String.data,"TYPE")));
-		 if(vrts_Json_String.type == 0){
-			 vrts_Json_String.lightsensor = json_object_object_get(vrts_Json_String.data,"LIGHT_SENSOR");
-			 vrts_Json_String.condition = (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"CONDITION")));
-			 if(vrts_Json_String.condition == 3 || vrts_Json_String.condition == 4 ){
-				 uint16_t parCondition = 256;
-				 vrts_Json_String.low_lux 	= (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"LOW_LUX")));
-				 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,NULL8, \
-						 parCondition, vrts_Json_String.low_lux, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, \
-						 vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-				 usleep(400000);
-			 }
-			 else if (vrts_Json_String.condition == 5 || vrts_Json_String.condition == 6){
-				 uint16_t parCondition = 768;
-				 vrts_Json_String.low_lux = (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"LOW_LUX")));
-				 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,NULL8, \
-				 		parCondition, vrts_Json_String.low_lux, NULL16 , NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, \
-						vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-				 usleep(400000);
-			 }
-			 else if(vrts_Json_String.condition == 7){
-				 uint16_t parCondition = 1024;
-				 vrts_Json_String.low_lux = (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"LOW_LUX")));
-				 vrts_Json_String.hight_lux = (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"HIGHT_LUX")));
-				 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,NULL8, \
-						parCondition, vrts_Json_String.low_lux, vrts_Json_String.hight_lux, NULL16, NULL16, vrts_Json_String.sceneID,\
-						vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-				 usleep(400000);
-			 }
-			 else if(vrts_Json_String.condition == 1){
-				 uint16_t parCondition = 512;
-				 vrts_Json_String.low_lux 	= (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"LOW_LUX")));
-				 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,NULL8, \
-						 parCondition, vrts_Json_String.low_lux, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, \
-						 vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-				 usleep(400000);
-			 }
-		 }
-		 else if(vrts_Json_String.type == 1){
-			 vrts_Json_String.pir = json_object_object_get(vrts_Json_String.data,"PIR_SENSOR");
-			 vrts_Json_String.motion = (json_object_get_int(json_object_object_get(vrts_Json_String.pir,"PIR")));
-			 if(vrts_Json_String.motion == 1){
-				 uint16_t parCondition = 1;
-				 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
-			 					parCondition, NULL16, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, \
-								vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-				 usleep(400000);
-			 }
-			 if(vrts_Json_String.motion == 0){
-				 uint16_t parCondition = 2;
-				 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
-			 					parCondition, NULL16, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID,\
-								vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-				 usleep(400000);
-			 }
-		 }
-		 else if(vrts_Json_String.type == 2){
-			 vrts_Json_String.lightsensor = json_object_object_get(vrts_Json_String.data,"LIGHT_SENSOR");
-			 vrts_Json_String.pir  		  = json_object_object_get(vrts_Json_String.data,"PIR_SENSOR");
-			 vrts_Json_String.condition = (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"CONDITION")));
-			 vrts_Json_String.low_lux 	= (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"LOW_LUX")));
-			 vrts_Json_String.hight_lux = (json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"HIGHT_LUX")));
-			 vrts_Json_String.motion = (json_object_get_int(json_object_object_get(vrts_Json_String.pir,"PIR")));
-			 if((vrts_Json_String.condition == 3 || vrts_Json_String.condition == 4) && (vrts_Json_String.motion == 0)){
-				 uint16_t parCondition = 258;
-			 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
-			 		 					parCondition, vrts_Json_String.low_lux, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, \
-										vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-			 	usleep(400000);
-			 }
-			 else if((vrts_Json_String.condition == 5 || vrts_Json_String.condition == 6) && (vrts_Json_String.motion == 0)){
-				 uint16_t parCondition = 770;
-			 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
-			 		 					parCondition,vrts_Json_String.low_lux , NULL16, NULL16, NULL16, vrts_Json_String.sceneID, \
-										vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-			 	usleep(400000);
-			 }
-			 else if(vrts_Json_String.motion == 0 && (vrts_Json_String.condition == 1)){
-				 uint16_t parCondition = 514;
-			 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
-			 		 					parCondition,vrts_Json_String.low_lux , NULL16, NULL16, NULL16, vrts_Json_String.sceneID, \
-										vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16,26);
-			 	usleep(400000);
-			 }
-			 else if(vrts_Json_String.motion == 0 && vrts_Json_String.condition == 7){
-				 uint16_t parCondition = 1026;
-				 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
-										parCondition,vrts_Json_String.low_lux , vrts_Json_String.hight_lux, NULL16, NULL16, vrts_Json_String.sceneID, \
-										vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-				 usleep(400000);
-			 }
-			 else if((vrts_Json_String.condition == 3 || vrts_Json_String.condition == 4) && (vrts_Json_String.motion == 1)){
-				 uint16_t parCondition = 257;
-			 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
-			 		 					parCondition, vrts_Json_String.low_lux, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, \
-										vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-			 	usleep(400000);
-			 }
-			 else if((vrts_Json_String.condition == 5 || vrts_Json_String.condition == 6) && (vrts_Json_String.motion == 1)){
-				 uint16_t parCondition = 769;
-			 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
-			 		 					parCondition,vrts_Json_String.low_lux , NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID,\
-										vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-			 	usleep(400000);
-			 }
-			 else if(vrts_Json_String.motion == 1 && (vrts_Json_String.condition == 1)){
-				 uint16_t parCondition = 513;
-			 	 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
-			 		 					parCondition,vrts_Json_String.low_lux , NULL16, NULL16, NULL16, vrts_Json_String.sceneID, vrts_Json_String.sceneID, \
-										vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-			 	usleep(400000);
-			 }
-			 else if(vrts_Json_String.motion == 1 && vrts_Json_String.condition == 7){
-				 uint16_t parCondition = 1025;
-				 Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
-										parCondition,vrts_Json_String.low_lux , vrts_Json_String.hight_lux, NULL16, NULL16, vrts_Json_String.sceneID, \
-										vrts_Json_String.sceneID, vrts_Json_String.srgbID, NULL8, NULL8, NULL8, NULL16, 26);
-				 usleep(400000);
-			 }
-		 }
+		vrts_Json_String.type = json_object_get_int(json_object_object_get(vrts_Json_String.data,"TYPE"));
+		vrts_Json_String.sceneID = json_object_get_int(json_object_object_get(vrts_Json_String.data,"SCENEID"));
+		uint8_t condition_Sensor = 0x00;
+		uint8_t condition_light = 0x00;
+		if(vrts_Json_String.type == 1){
+			vrts_Json_String.pir = (json_object_object_get(vrts_Json_String.data, "PIR_SENSOR"));
+			vrts_Json_String.motion = json_object_get_int(json_object_object_get(vrts_Json_String.pir,"PIR"));
+			vrts_Json_String.low_lux=vrts_Json_String.hight_lux=0;
+		}
+		else if(vrts_Json_String.type == 2){
+			vrts_Json_String.pir = (json_object_object_get(vrts_Json_String.data, "PIR_SENSOR"));
+			vrts_Json_String.motion = json_object_get_int(json_object_object_get(vrts_Json_String.pir,"PIR"));
+			vrts_Json_String.lightsensor = (json_object_object_get(vrts_Json_String.data,"LIGHT_SENSOR"));
+			vrts_Json_String.condition = json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"CONDITION"));
+			vrts_Json_String.low_lux = json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"LOW_LUX"));
+			vrts_Json_String.hight_lux = 0x0000;
+			if(vrts_Json_String.condition == 4 || vrts_Json_String.condition == 3){
+				condition_light = 0x01;
+			}
+			else if(vrts_Json_String.condition == 5 || vrts_Json_String.condition ==6){
+				condition_light = 0x03;
+			}
+			else if(vrts_Json_String.condition == 7){
+				condition_light = 0x02;
+				vrts_Json_String.hight_lux = json_object_get_int(json_object_object_get(vrts_Json_String.lightsensor,"HIGHT_LUX"));
+			}
+		}
+		condition_Sensor = (uint8_t)((vrts_Json_String.motion<<3) | (condition_light));
+		Function_Vendor(HCI_CMD_GATEWAY_CMD, SceneForSensor_LightPir_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8,\
+				NULL8, condition_Sensor, vrts_Json_String.low_lux/10, vrts_Json_String.hight_lux/10, NULL8, NULL8, vrts_Json_String.sceneID , NULL16,\
+				NULL8, NULL8, NULL8, NULL8, NULL16, 23);
+		usleep(400000);
 	}
-
 	else if(strcmp(vrts_Json_String.cmd,"ADDSCENE_LIGHT_SENSOR") == 0){
 		//update
 

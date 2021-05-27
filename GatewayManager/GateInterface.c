@@ -858,93 +858,50 @@ void GWIF_ProcessData (void)
 					case HEADER_SCENE_LIGHT_PIR_SET:
 						if(1){
 							json_component cmd = {"CMD","ADDSCENE_LIGHT_PIR_SENSOR",json_type_string};
-							json_component  jsonPir= {"PIR",vrts_Json_String.motion,json_type_int};
-							json_object *pir_Sensor_object = create_json_obj_from(add_component_to_obj, 1, mqtt_dont_push,&jsonPir);
-							json_component pir_Sensor_push_mqtt = {"PIR_SENSOR",pir_Sensor_object,json_type_object};
-							if (rspCondition == 256){
-								json_component type = {"TYPE",0,json_type_int};
-								json_component condition_push_mqtt = {"CONDITION",4,json_type_int};
-								json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
-								json_object *light_sensor_object = create_json_obj_from(add_component_to_obj, 2,mqtt_dont_push, &condition_push_mqtt,&low_lux_push_mqtt);
-								json_component ligh_sensor_push_mqtt = {"LIGHT_SENSOR",light_sensor_object,json_type_object};
-								json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, &device_unicast_id_json, &type, &ligh_sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
-								json_component data_Json = {"DATA",data_object, json_type_object};
-								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+							RD_Sensor_data_tdef data_Scene_Rsp;
+							data_Scene_Rsp.data = (vrts_GWIF_IncomeMessage->Message[12]<<24)|(vrts_GWIF_IncomeMessage->Message[13]<<16)|(vrts_GWIF_IncomeMessage->Message[14]<<8);
+							json_component pir_json = {"PIR",data_Scene_Rsp.Pir_Conditon,json_type_int};
+							json_object *pir_Object = create_json_obj_from(add_component_to_obj, 1, mqtt_dont_push, &pir_json);
+							json_component pir_Object_Json = {"PIR_SENSOR",pir_Object,json_type_object};
+							printf("condition light= %d\n",data_Scene_Rsp.Light_Conditon);
+							if(data_Scene_Rsp.Light_Conditon == 0){
+								char type = 1;
+								json_component type_json = {"TYPE",type,json_type_int};
+								json_object * data_object = create_json_obj_from(add_component_to_obj, 4, mqtt_dont_push, &device_unicast_id_json, &type_json, &pir_Object_Json, &sceneid_Json);
+								json_component data_json = {"DATA",data_object,json_type_object};
+								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_json);
 							}
-							else if(rspCondition == 512){
-								json_component type = {"TYPE",0,json_type_int};
-								json_component condition_push_mqtt = {"CONDITION",1,json_type_int};
-								json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
-								json_object *light_sensor_object = create_json_obj_from(add_component_to_obj, 2,mqtt_dont_push, &condition_push_mqtt,&low_lux_push_mqtt);
-								json_component ligh_sensor_push_mqtt = {"LIGHT_SENSOR",light_sensor_object,json_type_object};
-								json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, &device_unicast_id_json, &type, &ligh_sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
-								json_component data_Json = {"DATA",data_object, json_type_object};
-								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
-							}
-							else if(rspCondition == 768){
-								json_component type = {"TYPE",0,json_type_int};
-								json_component condition_push_mqtt = {"CONDITION",6,json_type_int};
-								json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
-								json_object *light_sensor_object = create_json_obj_from(add_component_to_obj, 2,mqtt_dont_push, &condition_push_mqtt,&low_lux_push_mqtt);
-								json_component ligh_sensor_push_mqtt = {"LIGHT_SENSOR",light_sensor_object,json_type_object};
-								json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, &device_unicast_id_json, &type, &ligh_sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
-								json_component data_Json = {"DATA",data_object, json_type_object};
-								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);							}
-							else if(rspCondition == 1024){
-								json_component type = {"TYPE",0,json_type_int};
-								json_component condition_push_mqtt = {"CONDITION",7,json_type_int};
-								json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
-								json_component hight_lux_push_mqtt = {"HIGHT_LUX",rspHighLux,json_type_int};
-								json_object *light_sensor_object = create_json_obj_from(add_component_to_obj, 3,mqtt_dont_push, &condition_push_mqtt,&low_lux_push_mqtt,&hight_lux_push_mqtt);
-								json_component ligh_sensor_push_mqtt = {"LIGHT_SENSOR",light_sensor_object,json_type_object};
-								json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, &device_unicast_id_json, &type, &ligh_sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
-								json_component data_Json = {"DATA",data_object, json_type_object};
-								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);								}
-							else if(rspCondition == 1 || rspCondition == 2){
-								json_component type = {"TYPE",1,json_type_int};
-								json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, &device_unicast_id_json, &type, &pir_Sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
-								json_component data_Json = {"DATA",data_object, json_type_object};
-								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
-							}
-							else if(rspCondition == 257 || rspCondition ==258){
-								json_component type = {"TYPE",2,json_type_int};
-								json_component condition_push_mqtt = {"CONDITION",4,json_type_int};
-								json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
-								json_object *light_Sensor_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&condition_push_mqtt,&low_lux_push_mqtt);
-								json_component light_Sensor_push_mqtt = {"LIGHT_SENSOR",light_Sensor_object,json_type_object};
-								json_object *data_object = create_json_obj_from(add_component_to_obj, 6, mqtt_dont_push, &device_unicast_id_json, &type, &light_Sensor_push_mqtt, &pir_Sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
-								json_component data_Json = {"DATA", data_object, json_type_object};
-								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
-							}
-							else if(rspCondition == 513 || rspCondition == 514){
-								json_component type = {"TYPE",2,json_type_int};
-								json_component condition_push_mqtt = {"CONDITION",1,json_type_int};
-								json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
-								json_object *light_Sensor_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&condition_push_mqtt,&low_lux_push_mqtt);
-								json_component light_Sensor_push_mqtt = {"LIGHT_SENSOR",light_Sensor_object,json_type_object};
-								json_object *data_object = create_json_obj_from(add_component_to_obj, 6, mqtt_dont_push, &device_unicast_id_json, &type, &light_Sensor_push_mqtt, &pir_Sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
-								json_component data_Json = {"DATA", data_object, json_type_object};
-								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);						}
-							else if(rspCondition == 769 || rspCondition == 770){
-								json_component type = {"TYPE",2,json_type_int};
-								json_component condition_push_mqtt = {"CONDITION",6,json_type_int};
-								json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
-								json_object *light_Sensor_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&condition_push_mqtt,&low_lux_push_mqtt);
-								json_component light_Sensor_push_mqtt = {"LIGHT_SENSOR",light_Sensor_object,json_type_object};
-								json_object *data_object = create_json_obj_from(add_component_to_obj, 6, mqtt_dont_push, &device_unicast_id_json, &type, &light_Sensor_push_mqtt, &pir_Sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
-								json_component data_Json = {"DATA", data_object, json_type_object};
-								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
-							}
-							else if(rspCondition == 1025 || rspCondition == 1026){
-								json_component type = {"TYPE",2,json_type_int};
-								json_component condition_push_mqtt = {"CONDITION",7,json_type_int};
-								json_component low_lux_push_mqtt = {"LOW_LUX",rspLowLux,json_type_int};
-								json_component hight_lux_push_mqtt = {"HIGHT_LUX",rspHighLux,json_type_int};
-								json_object *light_Sensor_object = create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push,&condition_push_mqtt,&low_lux_push_mqtt,&hight_lux_push_mqtt);
-								json_component light_Sensor_push_mqtt = {"LIGHT_SENSOR",light_Sensor_object,json_type_object};
-								json_object *data_object = create_json_obj_from(add_component_to_obj, 6, mqtt_dont_push, &device_unicast_id_json, &type, &light_Sensor_push_mqtt, &pir_Sensor_push_mqtt, &jsonSceneS, &jsonSrgbidS);
-								json_component data_Json = {"DATA", data_object, json_type_object};
-								create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_Json);
+							else {
+								char type = 2;
+								json_component type_json = {"TYPE",type,json_type_int};
+								if(data_Scene_Rsp.Light_Conditon == 1){
+									json_component condition_Light_Json = {"CONDITION",4,json_type_int};
+									json_component low_lux_Json = {"LOW_LUX",data_Scene_Rsp.Lux_low*10,json_type_int};
+									json_object * light_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &condition_Light_Json, &low_lux_Json);
+									json_component light_json = {"LIGHT_SENSOR",light_object, json_type_object};
+									json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, & device_unicast_id_json, &type_json, &light_json, &pir_Object_Json, &sceneid_Json);
+									json_component data_json = {"DATA",data_object, json_type_object};
+									create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_json);
+								}
+								else if(data_Scene_Rsp.Light_Conditon == 2){
+									json_component condition_Light_Json = {"CONDITION",7,json_type_int};
+									json_component low_lux_Json = {"LOW_LUX",data_Scene_Rsp.Lux_low*10,json_type_int};
+									json_component high_lux_Json = {"HIGHT_LUX",data_Scene_Rsp.Lux_hi*10, json_type_int};
+									json_object * light_object = create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push, &condition_Light_Json, &low_lux_Json,&high_lux_Json);
+									json_component light_json = {"LIGHT_SENSOR",light_object, json_type_object};
+									json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, & device_unicast_id_json, &type_json, &light_json, &pir_Object_Json, &sceneid_Json);
+									json_component data_json = {"DATA",data_object, json_type_object};
+									create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_json);
+								}
+								else if(data_Scene_Rsp.Light_Conditon == 3){
+									json_component condition_Light_Json = {"CONDITION",6,json_type_int};
+									json_component low_lux_Json = {"LOW_LUX",data_Scene_Rsp.Lux_low*10,json_type_int};
+									json_object * light_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &condition_Light_Json, &low_lux_Json);
+									json_component light_json = {"LIGHT_SENSOR",light_object, json_type_object};
+									json_object *data_object = create_json_obj_from(add_component_to_obj, 5, mqtt_dont_push, & device_unicast_id_json, &type_json, &light_json, &pir_Object_Json, &sceneid_Json);
+									json_component data_json = {"DATA",data_object, json_type_object};
+									create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_json);
+								}
 							}
 						}
 						break;

@@ -366,8 +366,7 @@ void DelSceneForRemote_AC(uint16_t adrRemote_AC, uint8_t buttonId, uint8_t modeI
 	vrts_CMD_STRUCTURE_VENDOR.para[3]= modeId;
 }
 //todo:afternoon
-void SetSceneForSensor_LightPir(uint16_t adrLightPir, uint16_t sceneID, uint16_t condition, uint16_t low_lux,\
-		uint16_t hight_lux, uint8_t srgbID)
+void SetSceneForSensor_LightPir(uint16_t adrLightPir, uint16_t sceneID, RD_Sensor_data_tdef dataScene_Pir_light)
 {
 	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrLightPir & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrLightPir>>8) & 0xFF;
@@ -380,13 +379,10 @@ void SetSceneForSensor_LightPir(uint16_t adrLightPir, uint16_t sceneID, uint16_t
 	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SCENE_LIGHT_PIR_SET>>8) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[2] = sceneID & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[3] = (sceneID >>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[4] = (condition>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[5] = condition & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[6] = low_lux & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[7] = (low_lux>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[8] = hight_lux & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[9] = (hight_lux>>8) & 0xFF;
-	vrts_CMD_STRUCTURE_VENDOR.para[10] = srgbID;
+	vrts_CMD_STRUCTURE_VENDOR.para[4] = (dataScene_Pir_light.data>>24) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[5] = (dataScene_Pir_light.data>>16) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[6] = (dataScene_Pir_light.data>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[7] = 0x00;
 }
 void DelSceneForSensor_LightPir(uint16_t adrLightPir, uint16_t sceneID)
 {
@@ -823,7 +819,12 @@ void Function_Vendor(uint16_t cmd,\
 		DelSceneForRemote_AC(adr, buttonID, modeID);
 	}
 	else if(Func_vendor == SceneForSensor_LightPir_vendor_typedef){
-		SetSceneForSensor_LightPir(adr,sceneID, condition_lightness, low_lux_switch1_2_socket1_2, hight_lux_switch3_4_socket3_4, srgbID);
+		RD_Sensor_data_tdef dataScene_Pir_Light_cmd1;
+		dataScene_Pir_Light_cmd1.Pir_Conditon = (uint32_t)(condition_lightness>>3);
+		dataScene_Pir_Light_cmd1.Light_Conditon =(uint32_t)((condition_lightness)& 0x0000007);
+		dataScene_Pir_Light_cmd1.Lux_low = (uint32_t)(low_lux_switch1_2_socket1_2);
+		dataScene_Pir_Light_cmd1.Lux_hi = (uint32_t)(hight_lux_switch3_4_socket3_4);
+		SetSceneForSensor_LightPir(adr,sceneID,dataScene_Pir_Light_cmd1);
 	}
 	else if(Func_vendor == DelSceneForSensor_LightPir_vendor_typedef){
 		DelSceneForSensor_LightPir(adr, sceneID);
