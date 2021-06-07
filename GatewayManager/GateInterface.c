@@ -426,56 +426,33 @@ void GWIF_ProcessData (void)
 //								NULL16, NULL16,NULL16, NULL16,rspSceneSensor, NULL8, NULL8, NULL8, NULL8,23);
 						}
 				}
-				else if(headerSensor == PM_SENSOR_MODULE_TYPE){
-					vrts_PMSensor_Rsp = (pmsensorRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
-					json_object *data_PM = json_object_new_object();
-					switch (vrts_PMSensor_Rsp->typeValue){
-					case PM10_SENSOR_TYPEVALUE:
-						if(1){
-							json_component pm10 = {"PM10_VALUE",vrts_PMSensor_Rsp->value[3],json_type_int};
-							data_PM = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&jsonAdr,&pm10);
-							//create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_PM);
-						}
-						break;
-					case PM2_5_SENSOR_TYPEVALUE:
-						if(1){
-							json_component pm2_5 = {"PM2.5_VALUE",vrts_PMSensor_Rsp->value[3],json_type_int};
-							data_PM = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&jsonAdr,&pm2_5);
-							//create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_PM);
-						}
-						break;
-					case PM1_0_SENSOR_TYPEVALUE:
-						if(1){
-							json_component pm1_0 = {"PM1_VALUE",vrts_PMSensor_Rsp->value[3],json_type_int};
-							data_PM = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&jsonAdr,&pm1_0);
-							//create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_PM);
-						}
-						break;
-					case TEMP_SENSOR_TYPEVALUE:
-						if(1){
-							if(vrts_PMSensor_Rsp->value[0] == 0xff){
-								json_component temp = {"TEMPERATURE_VALUE",(-1)*(vrts_PMSensor_Rsp->value[3]),json_type_int};
-								data_PM = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&jsonAdr,&temp);
-								//create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_PM);
-							}
-							else {
-								json_component temp = {"TEMPERATURE_VALUE",vrts_PMSensor_Rsp->value[3],json_type_int};
-								data_PM = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&jsonAdr,&temp);
-								//create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_PM);
-							}
-							//create_json_obj_from(add_component_to_obj, 2, mqtt_push,&jsonAdr,&temp);
-						}
-						break;
-					case HUMIDITY_SENSOR_TYPEVALUE:
-						if(1){
-							json_component humi = {"HUMIDITY_VALUE",vrts_PMSensor_Rsp->value[3],json_type_int};
-							data_PM = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr, &humi);
-							//create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_PM);
-						}
-						break;
+				else if(headerSensor == PM_SENSOR_MODULE_TEMP_HUM_TYPE){
+					vrts_PMSensor_Rsp_Temp_Hum = (pmsensorRsp_Temp_Hum *)(&vrts_GWIF_IncomeMessage->Message[6]);
+					uint16_t hum = (vrts_PMSensor_Rsp_Temp_Hum->hum[0] << 8)| vrts_PMSensor_Rsp_Temp_Hum->hum[1];
+					int temp;
+					if(vrts_PMSensor_Rsp_Temp_Hum->temp[0] == 0xFF){
+						temp = (-1)*((vrts_PMSensor_Rsp_Temp_Hum->temp[2]<<8) | vrts_PMSensor_Rsp_Temp_Hum->temp[3]);
 					}
-					json_component data_PM_Json = {"DATA",data_PM,json_type_object};
-					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_PM_Json);
+					else temp = ((vrts_PMSensor_Rsp_Temp_Hum->temp[2]<<8) | vrts_PMSensor_Rsp_Temp_Hum->temp[3]);
+					json_component cmd = {"CMD","PM_SENSOR",json_type_string};
+					json_component temp_json = {"TEMPERATURE_VALUE",temp,json_type_int};
+					json_component hum_json = {"HUMIDITY_VALUE",hum,json_type_int};
+					json_object *data_object= create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push, &jsonAdr, &temp_json, &hum_json);
+					json_component data_json = {"DATA",data_object,json_type_object};
+					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_json);
+				}
+				else if(headerSensor == PM_SENSOR_MODULE_PM_TYPE){
+					vrts_PMSensor_Rsp_PM = (pmsensorRsp_PM *)(&vrts_GWIF_IncomeMessage->Message[6]);
+					uint16_t pm2_5 = vrts_PMSensor_Rsp_PM->PM_2_5[0]<<8 | vrts_PMSensor_Rsp_PM->PM_2_5[1];
+					uint16_t pm10 = vrts_PMSensor_Rsp_PM->PM_10[0] << 8 | vrts_PMSensor_Rsp_PM->PM_10[1];
+					uint16_t pm1 = vrts_PMSensor_Rsp_PM->PM_1_0[0]<<8 | vrts_PMSensor_Rsp_PM->PM_1_0[1];
+					json_component cmd = {"CMD","PM_SENSOR",json_type_string};
+					json_component pm2_5_json = {"PM2.5_VALUE",pm2_5, json_type_int};
+					json_component pm1_json = {"PM1_VALUE",pm1,json_type_int};
+					json_component pm10_json = {"PM10_VALUE",pm10,json_type_int};
+					json_object * data_object = create_json_obj_from(add_component_to_obj, 4, mqtt_dont_push,&jsonAdr, &pm2_5_json, &pm1_json, &pm10_json);
+					json_component data_json = {"DATA",data_object,json_type_object};
+					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_json);
 				}
 				else if (headerSensor == TEMP_HUM_MODULE_TYPE){
 					uint16_t temp_Value_original    = ((vrts_GWIF_IncomeMessage->Message[8]<<8) | vrts_GWIF_IncomeMessage->Message[9]);

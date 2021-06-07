@@ -99,6 +99,9 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 #define HEADER_TEMPHUM_SCREENTOUCH    			(0x030A)
 #define HEADER_TIME_SCREENTOUCH					(0x040A)
 
+/*header ask temp, hum, pm in pm sensor*/
+#define HEADER_ASK_PM							(0x0700)
+
 #define NULL8    0x00
 #define NULL16   0x0000
 
@@ -215,6 +218,7 @@ typedef enum{
 	SaveGateway_vendor_typedef    ,
 	AskTypeDevice_vendor_typedef  ,
 	SetTypeDevice_vendor_typedef  ,
+	AskPm_vendor_typedef
 } functionTypeDef;
 
 /*

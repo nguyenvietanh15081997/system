@@ -61,17 +61,18 @@ void TimeForDs1307()
  */
 void TimeForInternet()
 {
-	FILE *fp;
-	  char path[1035];
-	  fp = popen("date", "r");
-	  if (fp == NULL) {
-		printf("Failed to run command");
+		FILE *fp;
+		char path[1035];
+		fp = popen("date", "r");
+		if (fp == NULL) {
+			printf("Failed to run command");
 		exit(1);
-	  }
-	  while (fgets(path, sizeof(path), fp) != NULL) {
-		  break;
-	  }
-	  pclose(fp);
+		}
+		int i=0;
+		while (fgets(path, sizeof(path), fp) != NULL) {
+			break;
+		}
+		pclose(fp);
 	  if(path[0]=='M' && path[1]=='o' && path[2]=='n'){
 		dataTimeInternet[3]=2;
 	  }

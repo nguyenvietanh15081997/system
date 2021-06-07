@@ -725,8 +725,6 @@ void DelSceneRgb(uint16_t adrDelSceneRgb, uint16_t appID)
 		vrts_CMD_STRUCTURE_VENDOR.para[i+4]= 0x00;
 	}
 }
-
-
 void AskTypeDevice(uint16_t adr)
 {
 	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adr & 0xFF;
@@ -777,6 +775,17 @@ void SaveGateway(uint16_t adrSaveGateway)
 	for(i=0;i<11;i++){
 		vrts_CMD_STRUCTURE_VENDOR.para[i+2] = 0x00;
 	}
+}
+void AskPm(uint16_t adrPmSensor){
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrPmSensor & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrPmSensor>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_ASK_PM) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_ASK_PM >>8 ) & 0xFF;
 }
 void Function_Vendor(uint16_t cmd,\
 		functionTypeDef Func_vendor,\
@@ -904,6 +913,9 @@ void Function_Vendor(uint16_t cmd,\
 	else if(Func_vendor == SetTypeDevice_vendor_typedef){
 		flag_typeDEV = true;
 		SetTypeDevice(adr, type_hours, attrubute_minute, application_second);
+	}
+	else if(Func_vendor == AskPm_vendor_typedef){
+		AskPm(adr);
 	}
 
 	uint8_t *tempDataUart;

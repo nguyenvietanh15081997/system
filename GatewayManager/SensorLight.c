@@ -8,7 +8,8 @@
 
 lightsensorRsp * vrts_LighSensor_Rsp;
 pirsensorRsp * vrts_PirSensor_Rsp;
-pmsensorRsp * vrts_PMSensor_Rsp;
+pmsensorRsp_Temp_Hum * vrts_PMSensor_Rsp_Temp_Hum;
+pmsensorRsp_PM * vrts_PMSensor_Rsp_PM;
 
 
 //bool flag_sensor_light_rsp = false;

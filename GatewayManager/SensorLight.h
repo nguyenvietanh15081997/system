@@ -34,14 +34,22 @@ typedef struct pirsensorRsp
 }pirsensorRsp;
 extern pirsensorRsp * vrts_PirSensor_Rsp;
 
-typedef struct pmsensorRsp
+typedef struct pmsensorRsp_Temp_Hum
 {
 	uint8_t header[2];
-	uint8_t typeValue;
-	uint8_t value[4];
-	uint8_t future;
-}pmsensorRsp;
-extern pmsensorRsp * vrts_PMSensor_Rsp;
+	uint8_t hum[2];
+	uint8_t temp[4];
+}pmsensorRsp_Temp_Hum;
+extern pmsensorRsp_Temp_Hum * vrts_PMSensor_Rsp_Temp_Hum;
+
+typedef struct pmsensorRsp_PM
+{
+	uint8_t header[2];
+	uint8_t PM_2_5[2];
+	uint8_t PM_10[2];
+	uint8_t PM_1_0[2];
+}pmsensorRsp_PM;
+extern pmsensorRsp_PM * vrts_PMSensor_Rsp_PM;
 
 typedef struct{
 	union{

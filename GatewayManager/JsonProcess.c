@@ -680,15 +680,10 @@ void JsonControl(json_object *jobj,char *key){
 				NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 19);
 		usleep(400000);
 	}
-	else if(strcmp(vrts_Json_String.cmd, "TEST") == 0){
-		FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, 0x0001, NULL16,NULL16, NULL16, NULL16, NULL16, 17);
+	else if(strcmp(vrts_Json_String.cmd, "ASK_PM_SENSOR") == 0){
+		Function_Vendor(HCI_CMD_GATEWAY_CMD, AskPm_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, \
+				NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
 		usleep(400000);
-		//vrts_Json_String.srgbID 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"SRGBID"));
-		//if(vrts_Json_String.srgbID !=0 ){
-			Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8, NULL8, NULL8, NULL16,\
-					NULL16, NULL16,NULL16, NULL16, NULL16, 0x0006, NULL8, NULL8, NULL8, NULL8, NULL16, 23);
-			//usleep(400000);
-		//}
 	}
 }
 
