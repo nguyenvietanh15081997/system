@@ -685,6 +685,7 @@ void JsonControl(json_object *jobj,char *key){
 				NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
 		usleep(400000);
 	}
+	vrts_Json_String.cmd = "\0";
 }
 
 /*

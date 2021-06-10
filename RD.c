@@ -16,6 +16,7 @@
 #include "GatewayManager/slog.h"
 #include "GatewayManager/LedProcess.h"
 #include "GatewayManager/Light.h"
+#include "GatewayManager/Linkerlist.h"
 
 pthread_t vrts_System_ThreadGWIF;
 pthread_t vrts_System_TestSend;
@@ -55,6 +56,8 @@ int main(void) {
     //pthread_join(vrts_System_Time, NULL);
     //pthread_join(vrts_System_Gpio,NULL);
 
+    // Init linkerlist
+    vrts_buff head = InitHead();
 	while(1){
 	}
 	return EXIT_SUCCESS;

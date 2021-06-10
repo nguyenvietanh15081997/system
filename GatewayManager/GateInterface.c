@@ -347,6 +347,13 @@ void GWIF_ProcessData (void)
 				else if(headerSensor == SCREEN_TOUCH_MODULE_TYPE){
 					vrts_ScreenT_Rsp = (screenTouch *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					uint16_t psceneScreenT = (vrts_ScreenT_Rsp->sceneID[0]) |(vrts_ScreenT_Rsp->sceneID[1]<<8);
+					if(psceneScreenT)
+					{
+
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, psceneScreenT,\
+								NULL16,NULL16, NULL16, NULL16, NULL16, 17);
+						usleep(400000);
+					}
 					uint8_t *buttonId_String;
 					if(vrts_ScreenT_Rsp->buttonID == 1){
 						buttonId_String = "BUTTON_1";
@@ -374,6 +381,7 @@ void GWIF_ProcessData (void)
 					json_object *data_Remote = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr, &button);
 					json_component data_Remote_Json = {"DATA",data_Remote,json_type_object};
 					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Sensor_Json, &data_Remote_Json);
+
 				}
 				else if (headerSensor == POWER_TYPE){
 					vrts_Battery_Rsp = (batteryRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);

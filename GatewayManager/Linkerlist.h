@@ -11,33 +11,57 @@ extern "C" {
 #include <stdlib.h>
 
 /*
- *Struct buffer save adr cmd control to db
+ *Struct of node of linker
+ *poniter message: message mqtt send to
+ *buffer_wait * next: link to next node
  */
 struct buffer_wait{
-	char *adr_buf;
+	char *message;
 	struct buffer_wait * next;
 };
+
 typedef struct buffer_wait *vrts_buff;
+//extern bool flag_process_available;
+
+extern vrts_buff head;
 
 /*
  *Create node save adr data from db
+ *
+ *para message: message of mqtt send to
+ *return a node of linker list
  */
-vrts_buff Create_buffer(char * adr_buf);
+vrts_buff Create_buffer(char * message);
 
 /*
- *Add new data to db into tail of linkerlist
+ *Add new data to database into tail of linkerlist
+ *
+ *para head head of linker list
+ *para message data of node in linker list
+ *return head of linker list
  */
-vrts_buff AddTail(vrts_buff head, char * adr_buf);
+vrts_buff AddTail(vrts_buff head, char * message);
 
 /*
- *Del old data 
+ *Del old data to head linker list
+ *
+ *para head: head of linker list
+ *return head of linker list
  */
 vrts_buff DellHead(vrts_buff head);
 
 /*
  *Init head of linkerlist
+ *
+ *para NULL
+ *return head of linker list
  */
 vrts_buff InitHead();
+
+/*
+ *Get data to buffer 
+ */
+void Process(vrts_buff head);
 
 #ifdef __cplusplus
 }

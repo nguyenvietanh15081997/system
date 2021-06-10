@@ -8,11 +8,16 @@
 #include "../GatewayManager/Light.h"
 #include "../GatewayManager/JsonProcess.h"
 #include "../GatewayManager/slog.h"
+#include "../GatewayManager/Linkerlist.h"
 
 char *pHeaderMqtt = "mqtt";
 struct mosquitto *mosq;
 unsigned char qos =2;
 int run = 1;
+
+// Init linkerlist
+vrts_buff head;
+
 void handle_signal(int s)
 {
 	run = 0;
@@ -35,7 +40,9 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 	if(json_tokener_parse(msg)!= NULL)
 	{
 		struct json_obj* jobj = json_tokener_parse(msg);
-		Json_Parse(jobj);
+		//Json_Parse(jobj);
+		AddTail(head, msg);
+		ProcessNode(head);
 	}
 }
 
@@ -44,7 +51,6 @@ void * MQTT_Thread(void *argv)
 		char clientid[24];
 		int rc = 0;
 		int abc = 0;
-
 		signal(SIGINT, handle_signal);
 		signal(SIGTERM, handle_signal);
 
