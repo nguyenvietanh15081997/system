@@ -102,6 +102,12 @@ extern cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
 /*header ask temp, hum, pm in pm sensor*/
 #define HEADER_ASK_PM							(0x0700)
 
+/*header of curtains*/
+#define HEADER_CONTROL_CURTAIN                	(0x0011)
+#define HEADER_SET_SCENE_CURTAIN				(0x0111)
+#define HEADER_DEL_SCENE_CURTAIN				(0x0211)
+#define HEADER_ASK_STATUS_CURTAIN      			(0x0311)
+
 #define NULL8    0x00
 #define NULL16   0x0000
 
@@ -209,6 +215,11 @@ typedef enum{
 	DelSceneForScreenT_vendor_typedef			,
 	SendTempHumForScreenT_vendor_typedef		,
 	SendTimeForScreenT_vendor_typedef			,
+
+	ControlCurtain_vendor_typedef				,
+	SetSceneCurtain_vendor_typedef				,
+	DelSceneCurtain_vendor_typedef				,
+	AskSceneCurtain_vendor_typedef				,
 
 	SceneForRGB_vendor_typedef 	  		,
 	CallSceneRgb_vendor_typedef   		,

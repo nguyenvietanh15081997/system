@@ -57,6 +57,7 @@ typedef struct jsonstring
 	json_object *switch4;
 	json_object *cct_object;
 	json_object *rgb_cct_object;
+	json_object *curtain_object;
 
 	json_object *data;//
 	uint8_t *cmd;//

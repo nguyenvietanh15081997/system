@@ -787,12 +787,63 @@ void AskPm(uint16_t adrPmSensor){
 	vrts_CMD_STRUCTURE_VENDOR.para[0] = (HEADER_ASK_PM) & 0xFF;
 	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_ASK_PM >>8 ) & 0xFF;
 }
+void ControlCurtains(uint16_t adrCurtain, uint8_t controlStt, uint8_t percentOpen){
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrCurtain & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrCurtain>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = HEADER_CONTROL_CURTAIN & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_CONTROL_CURTAIN>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = controlStt & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = percentOpen & 0xFF;
+}
+void SetSceneCurtains(uint16_t adrCurtain, uint16_t sceneID){
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrCurtain & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrCurtain>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = HEADER_SET_SCENE_CURTAIN & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_SET_SCENE_CURTAIN>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = sceneID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = (sceneID>>8) & 0xFF;
+}
+void DelSceneCurtains(uint16_t adrCurtain, uint16_t sceneID){
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrCurtain & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrCurtain>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = HEADER_DEL_SCENE_CURTAIN & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_DEL_SCENE_CURTAIN>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[2] = sceneID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[3] = (sceneID>>8) & 0xFF;
+}
+void AskStatusCurtain(uint16_t adrCurtain){
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[0] = adrCurtain & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.adr_dst[1] = (adrCurtain>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[0] = RD_OPCODE_SCENE_SEND & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[1] = VENDOR_ID & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.opCode[2] = (VENDOR_ID>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[0] = STATUS_CMD_SCENE & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.status_cmd[1] = (STATUS_CMD_SCENE>>8) & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[0] = HEADER_ASK_STATUS_CURTAIN & 0xFF;
+	vrts_CMD_STRUCTURE_VENDOR.para[1] = (HEADER_ASK_STATUS_CURTAIN>>8) & 0xFF;
+}
+
 void Function_Vendor(uint16_t cmd,\
 		functionTypeDef Func_vendor,\
 		uint16_t adr,\
 		uint16_t header_destination,\
-		uint8_t buttonID,\
-		uint8_t modeID,\
+		uint8_t buttonID_controlCurtain,\
+		uint8_t modeID_percentOpen,\
 		uint8_t status_door,\
 		uint16_t condition_lightness,\
 		uint16_t low_lux_switch1_2_socket1_2,\
@@ -816,16 +867,16 @@ void Function_Vendor(uint16_t cmd,\
 	vrts_CMD_STRUCTURE_VENDOR.retry_cnt = parRetry_cnt;
 	vrts_CMD_STRUCTURE_VENDOR.rsp_max = parRsp_Max;
 	if(Func_vendor == SceneForRemote_DC_vendor_typedef){
-		SetSceneForRemote_DC(adr, buttonID, modeID, sceneID, appID, srgbID);
+		SetSceneForRemote_DC(adr, buttonID_controlCurtain, modeID_percentOpen, sceneID, appID, srgbID);
 	}
 	else if(Func_vendor == DelSceneForRemote_DC_vendor_typedef){
-		DelSceneForRemote_DC(adr, buttonID, modeID);
+		DelSceneForRemote_DC(adr, buttonID_controlCurtain, modeID_percentOpen);
 	}
 	else if(Func_vendor == SceneForRemote_AC_vendor_typedef){
-		SetSceneForRemote_AC(adr, buttonID, modeID, sceneID, appID, srgbID);
+		SetSceneForRemote_AC(adr, buttonID_controlCurtain, modeID_percentOpen, sceneID, appID, srgbID);
 	}
 	else if(Func_vendor == DelSceneForRemote_AC_vendor_typedef){
-		DelSceneForRemote_AC(adr, buttonID, modeID);
+		DelSceneForRemote_AC(adr, buttonID_controlCurtain, modeID_percentOpen);
 	}
 	else if(Func_vendor == SceneForSensor_LightPir_vendor_typedef){
 		RD_Sensor_data_tdef dataScene_Pir_Light_cmd1;
@@ -878,10 +929,10 @@ void Function_Vendor(uint16_t cmd,\
 		DelSceneForSocket1(adr, sceneID);
 	}
 	else if(Func_vendor == SceneForScreenT_vendor_typedef){
-		SceneForTouchScreen(adr, buttonID, sceneID,srgbID);
+		SceneForTouchScreen(adr, buttonID_controlCurtain, sceneID,srgbID);
 	}
 	else if(Func_vendor == DelSceneForScreenT_vendor_typedef){
-		DelSceneForTouchScreen(adr, buttonID);
+		DelSceneForTouchScreen(adr, buttonID_controlCurtain);
 	}
 	else if(Func_vendor == SendTempHumForScreenT_vendor_typedef){
 		SendTempHumForScreenT(adr, temp, hum);
@@ -916,6 +967,18 @@ void Function_Vendor(uint16_t cmd,\
 	}
 	else if(Func_vendor == AskPm_vendor_typedef){
 		AskPm(adr);
+	}
+	else if(Func_vendor == ControlCurtain_vendor_typedef){
+		ControlCurtains(adr, buttonID_controlCurtain, modeID_percentOpen);
+	}
+	else if(Func_vendor == SetSceneCurtain_vendor_typedef){
+		SetSceneCurtains(adr, sceneID);
+	}
+	else if(Func_vendor == DelSceneCurtain_vendor_typedef){
+		DelSceneCurtains(adr, sceneID);
+	}
+	else if(Func_vendor == AskSceneCurtain_vendor_typedef){
+		AskStatusCurtain(adr);
 	}
 
 	uint8_t *tempDataUart;

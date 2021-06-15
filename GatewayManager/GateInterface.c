@@ -13,6 +13,7 @@
 #include "../GatewayManager/slog.h"
 #include "../GatewayManager/LedProcess.h"
 #include "../GatewayManager/Ds1307.h"
+#include "../GatewayManager/Linkerlist.h"
 
 static ringbuffer_t 		vrts_ringbuffer_Data;
 static mraa_uart_context	vrts_UARTContext;
@@ -298,6 +299,9 @@ void GWIF_ProcessData (void)
  */
 			if(vrts_GWIF_IncomeMessage->Message[0]==HCI_GATEWAY_RSP_OP_CODE && vrts_GWIF_IncomeMessage->Message[5] == (SENSOR_TYPE & 0xFF)){
 				uint16_t adr = (vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8));
+				if(adr == unicastId){
+					flag_check_rsp = true;
+				}
 				uint16_t headerSensor = vrts_GWIF_IncomeMessage->Message[6] | (vrts_GWIF_IncomeMessage->Message[7]<<8);
 
 				json_component jsonAdr = {"DEVICE_UNICAST_ID",adr,json_type_int};
@@ -538,6 +542,9 @@ void GWIF_ProcessData (void)
 				uint16_t h,s,l;
 				valueOpcode = (vrts_GWIF_IncomeMessage->Message[5] | (vrts_GWIF_IncomeMessage->Message[6]<<8));
 				jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+				if(jsonadr == unicastId){
+					flag_check_rsp = true;
+				}
 				json_component adr = {"DEVICE_UNICAST_ID",jsonadr,json_type_int};
 				switch (valueOpcode){
 				case G_ONOFF_STATUS:
@@ -665,6 +672,9 @@ void GWIF_ProcessData (void)
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_RSP_OP_CODE)
 			{
 				uint16_t jsonAdr =  (vrts_GWIF_IncomeMessage->Message[1]) | (vrts_GWIF_IncomeMessage->Message[2]<<8);
+				if(jsonAdr == unicastId){
+					flag_check_rsp = true;
+				}
 				uint16_t jsonAdrgw= vrts_GWIF_IncomeMessage->Message[3] | (vrts_GWIF_IncomeMessage->Message[4]<<8);
 				uint8_t opcodevendor = vrts_GWIF_IncomeMessage->Message[5];
 				uint16_t vendorid = (vrts_GWIF_IncomeMessage->Message[6])|(vrts_GWIF_IncomeMessage->Message[7]<<8);

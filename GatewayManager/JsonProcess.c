@@ -685,6 +685,27 @@ void JsonControl(json_object *jobj,char *key){
 				NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
 		usleep(400000);
 	}
+	else if(strcmp(vrts_Json_String.cmd,"CONTROL_CURTAIN") == 0){
+		vrts_Json_String.curtain_object = json_object_object_get(vrts_Json_String.data,"CURTAIN_STATUS");
+		vrts_Json_String.onoff = json_object_get_int(json_object_object_get(vrts_Json_String.curtain_object, "STATUS"));
+		vrts_Json_String.modeid = json_object_get_int(json_object_object_get(vrts_Json_String.curtain_object,"PERCENT"));
+		Function_Vendor(HCI_CMD_GATEWAY_CMD, ControlCurtain_vendor_typedef, vrts_Json_String.adr, NULL16, vrts_Json_String.onoff, vrts_Json_String.modeid,\
+				NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
+	}
+	else if(strcmp(vrts_Json_String.cmd,"ADDSCENE_CURTAIN") == 0){
+		vrts_Json_String.sceneID = json_object_get_int(json_object_object_get(vrts_Json_String.data, "SCENEID"));
+		Function_Vendor(HCI_CMD_GATEWAY_CMD, SetSceneCurtain_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
+				NULL16, NULL16, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
+	}
+	else if(strcmp(vrts_Json_String.cmd,"DELSCENE_CURTAIN") == 0){
+		vrts_Json_String.sceneID = json_object_get_int(json_object_object_get(vrts_Json_String.data, "SCENEID"));
+		Function_Vendor(HCI_CMD_GATEWAY_CMD, DelSceneCurtain_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
+				NULL16, NULL16, NULL16, NULL16, NULL16, vrts_Json_String.sceneID, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
+	}
+	else if(strcmp(vrts_Json_String.cmd,"ASK_STATUS_CURTAIN") == 0){
+		Function_Vendor(HCI_CMD_GATEWAY_CMD, AskSceneCurtain_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
+				NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
+	}
 	vrts_Json_String.cmd = "\0";
 }
 

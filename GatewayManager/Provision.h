@@ -43,6 +43,8 @@ extern unsigned int Timeout_CheckDataBuffer;
 extern unsigned char scanNotFoundDev;
 extern unsigned int adr_heartbeat;
 
+extern uint16_t unicastId;
+
 extern pthread_t tmp ;
 
 /*

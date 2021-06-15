@@ -39,10 +39,13 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 	slog_info("(%s)Message_receive: %s",pHeaderMqtt,msg);
 	if(json_tokener_parse(msg)!= NULL)
 	{
-		struct json_obj* jobj = json_tokener_parse(msg);
-		//Json_Parse(jobj);
+//		struct json_obj* jobj = json_tokener_parse(msg);
+//		Json_Parse(jobj);
+		pthread_mutex_trylock(&vrpth_LinkerList);
 		AddTail(head, msg);
-		ProcessNode(head);
+		ShowLL(head);
+		//ProcessNode(head);
+		pthread_mutex_unlock(&vrpth_LinkerList);
 	}
 }
 

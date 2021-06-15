@@ -8,6 +8,7 @@
 #include "../GatewayManager/LedProcess.h"
 #include "../GatewayManager/JsonProcess.h"
 #include "../GatewayManager/MQTT.h"
+#include "../GatewayManager/Linkerlist.h"
 
 pthread_t tmp;
 pthread_t vrts_System_Gpio;
@@ -44,8 +45,11 @@ bool flag_checkHB           = false;
 bool flag_checkSaveGW		= false;
 bool flag_checkTypeDEV 		= false;
 
+uint16_t unicastId;
 void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 {
+	unicastId = message[8] | (message[9]<<8);
+	printf("unicastID: %d\n",unicastId);
 	pthread_mutex_lock(&vrpth_SHAREMESS_Send2GatewayLock);
 	vrb_SHAREMESS_Send2GatewayAvailabe = true;
 	vrui_SHAREMESS_Send2GatewayLength = lengthmessage;

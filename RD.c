@@ -23,6 +23,7 @@ pthread_t vrts_System_TestSend;
 pthread_t vrts_System_MQTT;
 pthread_t vrts_System_Time;
 pthread_t vrts_System_Gpio;
+pthread_t vrts_System_Linkerlist;
 
 
 SLogConfig slgCfg;
@@ -50,9 +51,11 @@ int main(void) {
     pthread_create(&vrts_System_MQTT,   NULL,   MQTT_Thread,    NULL);
     //pthread_create(&vrts_System_Time,NULL,Time_Thread, NULL);
     pthread_create(&tmp1,NULL,Led_Thread,NULL);
+    pthread_create(&vrts_System_Linkerlist, NULL, LinkerList_Thread, NULL);
 
     pthread_join(vrts_System_ThreadGWIF, NULL);
     pthread_join(vrts_System_MQTT,NULL);
+    //pthread_join(vrts_System_Linkerlist, NULL);
     //pthread_join(vrts_System_Time, NULL);
     //pthread_join(vrts_System_Gpio,NULL);
 

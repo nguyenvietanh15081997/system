@@ -9,6 +9,7 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
+#include "pthread.h"
 
 /*
  *Struct of node of linker
@@ -21,10 +22,11 @@ struct buffer_wait{
 };
 
 typedef struct buffer_wait *vrts_buff;
-//extern bool flag_process_available;
+extern bool flag_check_rsp;
+extern int timeoutRsp;
 
 extern vrts_buff head;
-
+extern pthread_t vrpth_LinkerList;
 /*
  *Create node save adr data from db
  *
@@ -59,9 +61,15 @@ vrts_buff DellHead(vrts_buff head);
 vrts_buff InitHead();
 
 /*
+ * Show linker list
+ *
+ */
+void ShowLL(vrts_buff head);
+
+/*
  *Get data to buffer 
  */
-void Process(vrts_buff head);
+void *LinkerList_Thread(void *argv);
 
 #ifdef __cplusplus
 }
