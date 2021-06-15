@@ -59,8 +59,6 @@ void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 		strcat(tempDataLog,temp);
 	}
 	slog_info("(cmd)%s",tempDataLog);
-	//usleep(400000);
-	//usleep(500000);
 }
 void *ProvisionThread (void *argv )
 {
@@ -139,13 +137,16 @@ void *ProvisionThread (void *argv )
 		{
 			flag_setpro = false;
 			srand((int)time(0));
-			int random;
+			int random1,random2;
 			int i;
 			for(i=0;i<16;i++)
 			{
-				random=rand()%256;
-				setpro_internal[i+3]=random;
+				random1=rand()%256;
+				random2=rand()%256;
+				setpro_internal[i+3]=random1;
+				admit_pro_internal[i+5]=random2;
 			}
+			//srand((int)time(0));
 			slog_print(SLOG_INFO, 1, "<provision>SETPRO....");
 			ControlMessage(28, setpro_internal);
 			slog_print(SLOG_INFO, 1, "<provision>ADMITPRO...");
@@ -186,6 +187,14 @@ void *ProvisionThread (void *argv )
 		{
 			flag_provision = false;
 			//sleep(1);
+			srand((int)time(0));
+			int random;
+			int i;
+			for(i=0;i<16;i++)
+			{
+				random=rand()%256;
+				OUTMESSAGE_BindingALl[i+6]=random;
+			}
 			ControlMessage(22, OUTMESSAGE_BindingALl);
 			slog_print(SLOG_INFO, 1, "<provision>BINDING ALL");
 			flag_set_type = false;

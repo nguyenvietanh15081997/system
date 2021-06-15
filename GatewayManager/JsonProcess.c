@@ -169,7 +169,7 @@ void JsonControl(json_object *jobj,char *key){
 			flag_check_select_mac  = false;
 			flag_done          = true;
 			flag_set_type = false;
-
+			ControlMessage(3, OUTMESSAGE_ScanStop);
 			struct json_object *object;
 			object = json_object_new_object();
 			json_object_object_add(object, "CMD", json_object_new_string("STOP"));
@@ -183,7 +183,25 @@ void JsonControl(json_object *jobj,char *key){
 			led_pin_off(gpio[LED_BLE_PIN_INDEX]);
 		 }
 		 else if(strcmp(vrts_Json_String.cmd,"RESETNODE")==0){
-			 check_resetnode = true;
+			 enum json_type type;
+			 int valueArray[100];
+			 json_object *array_object = json_object_object_get(jobj,"ADR");
+			 type = json_object_get_type(array_object);
+			 if(type == json_type_array){
+				 int arrayLength = json_object_array_length(array_object);
+				 int i;
+				 for(i=0;i<arrayLength;i++){
+					 json_object * value_Object = json_object_array_get_idx(array_object, i);
+					 type = json_object_get_type(value_Object);
+					 if(type == json_type_int){
+						 valueArray[i]= json_object_get_int(value_Object);
+						 //printf("Array[%d] = %d\n",i,valueArray[i]);
+						 FunctionPer(HCI_CMD_GATEWAY_CMD, ResetNode_typedef, valueArray[i], NULL8, NULL8, \
+								 NULL16, NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, NULL16, 12);
+						 usleep(400000);
+					 }
+				 }
+			 }
 		 }
 		 else if(strcmp(vrts_Json_String.cmd,"SETSCENEFORREMOTE") == 0){
 			 vrts_Json_String.adr        	= (json_object_get_int(json_object_object_get(jobj,"ADR")));
@@ -371,11 +389,15 @@ void JsonControl(json_object *jobj,char *key){
 		 }
 		 else if(strcmp(vrts_Json_String.cmd,"DELHC") ==0 ){
 			 ControlMessage(3, reset_GW);
+			 slog_print(SLOG_INFO, 1, "RESET_GATEWAY...");
+			 sleep(5);
 			 FILE *file;
 			 char filename[]= "device_key.txt";
 			 if((file = fopen(filename,"r"))){
 				 remove(filename);
 			 }
+			 slog_print(SLOG_INFO, 1, "RESET_DONE");
+			 GWIF_Init();
 		 }
 	 }
 	 if(strcmp(key,"UPDATE")==0){

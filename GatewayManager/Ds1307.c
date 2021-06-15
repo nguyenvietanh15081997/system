@@ -10,6 +10,7 @@
 uint8_t dataDecTimeDs1307[7];
 uint8_t dataBcdTimeDs1307[7];
 uint8_t dataTimeInternet[7];
+uint8_t dataTest[128];
 
 #define I2C_BUS     0
 #define DS1307_ADDR 0x68
@@ -28,7 +29,6 @@ uint8_t DEC2BCD(uint8_t dataDEC)
 
 void Ds1307_Init()
 {
-
 	i2c = mraa_i2c_init(I2C_BUS);
 	mraa_i2c_frequency(i2c, 0);
 	mraa_i2c_address(i2c, DS1307_ADDR);
@@ -44,13 +44,13 @@ void TimeForDs1307()
 	for(i=0;i<7;i++){
 		dataDecTimeDs1307[i]= BCD2DEC(dataBcdTimeDs1307[i]);
 	}
-	char arrayTime[200]="";
-	char tempTime[4];
-	for(i=0;i<7;i++){
-		sprintf(tempTime,"%d ",dataDecTimeDs1307[i]);
-		strcat(arrayTime,tempTime);
-	}
-	//slog_trace("%s",arrayTime);
+//	char arrayTime[200]="";
+//	char tempTime[4];
+//	for(i=0;i<7;i++){
+//		sprintf(tempTime,"%d ",dataDecTimeDs1307[i]);
+//		strcat(arrayTime,tempTime);
+//	}
+//	slog_trace("%s",arrayTime);
 }
 
 /*
@@ -153,15 +153,29 @@ void SetTimeForDs1307(uint8_t seconds, uint8_t minutes, uint8_t hours, uint8_t d
 void * Time_Thread(void *argv)
 {
 	Ds1307_Init();
-	int time = 0 ;
-	int value_Dim =100;
-	while(1)
-	{
-		TimeForInternet();
-//		Function_Vendor(HCI_CMD_GATEWAY_CMD, SendTimeForScreenT_vendor_typedef, 65535, NULL16, NULL8, NULL8, NULL8, NULL16, NULL16, \
-//				NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, dataTimeInternet[0], dataTimeInternet[1], NULL8, NULL16, 23);
-//		sleep(30);
-		//if(dataTimeInternet)
-	}
+//	dataTest[0] = 0xe8;
+//	dataTest[1] = 0xff;
+//	dataTest[2] = dataTest[3] = dataTest[4] = dataTest[5] = 0x00;
+//	dataTest[6] = 0x02; dataTest[7] = 0x00;
+//	dataTest[8] = 0x0a;dataTest[9] = 0x00;
+//	dataTest[10] = 0xe2; dataTest[11] = 0x11; dataTest[12] = 0x02;
+//	dataTest[13] = 0xe3; dataTest[14] = 0x00;
+//	dataTest[15] = 0x03; dataTest[16] = 0x00;
+//	dataTest[17] = 0x19; dataTest[18] = 0x00;
+//	dataTest[19] = 0x03;
+//	int i;
+//	for(i=20;i<128;i++){
+//		dataTest[i]=i;
+//	}
+//	uint8_t *message = (uint8_t *)(&dataTest);
+//	ControlMessage(128, message);
+//	sleep(1);
+//	ControlMessage(128, message);
+//	while(1)
+//	{
+//		puts("prepare send data");
+//		ControlMessage(128, message);
+//		sleep(2);
+//	}
 	return NULL;
 }
