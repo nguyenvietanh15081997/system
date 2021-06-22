@@ -13,7 +13,7 @@
 char *pHeaderCmd= "cmd";
 cmdcontrol_t vrts_CMD_STRUCTURE;
 cmdcontrol_vendor vrts_CMD_STRUCTURE_VENDOR;
-uint8_t parRetry_cnt = 0x02;
+uint8_t parRetry_cnt = 0x01;
 uint8_t parRsp_Max = 0x00;
 uint8_t parFuture = 0;
 

@@ -151,19 +151,19 @@ void JsonControl(json_object *jobj,char *key){
 		vrts_Json_String.onoff 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"VALUE_ONOFF"));
 		FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,vrts_Json_String.adr ,NULL8, vrts_Json_String.onoff, NULL16, NULL16, NULL16,\
 				NULL16,NULL16, NULL16, NULL16, NULL16, 14);
-		usleep(400000);
+		//usleep(400000);
 	}
 	else if(strcmp(vrts_Json_String.cmd,"CCT") == 0){
 		vrts_Json_String.cct 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"VALUE_CCT"));
 		FunctionPer(HCI_CMD_GATEWAY_CMD, CCT_Set_typedef, (vrts_Json_String.adr), NULL8, NULL8, NULL16,Percent2ParamCCT(vrts_Json_String.cct),\
 				NULL16, NULL16,NULL16, NULL16, NULL16, NULL16, 17);
-		usleep(400000);
+		//usleep(400000);
 	}
 	else if(strcmp(vrts_Json_String.cmd,"DIM") == 0){
 		vrts_Json_String.dim 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"VALUE_DIM"));
 		FunctionPer(HCI_CMD_GATEWAY_CMD, Lightness_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, Percent2ParamDIM(vrts_Json_String.dim),\
 				NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, NULL16, 15);
-		usleep(400000);
+		//usleep(400000);
 	}
 	else if(strcmp(vrts_Json_String.cmd,"HSL") == 0){
 		vrts_Json_String.hue 		= json_object_get_int(json_object_object_get(vrts_Json_String.data,"VALUE_H"));
@@ -211,9 +211,10 @@ void JsonControl(json_object *jobj,char *key){
 				if(flag_check_device_unicast_id){
 					flag_check_device_unicast_id = false;
 					for(i=0;i<arraylen;i++){
+						usleep(500000);
 						FunctionPer(HCI_CMD_GATEWAY_CMD, AddSence_typedef, adr_dv[i], NULL8, NULL8, NULL16, NULL16, \
 								vrts_Json_String.sceneID, NULL16,NULL16, NULL16, NULL16, NULL16, 14);
-						usleep(400000);
+						//usleep(400000);
 					}
 				}
 				arraylen = 0;
@@ -706,7 +707,20 @@ void JsonControl(json_object *jobj,char *key){
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, AskSceneCurtain_vendor_typedef, vrts_Json_String.adr, NULL16, NULL8, NULL8, NULL8, \
 				NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 17);
 	}
+	else if(strcmp(vrts_Json_String.cmd,"DELHC") == 0){
+		 ControlMessage(3, reset_GW);
+		 slog_print(SLOG_INFO, 1, "RESET_GATEWAY...");
+		 sleep(6);
+		 FILE *file;
+		 char filename[]= "device_key.txt";
+		 if((file = fopen(filename,"r"))){
+			 remove(filename);
+		 }
+		 slog_print(SLOG_INFO, 1, "RESET_DONE");
+		 GWIF_Init();
+	}
 	vrts_Json_String.cmd = "\0";
+	vrts_Json_String.adr = 0;
 }
 
 /*

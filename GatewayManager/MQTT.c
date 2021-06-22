@@ -15,9 +15,6 @@ struct mosquitto *mosq;
 unsigned char qos =2;
 int run = 1;
 
-// Init linkerlist
-vrts_buff head;
-
 void handle_signal(int s)
 {
 	run = 0;
@@ -33,6 +30,8 @@ void connect_callback(struct mosquitto *mosq, void *obj, int result)
 	slog_info("(%s)%s: Connect callback, rc=%d",pHeaderMqtt,mqtt_host,result);
 	mqtt_send(mosq,"RD_STATUS","{\"CMD\":\"CONNECTED\"}");
 }
+
+pthread_rwlock_t rwlock;
 void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
 {
 	char* msg = (char*)message->payload;
@@ -42,6 +41,7 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 //		struct json_obj* jobj = json_tokener_parse(msg);
 //		Json_Parse(jobj);
 		pthread_mutex_trylock(&vrpth_LinkerList);
+		//while(pthread_mutex_lock(&vrpth_LinkerList) != 0){}
 		AddTail(head, msg);
 		ShowLL(head);
 		//ProcessNode(head);

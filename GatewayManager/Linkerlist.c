@@ -5,25 +5,34 @@
 
 #include <time.h>
 
-clock_t start, end;
-
+clock_t start_t,end_t,total_t;
+//void Clock_Time(){
+//	start_t = clock();
+//	do{
+//		end_t= clock();
+//		total_t = (double)(end_t-start_t)/CLOCKS_PER_SEC;
+//	}
+//	while(total_t != 40000000);
+//}
 typedef struct buffer_wait *vrts_buff;
 
 vrts_buff head = NULL;
 bool flag_check_rsp = true;
-int timeoutRsp = 0;
+long long timeoutRsp = 0;
 
 pthread_t vrpth_LinkerList= PTHREAD_MUTEX_INITIALIZER;
 
 vrts_buff Create_buffer(char * message){
 	//puts("Create buffer save msg");
 	int length = strlen(message);
-	char *create_buffer = (char *)malloc(length);
+	char *create_buffer = (char *)malloc(length + 1);
 	strcpy(create_buffer,message);
+	*(create_buffer + length) = '\0';
 	vrts_buff newdata;
 	newdata = (vrts_buff)malloc(sizeof(struct buffer_wait));
 	newdata->message = create_buffer;
 	newdata->next = NULL;
+	//free(create_buffer);
 	return newdata;
 }
 
@@ -76,34 +85,61 @@ void ShowLL(vrts_buff head){
 	}
 }
 
+bool mode_setup = true;
+uint8_t time_Send_setup = 0;
+bool get_start_time = true;
+bool flag_new_send = true;
+
 void *LinkerList_Thread(void *argv)
 {
 	while(1){
-		//pthread_mutex_trylock(&vrpth_LinkerList);
-		//puts("into process linker list");
+		while(pthread_mutex_lock(&vrpth_LinkerList) != 0){
+
+		}
 		if(head != NULL){
-			if(head->next == NULL){
-				timeoutRsp = 0;
-				struct json_obj* jobj = json_tokener_parse(head->message);
-				Json_Parse(jobj);
-				head = DellHead(head);
-			}
-			else {
-				timeoutRsp++;
-				slog_print(SLOG_INFO, 1, "timeout= %d",timeoutRsp);
-				if((flag_check_rsp == true) || (timeoutRsp == 64)){
+			if(mode_setup){
+				//pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
+				printf("\tflag_check = %d\n",flag_check_rsp);
+				flag_check_rsp = 0;
+				get_start_time = true;
+				while(!flag_check_rsp){
+					if(get_start_time){
+						get_start_time = false;
+						start_t =clock();
+						puts("GET START TIME");
+					}
+					end_t = clock();
+					if(flag_check_rsp){
+						printf("ABOUT TIME = %f\n",(double)(end_t-start_t));
+					}
+					//pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
+					//printf("\tflag_check = %d\n",flag_check_rsp);
 					//slog_print(SLOG_INFO, 1, "timeout= %d",timeoutRsp);
-					//puts("done rsp");
-					flag_check_rsp = false;
-					timeoutRsp =0;
-					//slog_print(SLOG_INFO, 1, "timeout= %d",timeoutRsp);
-					struct json_obj* jobj = json_tokener_parse(head->message);
-					Json_Parse(jobj);
-					head = DellHead(head);
+					//printf("%d\n",timeoutRsp);
+					if(((double)(end_t - start_t)) >= 450000){
+						get_start_time = true;
+						puts("PROCESS JSON AND SEND CMD");
+						struct json_obj* jobj = json_tokener_parse(head->message);
+						Json_Parse(jobj);
+						time_Send_setup++;
+						if(time_Send_setup == 3){
+							puts("3 TIME SEND");
+							time_Send_setup = 0;
+							//pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
+							flag_check_rsp = true;
+							//pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
+						}
+					}
+					//pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
+					usleep(1000);
 				}
+				head = DellHead(head);
+				printf("\tDELETE LINKER LIST\n");
+				ShowLL(head);
 			}
 		}
-		//pthread_mutex_unlock(&vrpth_LinkerList);
+		pthread_mutex_unlock(&vrpth_LinkerList);
+		usleep(1000);
 	}
 	return NULL;
 }

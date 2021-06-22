@@ -49,7 +49,7 @@ uint16_t unicastId;
 void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 {
 	unicastId = message[8] | (message[9]<<8);
-	printf("unicastID: %d\n",unicastId);
+	//printf("unicastID: %d\n",unicastId);
 	pthread_mutex_lock(&vrpth_SHAREMESS_Send2GatewayLock);
 	vrb_SHAREMESS_Send2GatewayAvailabe = true;
 	vrui_SHAREMESS_Send2GatewayLength = lengthmessage;

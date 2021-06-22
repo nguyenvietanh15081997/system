@@ -299,8 +299,12 @@ void GWIF_ProcessData (void)
  */
 			if(vrts_GWIF_IncomeMessage->Message[0]==HCI_GATEWAY_RSP_OP_CODE && vrts_GWIF_IncomeMessage->Message[5] == (SENSOR_TYPE & 0xFF)){
 				uint16_t adr = (vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8));
+
 				if(adr == unicastId){
+					//pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
 					flag_check_rsp = true;
+					puts("RSP OF remote sensor");
+					//pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
 				}
 				uint16_t headerSensor = vrts_GWIF_IncomeMessage->Message[6] | (vrts_GWIF_IncomeMessage->Message[7]<<8);
 
@@ -543,7 +547,11 @@ void GWIF_ProcessData (void)
 				valueOpcode = (vrts_GWIF_IncomeMessage->Message[5] | (vrts_GWIF_IncomeMessage->Message[6]<<8));
 				jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				if(jsonadr == unicastId){
+					//pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
 					flag_check_rsp = true;
+					puts("RSP OF LIGHT");
+					//pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
+
 				}
 				json_component adr = {"DEVICE_UNICAST_ID",jsonadr,json_type_int};
 				switch (valueOpcode){
@@ -673,8 +681,12 @@ void GWIF_ProcessData (void)
 			{
 				uint16_t jsonAdr =  (vrts_GWIF_IncomeMessage->Message[1]) | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				if(jsonAdr == unicastId){
+					//pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
 					flag_check_rsp = true;
+					puts("RSP OF opcode vendor");
+					//pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
 				}
+
 				uint16_t jsonAdrgw= vrts_GWIF_IncomeMessage->Message[3] | (vrts_GWIF_IncomeMessage->Message[4]<<8);
 				uint8_t opcodevendor = vrts_GWIF_IncomeMessage->Message[5];
 				uint16_t vendorid = (vrts_GWIF_IncomeMessage->Message[6])|(vrts_GWIF_IncomeMessage->Message[7]<<8);

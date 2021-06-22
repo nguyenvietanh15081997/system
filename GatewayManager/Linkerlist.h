@@ -23,7 +23,7 @@ struct buffer_wait{
 
 typedef struct buffer_wait *vrts_buff;
 extern bool flag_check_rsp;
-extern int timeoutRsp;
+extern long long timeoutRsp;
 
 extern vrts_buff head;
 extern pthread_t vrpth_LinkerList;
