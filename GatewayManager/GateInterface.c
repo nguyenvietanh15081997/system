@@ -301,10 +301,10 @@ void GWIF_ProcessData (void)
 				uint16_t adr = (vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8));
 
 				if(adr == unicastId){
-					//pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
-					flag_check_rsp = true;
-					puts("RSP OF remote sensor");
-					//pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
+					pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
+					hasRsp = true;
+					//puts("RSP OF remote sensor");
+					pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
 				}
 				uint16_t headerSensor = vrts_GWIF_IncomeMessage->Message[6] | (vrts_GWIF_IncomeMessage->Message[7]<<8);
 
@@ -516,6 +516,12 @@ void GWIF_ProcessData (void)
 					json_component data_Smoke_Json 	= {"DATA",data_Smoke,json_type_object};
 					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Smoke_Json);
 				}
+				else if(headerSensor == SMOKE_SENSOR_LOW_BATTERY){
+					json_component smoke_low_batery = {"SMOKE_POWER","LOW_BATTERY",json_type_string};
+					json_object *data_Smoke         = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr,&smoke_low_batery);
+					json_component data_Smoke_Json	= {"DATA",data_Smoke,json_type_object};
+					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Smoke_Json);
+				}
 				else if(headerSensor == SWITCH4_MODULE_TYPE){
 					uint8_t relay1 = vrts_GWIF_IncomeMessage->Message[8] & 0xFF;
 					uint8_t relay2 = vrts_GWIF_IncomeMessage->Message[9] & 0xFF;
@@ -547,10 +553,10 @@ void GWIF_ProcessData (void)
 				valueOpcode = (vrts_GWIF_IncomeMessage->Message[5] | (vrts_GWIF_IncomeMessage->Message[6]<<8));
 				jsonadr = vrts_GWIF_IncomeMessage->Message[1] | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				if(jsonadr == unicastId){
-					//pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
-					flag_check_rsp = true;
+					pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
+					hasRsp = true;
 					puts("RSP OF LIGHT");
-					//pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
+					pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
 
 				}
 				json_component adr = {"DEVICE_UNICAST_ID",jsonadr,json_type_int};
@@ -681,10 +687,10 @@ void GWIF_ProcessData (void)
 			{
 				uint16_t jsonAdr =  (vrts_GWIF_IncomeMessage->Message[1]) | (vrts_GWIF_IncomeMessage->Message[2]<<8);
 				if(jsonAdr == unicastId){
-					//pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
-					flag_check_rsp = true;
+					pthread_mutex_lock(&vrpth_SHAREMESS_FlagCheckRsp);
+					hasRsp = true;
 					puts("RSP OF opcode vendor");
-					//pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
+					pthread_mutex_unlock(&vrpth_SHAREMESS_FlagCheckRsp);
 				}
 
 				uint16_t jsonAdrgw= vrts_GWIF_IncomeMessage->Message[3] | (vrts_GWIF_IncomeMessage->Message[4]<<8);

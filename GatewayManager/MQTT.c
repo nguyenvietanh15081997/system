@@ -9,11 +9,18 @@
 #include "../GatewayManager/JsonProcess.h"
 #include "../GatewayManager/slog.h"
 #include "../GatewayManager/Linkerlist.h"
+#include <time.h>
 
+clock_t start, end;
 char *pHeaderMqtt = "mqtt";
 struct mosquitto *mosq;
 unsigned char qos =2;
 int run = 1;
+bool countdown= false;
+bool hasRsp = false;
+bool isSetup = true;
+uint8_t timeSendNode = 0;
+bool delHead = false;
 
 void handle_signal(int s)
 {
@@ -30,23 +37,57 @@ void connect_callback(struct mosquitto *mosq, void *obj, int result)
 	slog_info("(%s)%s: Connect callback, rc=%d",pHeaderMqtt,mqtt_host,result);
 	mqtt_send(mosq,"RD_STATUS","{\"CMD\":\"CONNECTED\"}");
 }
-
-pthread_rwlock_t rwlock;
+//bool waitTimeout(){
+//	if(countdown){
+//		start = clock();
+//		countdown = false;
+//	}
+//	end = clock();
+//	if((double)(start-end) == 400000){
+//		countdown = true;
+//		return true;
+//	}
+//}
 void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
 {
 	char* msg = (char*)message->payload;
 	slog_info("(%s)Message_receive: %s",pHeaderMqtt,msg);
 	if(json_tokener_parse(msg)!= NULL)
 	{
-//		struct json_obj* jobj = json_tokener_parse(msg);
-//		Json_Parse(jobj);
-		pthread_mutex_trylock(&vrpth_LinkerList);
-		//while(pthread_mutex_lock(&vrpth_LinkerList) != 0){}
-		AddTail(head, msg);
-		ShowLL(head);
-		//ProcessNode(head);
-		pthread_mutex_unlock(&vrpth_LinkerList);
+			AddTail(head, msg);
+			ShowLL(head);
+			countdown= true;
 	}
+	if(head != NULL){
+		hasRsp = false;
+		while(!hasRsp){
+			if(countdown){
+				countdown = false;
+				start = clock();
+			}
+
+			end = clock();
+			if(((double)(end-start) >= 500000) || (hasRsp == true)){
+				countdown = true;
+				struct json_object * jobj = json_tokener_parse(head->message);
+				Json_Parse(jobj);
+				timeSendNode++;
+				if(timeSendNode == 3){
+					delHead = true;
+					timeSendNode = 0;
+					hasRsp = true;
+				}
+			}
+		}
+		if((hasRsp == true) || (delHead == true)){
+			delHead = false;
+			hasRsp = false;
+			head = DellHead(head);
+			//printf("DELETE LINKER LIST\n");
+			ShowLL(head);
+		}
+	}
+	usleep(100);
 }
 
 void * MQTT_Thread(void *argv)

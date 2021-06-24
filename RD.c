@@ -23,7 +23,6 @@ pthread_t vrts_System_TestSend;
 pthread_t vrts_System_MQTT;
 pthread_t vrts_System_Time;
 pthread_t vrts_System_Gpio;
-pthread_t vrts_System_Linkerlist;
 
 
 SLogConfig slgCfg;
@@ -37,6 +36,7 @@ SLogConfig slgCfg;
 int main(void) {
 
 	puts("--------------Start system-----------------");
+	//config logfile
 	slog_init("logfile", SLOG_FLAGS_ALL, 1);
 	slog_config_get(&slgCfg);
 	slgCfg.eColorFormat = SLOG_COLOR_DISABLE;
@@ -49,18 +49,16 @@ int main(void) {
 
     pthread_create(&vrts_System_ThreadGWIF, NULL, GWINF_Thread, NULL);
     pthread_create(&vrts_System_MQTT,   NULL,   MQTT_Thread,    NULL);
-    //pthread_create(&vrts_System_Time,NULL,Time_Thread, NULL);
+//    pthread_create(&vrts_System_Time,NULL,Time_Thread, NULL);
     pthread_create(&tmp1,NULL,Led_Thread,NULL);
-    pthread_create(&vrts_System_Linkerlist, NULL, LinkerList_Thread, NULL);
+//    pthread_create(&vrts_System_Linkerlist, NULL, LinkerList_Thread, NULL);
 
     pthread_join(vrts_System_ThreadGWIF, NULL);
     pthread_join(vrts_System_MQTT,NULL);
-    //pthread_join(vrts_System_Linkerlist, NULL);
-    //pthread_join(vrts_System_Time, NULL);
-    //pthread_join(vrts_System_Gpio,NULL);
+//    pthread_join(vrts_System_Linkerlist, NULL);
+//    pthread_join(vrts_System_Time, NULL);
+//    pthread_join(vrts_System_Gpio,NULL);
 
-    // Init linkerlist
-    vrts_buff head = InitHead();
 	while(1){
 	}
 	return EXIT_SUCCESS;

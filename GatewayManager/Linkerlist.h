@@ -22,11 +22,11 @@ struct buffer_wait{
 };
 
 typedef struct buffer_wait *vrts_buff;
-extern bool flag_check_rsp;
-extern long long timeoutRsp;
+
 
 extern vrts_buff head;
-extern pthread_t vrpth_LinkerList;
+extern vrts_buff tail;
+
 /*
  *Create node save adr data from db
  *
@@ -51,14 +51,6 @@ vrts_buff AddTail(vrts_buff head, char * message);
  *return head of linker list
  */
 vrts_buff DellHead(vrts_buff head);
-
-/*
- *Init head of linkerlist
- *
- *para NULL
- *return head of linker list
- */
-vrts_buff InitHead();
 
 /*
  * Show linker list
