@@ -25,11 +25,10 @@ static bool					vrb_GWIF_CheckNow = false;
 static bool					vrb_GWIF_RestartMessage = true;
 static bool 				message_Update= false;
 
-uint8_t uuid[50]="";
-uint8_t device_key[50]="";
-uint8_t app_key[50]="";
-uint8_t net_key[50]="";
-uint8_t temp1[2];
+uint8_t uuid[17];
+uint8_t net_key[17];
+uint8_t app_key[17];
+
 bool checkcallscene = false;
 uint16_t sceneForCCt;
 
@@ -213,12 +212,21 @@ void GWIF_ProcessData (void)
 				for(i=0; i<6; i++){
 					OUTMESSAGE_MACSelect[i+3]=vrts_GWIF_IncomeMessage->Message[i+1];
 				}
-				sprintf(uuid,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],\
-						vrts_GWIF_IncomeMessage->Message[12],vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],\
-						vrts_GWIF_IncomeMessage->Message[15],vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17],\
-						vrts_GWIF_IncomeMessage->Message[18],vrts_GWIF_IncomeMessage->Message[19],vrts_GWIF_IncomeMessage->Message[20],\
-						vrts_GWIF_IncomeMessage->Message[21],vrts_GWIF_IncomeMessage->Message[22],vrts_GWIF_IncomeMessage->Message[23],\
-						vrts_GWIF_IncomeMessage->Message[24],vrts_GWIF_IncomeMessage->Message[25]);
+//				sprintf(uuid,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],\
+//						vrts_GWIF_IncomeMessage->Message[12],vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],\
+//						vrts_GWIF_IncomeMessage->Message[15],vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17],\
+//						vrts_GWIF_IncomeMessage->Message[18],vrts_GWIF_IncomeMessage->Message[19],vrts_GWIF_IncomeMessage->Message[20],\
+//						vrts_GWIF_IncomeMessage->Message[21],vrts_GWIF_IncomeMessage->Message[22],vrts_GWIF_IncomeMessage->Message[23],\
+//						vrts_GWIF_IncomeMessage->Message[24],vrts_GWIF_IncomeMessage->Message[25]);
+
+				int i;
+				for(i=0;i<16;i++){
+					uuid[i]=vrts_GWIF_IncomeMessage->Message[i+10];
+				}
+				for(i=0;i<40;i++){
+					uuid_json[i] = NULL;
+				}
+				ConvertUuid(uuid, uuid_json);
 				flag_selectmac=true;
 				flag_check_select_mac= false;
 			}
@@ -258,12 +266,18 @@ void GWIF_ProcessData (void)
 					}
 					adr_heartbeat= OUTMESSAGE_Provision[26] | (OUTMESSAGE_Provision[27]<<8);
 				}
-				sprintf(net_key,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[2],vrts_GWIF_IncomeMessage->Message[3],\
+				sprintf(netkey_json,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[2],vrts_GWIF_IncomeMessage->Message[3],\
 										vrts_GWIF_IncomeMessage->Message[4],vrts_GWIF_IncomeMessage->Message[5],vrts_GWIF_IncomeMessage->Message[6],\
 										vrts_GWIF_IncomeMessage->Message[7],vrts_GWIF_IncomeMessage->Message[8],vrts_GWIF_IncomeMessage->Message[9],\
 										vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],vrts_GWIF_IncomeMessage->Message[12],\
 										vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],vrts_GWIF_IncomeMessage->Message[15],\
 										vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17]);
+
+//				int i;
+//				for(i=0;i<16;i++){
+//					net_key[i]=vrts_GWIF_IncomeMessage->Message[i+2];
+//				}
+
 				flag_getpro_info = true;
 			}
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_SEND_ELE_CNT){
@@ -274,12 +288,18 @@ void GWIF_ProcessData (void)
 			}
 			/* app key*/
 			if((vrui_GWIF_LengthMeassge == 27) && (vrts_GWIF_IncomeMessage->Message[0] == 0xb5)){
-				sprintf(app_key,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],\
+				sprintf(appkey_json,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],\
 						vrts_GWIF_IncomeMessage->Message[12],vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],\
 						vrts_GWIF_IncomeMessage->Message[15],vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17],\
 						vrts_GWIF_IncomeMessage->Message[18],vrts_GWIF_IncomeMessage->Message[19],vrts_GWIF_IncomeMessage->Message[20],\
 						vrts_GWIF_IncomeMessage->Message[21],vrts_GWIF_IncomeMessage->Message[22],vrts_GWIF_IncomeMessage->Message[23],\
 						vrts_GWIF_IncomeMessage->Message[24],vrts_GWIF_IncomeMessage->Message[25]);
+
+//				int i;
+//				for(i=0;i<16;i++){
+//					app_key[i]=vrts_GWIF_IncomeMessage->Message[i+10];
+//				}
+
 			}
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_KEY_BIND_EVT && vrts_GWIF_IncomeMessage->Message[1] == HCI_GATEWAY_CMD_BIND_SUSCESS){
 				slog_info("<provision> success");
@@ -341,8 +361,9 @@ void GWIF_ProcessData (void)
 					//create_json_obj_from(add_component_to_obj, 6,mqtt_push,&cmd, &jsonAdr, &button, &mode, &scene, &srgbid_push);
 					if(pscenedc!=0){
 						/*call scene normal*/
-//						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
-//						sleep(1);
+						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, pscenedc, \
+							 NULL16,NULL16, NULL16, NULL16,NULL16, 17);
+						usleep(400000);
 						/*call scene RGB*/
 						Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8,NULL8, NULL8, NULL16,\
 								NULL16, NULL16,NULL16, NULL16,pscenedc, NULL8, NULL8, NULL8, NULL8,23);
@@ -638,19 +659,23 @@ void GWIF_ProcessData (void)
 								   printf("Error! opening file");
 								   exit(1);
 							}
-							fscanf(file,"%[^\n]",device_key);
+							fscanf(file,"%[^\n]",deviceid_json);
 							fclose(file);
 							/**/
+//							ConvertUuid(uuid, uuid_json);
+//							ConvertUuid(app_key, appkey_json);
+//							ConvertUuid(net_key, netkey_json);
 							json_component cmd = {"CMD","TYPE_DEVICE",json_type_string};
 							json_component json_unicast_id = {"DEVICE_UNICAST_ID",jsonAdr,json_type_int};
-							json_component json_id = {"DEVICE_ID",uuid,json_type_string};
-							json_component json_device_key = {"DEVICE_KEY",device_key,json_type_string};
-							json_component json_net_key = {"NET_KEY",net_key,json_type_string};
-							json_component json_app_key = {"APP_KEY",app_key,json_type_string};
+							json_component json_id = {"DEVICE_ID",uuid_json,json_type_string};
+							json_component json_device_key = {"DEVICE_KEY",deviceid_json,json_type_string};
+							json_component json_net_key = {"NET_KEY",netkey_json,json_type_string};
+							json_component json_app_key = {"APP_KEY",appkey_json,json_type_string};
 							json_component json_type_id = {"DEVICE_TYPE_ID",TypeConvertID(jsonType,jsonAttrubute,jsonApplication),json_type_int};
 							json_object *data = create_json_obj_from(add_component_to_obj, 6,mqtt_dont_push, &json_unicast_id, &json_id, &json_device_key, &json_net_key, &json_app_key, &json_type_id);
 							json_component jsondata = {"DATA",data,json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &jsondata);
+							//uuid_json = {"\0"};
 						}
 					}
 					else if(header == HEADER_TYPE_SAVEGW){

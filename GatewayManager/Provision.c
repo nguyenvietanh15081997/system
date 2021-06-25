@@ -26,7 +26,7 @@ uint8_t OUTMESSAGE_BindingALl[22]  = {0xe9, 0xff, 0x0b, 0x00, 0x00, 0x00, 0x60, 
 uint8_t setpro_internal[]       =   {0xe9, 0xff, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11, 0x22, 0x33, 0x44, 0x01, 0x00};
 uint8_t admit_pro_internal[]    =   {0xe9, 0xff, 0x0d, 0x01, 0x00, 0xff, 0xfb, 0xeb, 0xbf, 0xea, 0x06, 0x09, 0x00, 0x52, 0x90, 0x49, 0xf1, 0xf1, 0xbb, 0xe9, 0xeb};// trả về unicast tiếp theo của con đèn cần thêm vào
 uint8_t reset_GW[]				=	{0xe9, 0xff, 0x02};
-uint8_t device_key1[50];
+//uint8_t device_key1[50];
 
 bool flag_selectmac     	= false;
 bool flag_getpro_info   	= false;
@@ -44,6 +44,76 @@ bool flag_checkHB           = false;
 bool flag_checkSaveGW		= false;
 bool flag_checkTypeDEV 		= false;
 
+uint8_t uuid_json[40]= {0};
+uint8_t deviceid_json[40]= {0};
+uint8_t netkey_json[40]= {0};
+uint8_t appkey_json[40]= {0};
+
+void ConvertUuid(uint8_t *uuid, uint8_t *uuid_string)
+{
+	uint8_t temp[3];
+	uint8_t uuid_convert8[12]={0};
+	uint8_t uuid_convert4_1[9]={0};
+	uint8_t uuid_convert4_2[9]={0};
+	uint8_t uuid_convert4_3[9]={0};
+	uint8_t uuid_convert12[20]={0};
+	uint8_t *gach = "-";
+	int i;
+	for(i=0; i<4 ; i++){
+        if(uuid[i]<= 0x0f){
+            sprintf(temp,"0%x",uuid[i]);
+        }
+        else{
+		    sprintf(temp,"%2x",uuid[i]);
+        }
+        strcat(uuid_convert8,temp);
+	}
+    strcat(uuid_convert8,gach);
+    strcat(uuid_string,uuid_convert8);
+ 	for(i=4; i<6 ; i++){
+        if(uuid[i]<=0x0f){
+            sprintf(temp,"0%x",uuid[i]);
+        }
+        else{
+		    sprintf(temp,"%2x",uuid[i]);
+        }
+        strcat(uuid_convert4_1,temp);
+	}
+    strcat(uuid_convert4_1,gach);
+    strcat(uuid_string,uuid_convert4_1);
+    for(i=6; i<8 ; i++){
+        if(uuid[i]<=0x0f){
+            sprintf(temp,"0%x",uuid[i]);
+        }
+        else{
+		    sprintf(temp,"%2x",uuid[i]);
+        }
+        strcat(uuid_convert4_2,temp);
+	}
+    strcat(uuid_convert4_2,gach);
+    strcat(uuid_string,uuid_convert4_2);
+    for(i=8; i<10 ; i++){
+        if(uuid[i]<=0x0f){
+            sprintf(temp,"0%x",uuid[i]);
+        }
+        else{
+		    sprintf(temp,"%2x",uuid[i]);
+        }
+        strcat(uuid_convert4_3,temp);
+	}
+    strcat(uuid_convert4_3,gach);
+    strcat(uuid_string,uuid_convert4_3);
+    for(i=10; i<16 ; i++){
+        if(uuid[i]<=0x0f){
+            sprintf(temp,"0%x",uuid[i]);
+        }
+        else{
+		    sprintf(temp,"%2x",uuid[i]);
+        }
+        strcat(uuid_convert12,temp);
+	}
+    strcat(uuid_string,uuid_convert12);
+ }
 void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 {
 	pthread_mutex_lock(&vrpth_SHAREMESS_Send2GatewayLock);
@@ -152,22 +222,26 @@ void *ProvisionThread (void *argv )
 			slog_print(SLOG_INFO, 1, "<provision>ADMITPRO...");
 			ControlMessage(21, admit_pro_internal);
 			/*add device key to file*/
-			sprintf(device_key1,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",admit_pro_internal[5],admit_pro_internal[6],admit_pro_internal[7],\
+			sprintf(deviceid_json,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",admit_pro_internal[5],admit_pro_internal[6],admit_pro_internal[7],\
 					admit_pro_internal[8],admit_pro_internal[9],admit_pro_internal[10],admit_pro_internal[11],admit_pro_internal[12],admit_pro_internal[13],\
 					admit_pro_internal[14],admit_pro_internal[15],admit_pro_internal[16],admit_pro_internal[17], admit_pro_internal[18],\
 					admit_pro_internal[19],admit_pro_internal[20]);
+//			uint8_t device_key[16];
+//			for(i=0;i<16;i++){
+//				device_key[i]=admit_pro_internal[i+5];
+//			}
+//			ConvertUuid(device_key, deviceid_json);
 			FILE *file=fopen("/root/device_key.txt","w");
 			   if(file == NULL)
 			   {
 			      printf("Error!");
 			      exit(1);
 			   }
-			   fprintf(file,"%s",device_key1);
+			   fprintf(file,"%s",deviceid_json);
 			   fclose(file);
 			/**/
 			//usleep(100000);
 			flag_checkadmitpro = true;
-
 		}
 		if(flag_admitpro == true && flag_checkadmitpro== true)
 		{
@@ -187,14 +261,14 @@ void *ProvisionThread (void *argv )
 		{
 			flag_provision = false;
 			//sleep(1);
-			srand((int)time(0));
-			int random;
-			int i;
-			for(i=0;i<16;i++)
-			{
-				random=rand()%256;
-				OUTMESSAGE_BindingALl[i+6]=random;
-			}
+//			srand((int)time(0));
+//			int random;
+//			int i;
+//			for(i=0;i<16;i++)
+//			{
+//				random=rand()%256;
+//				OUTMESSAGE_BindingALl[i+6]=random;
+//			}
 			ControlMessage(22, OUTMESSAGE_BindingALl);
 			slog_print(SLOG_INFO, 1, "<provision>BINDING ALL");
 			flag_set_type = false;
@@ -208,6 +282,7 @@ void *ProvisionThread (void *argv )
 		}
 		if(flag_checkHB){
 			flag_checkHB = false;
+			puts("save gw");
 			 Function_Vendor(HCI_CMD_GATEWAY_CMD, SaveGateway_vendor_typedef, adr_heartbeat, NULL16,\
 					 NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8,17);
 			 flag_checkSaveGW = false;

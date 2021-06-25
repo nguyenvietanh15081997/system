@@ -38,13 +38,18 @@ extern bool flag_checkHB;
 extern bool flag_checkSaveGW;
 extern bool flag_checkTypeDEV;
 
-
 extern unsigned int Timeout_CheckDataBuffer;
 extern unsigned char scanNotFoundDev;
 extern unsigned int adr_heartbeat;
 
 extern pthread_t tmp ;
 
+extern uint8_t uuid_json[40];
+extern uint8_t deviceid_json[40];
+extern uint8_t netkey_json[40];
+extern uint8_t appkey_json[40];
+
+void ConvertUuid(uint8_t *uuid, uint8_t *uuid_string);
 /*
  * Transmit uart to control process provision
  *
