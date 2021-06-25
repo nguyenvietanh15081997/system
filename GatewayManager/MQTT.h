@@ -35,6 +35,7 @@ extern "C" {
 extern int run;
 extern struct mosquitto *mosq;
 extern unsigned char qos;
+extern bool hasRsp;
 
 /*
  * Check signal to process

@@ -8,6 +8,7 @@
 #include "../GatewayManager/LedProcess.h"
 #include "../GatewayManager/JsonProcess.h"
 #include "../GatewayManager/MQTT.h"
+#include "../GatewayManager/Linkerlist.h"
 
 pthread_t tmp;
 pthread_t vrts_System_Gpio;
@@ -49,6 +50,7 @@ uint8_t deviceid_json[40]= {0};
 uint8_t netkey_json[40]= {0};
 uint8_t appkey_json[40]= {0};
 
+uint16_t unicastId;
 void ConvertUuid(uint8_t *uuid, uint8_t *uuid_string)
 {
 	uint8_t temp[3];
@@ -116,6 +118,7 @@ void ConvertUuid(uint8_t *uuid, uint8_t *uuid_string)
  }
 void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 {
+	unicastId = message[8] | (message[9]<<8);
 	pthread_mutex_lock(&vrpth_SHAREMESS_Send2GatewayLock);
 	vrb_SHAREMESS_Send2GatewayAvailabe = true;
 	vrui_SHAREMESS_Send2GatewayLength = lengthmessage;
