@@ -458,22 +458,22 @@ void JsonControl(json_object *jobj,char *key){
 		vrts_Json_String.buttonid     = (json_object_get_string(json_object_object_get(vrts_Json_String.data,"BUTTONID")));
 		uint8_t buttonId_int;
 		if(strcmp(vrts_Json_String.buttonid,"BUTTON_1")==0){
-		buttonId_int =1;
+			buttonId_int =1;
 		}
 		else if(strcmp(vrts_Json_String.buttonid,"BUTTON_2")==0){
-		buttonId_int =2;
+			buttonId_int =2;
 		}
 		else if(strcmp(vrts_Json_String.buttonid,"BUTTON_3")==0){
-		buttonId_int =3;
+			buttonId_int =3;
 		}
 		else if(strcmp(vrts_Json_String.buttonid,"BUTTON_4")==0){
-		buttonId_int =4;
+			buttonId_int =4;
 		}
 		else if(strcmp(vrts_Json_String.buttonid,"BUTTON_5")==0){
-		buttonId_int =5;
+			buttonId_int =5;
 		}
 		else if(strcmp(vrts_Json_String.buttonid,"BUTTON_6")==0){
-		buttonId_int =6;
+			buttonId_int =6;
 		}
 		vrts_Json_String.modeid = (json_object_get_int(json_object_object_get(vrts_Json_String.data,"MODEID")));
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, DelSceneForRemote_AC_vendor_typedef, vrts_Json_String.adr, NULL16, buttonId_int,\
@@ -718,6 +718,18 @@ void JsonControl(json_object *jobj,char *key){
 		 }
 		 slog_print(SLOG_INFO, 1, "RESET_DONE");
 		 GWIF_Init();
+	}
+	else if(strcmp(vrts_Json_String.cmd,"SCREEN_TOUCH") == 0){
+		char *stringUart= json_object_get_string(json_object_object_get(vrts_Json_String.data, "UART"));
+		int length = strlen(stringUart)/3 +1;
+	    unsigned char a[50];
+	    int i;
+	    puts("ok");
+	    for(i=0; i<length ; i++){
+	        sscanf(stringUart+i*3,"%2x",&a[i]);
+	        //ControlMessage(1, a[i]);
+	    }
+	    ControlMessage(length, a);
 	}
 	vrts_Json_String.cmd = "\0";
 	vrts_Json_String.adr = 0;

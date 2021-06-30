@@ -26,12 +26,14 @@ void handle_signal(int s)
 {
 	run = 0;
 }
+
 int mqtt_send(struct mosquitto *mosq, char * topic,char *msg)
 {
 	mosquitto_publish(mosq, NULL,topic, strlen(msg), msg, qos, 0);
 	slog_info("(%s)Message_send: %s",pHeaderMqtt,msg);
 	return 0;
 }
+
 void connect_callback(struct mosquitto *mosq, void *obj, int result)
 {
 	slog_info("(%s)%s: Connect callback, rc=%d",pHeaderMqtt,mqtt_host,result);

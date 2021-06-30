@@ -355,40 +355,45 @@ void GWIF_ProcessData (void)
 				else if(headerSensor == SCREEN_TOUCH_MODULE_TYPE){
 					vrts_ScreenT_Rsp = (screenTouch *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					uint16_t psceneScreenT = (vrts_ScreenT_Rsp->sceneID[0]) |(vrts_ScreenT_Rsp->sceneID[1]<<8);
+					json_component cmd = {"CMD","SCREEN_TOUCH",json_type_string};
+					json_component sceneid_json = {"SCENEID",psceneScreenT,json_type_int};
+					json_object *data_object = create_json_obj_from(add_component_to_obj, 1, mqtt_dont_push, &sceneid_json);
+					json_component data_json = {"DATA",data_object,json_type_object};
+					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd, &data_json);
 					if(psceneScreenT)
 					{
 
-						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, psceneScreenT,\
-								NULL16,NULL16, NULL16, NULL16, NULL16, 17);
-						usleep(400000);
+//						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, psceneScreenT,\
+//								NULL16,NULL16, NULL16, NULL16, NULL16, 17);
+//						usleep(400000);
 					}
-					uint8_t *buttonId_String;
-					if(vrts_ScreenT_Rsp->buttonID == 1){
-						buttonId_String = "BUTTON_1";
-					}
-					else if(vrts_ScreenT_Rsp->buttonID == 2){
-						buttonId_String = "BUTTON_2";
-					}
-					else if(vrts_ScreenT_Rsp->buttonID == 3){
-						buttonId_String = "BUTTON_3";
-					}
-					else if(vrts_ScreenT_Rsp->buttonID == 4){
-						buttonId_String = "BUTTON_4";
-					}
-					else if(vrts_ScreenT_Rsp->buttonID == 5){
-						buttonId_String = "BUTTON_5";
-					}
-					else if(vrts_ScreenT_Rsp->buttonID == 6){
-						buttonId_String = "BUTTON_6";
-					}
-					if(vrts_ScreenT_Rsp->aksTime == 0x01){
-						Function_Vendor(HCI_CMD_GATEWAY_CMD, SendTimeForScreenT_vendor_typedef, 65535, NULL16, NULL8, NULL8, NULL8, NULL16, NULL16, \
-								NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, dataTimeInternet[0], dataTimeInternet[1], NULL8, NULL16, 23);
-					}
-					json_component button = {"BUTTON_VALUE", buttonId_String, json_type_string};
-					json_object *data_Remote = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr, &button);
-					json_component data_Remote_Json = {"DATA",data_Remote,json_type_object};
-					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Sensor_Json, &data_Remote_Json);
+//					uint8_t *buttonId_String;
+//					if(vrts_ScreenT_Rsp->buttonID == 1){
+//						buttonId_String = "BUTTON_1";
+//					}
+//					else if(vrts_ScreenT_Rsp->buttonID == 2){
+//						buttonId_String = "BUTTON_2";
+//					}
+//					else if(vrts_ScreenT_Rsp->buttonID == 3){
+//						buttonId_String = "BUTTON_3";
+//					}
+//					else if(vrts_ScreenT_Rsp->buttonID == 4){
+//						buttonId_String = "BUTTON_4";
+//					}
+//					else if(vrts_ScreenT_Rsp->buttonID == 5){
+//						buttonId_String = "BUTTON_5";
+//					}
+//					else if(vrts_ScreenT_Rsp->buttonID == 6){
+//						buttonId_String = "BUTTON_6";
+//					}
+//					if(vrts_ScreenT_Rsp->aksTime == 0x01){
+//						Function_Vendor(HCI_CMD_GATEWAY_CMD, SendTimeForScreenT_vendor_typedef, 65535, NULL16, NULL8, NULL8, NULL8, NULL16, NULL16, \
+//								NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, dataTimeInternet[0], dataTimeInternet[1], NULL8, NULL16, 23);
+//					}
+//					json_component button = {"BUTTON_VALUE", buttonId_String, json_type_string};
+//					json_object *data_Remote = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr, &button);
+//					json_component data_Remote_Json = {"DATA",data_Remote,json_type_object};
+//					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Sensor_Json, &data_Remote_Json);
 
 				}
 				else if (headerSensor == POWER_TYPE){
@@ -517,10 +522,20 @@ void GWIF_ProcessData (void)
 					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Smoke_Json);
 				}
 				else if(headerSensor == SMOKE_SENSOR_LOW_BATTERY){
-					json_component smoke_low_batery = {"SMOKE_POWER","LOW_BATTERY",json_type_string};
-					json_object *data_Smoke         = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr,&smoke_low_batery);
-					json_component data_Smoke_Json	= {"DATA",data_Smoke,json_type_object};
-					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Smoke_Json);
+					uint8_t power 					= vrts_GWIF_IncomeMessage->Message[8];
+					if(power){
+						json_component smoke_low_batery = {"SMOKE_POWER","LOW_BATTERY",json_type_string};
+						json_object *data_Smoke         = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr,&smoke_low_batery);
+						json_component data_Smoke_Json	= {"DATA",data_Smoke,json_type_object};
+						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Smoke_Json);
+					}
+					else {
+						json_component smoke_low_batery = {"SMOKE_POWER","HIGH_BATTERY",json_type_string};
+						json_object *data_Smoke         = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr,&smoke_low_batery);
+						json_component data_Smoke_Json	= {"DATA",data_Smoke,json_type_object};
+						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Smoke_Json);
+					}
+
 				}
 				else if(headerSensor == SWITCH4_MODULE_TYPE){
 					uint8_t relay1 = vrts_GWIF_IncomeMessage->Message[8] & 0xFF;
