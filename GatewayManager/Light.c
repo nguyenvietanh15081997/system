@@ -41,8 +41,8 @@ void Lightness_Set(uint16_t uniAdrSetDim, uint16_t valueLightness,uint16_t trans
 	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrSetDim>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[0] = LIGHTNESS_SET & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[1] = (LIGHTNESS_SET>>8) & 0xFF;
-	vrts_CMD_STRUCTURE.para[0] = 0;
-	vrts_CMD_STRUCTURE.para[1] = valueLightness & 0xFF;
+	vrts_CMD_STRUCTURE.para[0] = valueLightness & 0xFF;
+	vrts_CMD_STRUCTURE.para[1] = (valueLightness>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[2] = 0;
 	vrts_CMD_STRUCTURE.para[3] = transition & 0xFF;
 	vrts_CMD_STRUCTURE.para[4] = (transition >> 8) & 0xFF;
@@ -1005,10 +1005,10 @@ uint8_t Param2PrecentCCT(uint16_t param){
 }
 uint16_t Percent2ParamDIM(uint8_t percent)
 {
-	return ((percent*255)/100);
+	return ((percent*65535)/100);
 }
 uint8_t Param2PrecentDIM(uint16_t param){
-	return ((param*100)/255);
+	return ((param*100)/65535);
 }
 uint16_t Percent2ParamHSL(uint8_t percent){
 	return((percent * 65535)/100);

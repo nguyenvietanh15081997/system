@@ -24,7 +24,7 @@ extern "C" {
 
 #define RINGBUFFER_LEN 		(2048)
 
-#define UART_INTERFACE		(0)
+#define UART_INTERFACE		(1)
 #define UART_BAUDRATE		(115200)
 #define UART_LENGTHDATA		(8)
 
