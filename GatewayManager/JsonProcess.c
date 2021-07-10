@@ -9,6 +9,13 @@
 #include "../GatewayManager/slog.h"
 #include "../GatewayManager/LedProcess.h"
 
+#define ZERO			0x0000
+#define MINUTE 			0x007e
+#define FIVE_MINUTE 	0X009E
+#define TEN_MUNITE 		0x00c1
+#define TEWNTY_MUNITE 	0x00c2
+#define THIRTY_MUNITE 	0x00c3
+
 jsonstring vrts_Json_String;
 pthread_t vrts_System_Provision;
 
@@ -23,6 +30,33 @@ static uint16_t adr_dv[100];
 static uint16_t adr_rgb_cct_dv[100];
 static uint16_t adr_rgb_dv[100];
 int i, arraylen, arraylen_rgb, arraylen_rgb_cct;
+
+
+
+uint16_t GetTransition(uint16_t parTime){
+	uint16_t transition;
+	switch(parTime){
+	case 1:
+		transition = MINUTE;
+		break;
+	case 5:
+		transition = FIVE_MINUTE;
+		break;
+	case 10:
+		transition = TEN_MUNITE;
+		break;
+	case 20:
+		transition = TEWNTY_MUNITE;
+		break;
+	case 30:
+		transition = THIRTY_MUNITE;
+		break;
+	default:
+		transition = ZERO;
+		break;
+	}
+	return transition;
+}
 
 int json_parse_array( json_object *jobj, char *key)
 {
@@ -149,28 +183,32 @@ void JsonControl(json_object *jobj,char *key){
 	}
 	else if(strcmp(vrts_Json_String.cmd,"ONOFF")==0){
 		vrts_Json_String.onoff 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"VALUE_ONOFF"));
+		uint16_t transition 	= json_object_get_int(json_object_object_get(jobj,"TIME"));
 		FunctionPer(HCI_CMD_GATEWAY_CMD,ControlOnOff_typedef,vrts_Json_String.adr ,NULL8, vrts_Json_String.onoff, NULL16, NULL16, NULL16,\
-				NULL16,NULL16, NULL16, NULL16, NULL16, 14);
+				NULL16,NULL16, NULL16, NULL16, GetTransition(transition), 16);
 		//usleep(400000);
 	}
 	else if(strcmp(vrts_Json_String.cmd,"CCT") == 0){
 		vrts_Json_String.cct 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"VALUE_CCT"));
+		uint16_t transition 	= json_object_get_int(json_object_object_get(jobj,"TIME"));
 		FunctionPer(HCI_CMD_GATEWAY_CMD, CCT_Set_typedef, (vrts_Json_String.adr), NULL8, NULL8, NULL16,Percent2ParamCCT(vrts_Json_String.cct),\
-				NULL16, NULL16,NULL16, NULL16, NULL16, NULL16, 17);
+				NULL16, NULL16,NULL16, NULL16, NULL16, GetTransition(transition), 19);
 		//usleep(400000);
 	}
 	else if(strcmp(vrts_Json_String.cmd,"DIM") == 0){
 		vrts_Json_String.dim 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"VALUE_DIM"));
+		uint16_t transition 	= json_object_get_int(json_object_object_get(jobj,"TIME"));
 		FunctionPer(HCI_CMD_GATEWAY_CMD, Lightness_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, Percent2ParamDIM(vrts_Json_String.dim),\
-				NULL16, NULL16, NULL16,NULL16, NULL16, NULL16, NULL16, 15);
+				NULL16, NULL16, NULL16,NULL16, NULL16, NULL16,  GetTransition(transition), 17);
 		//usleep(400000);
 	}
 	else if(strcmp(vrts_Json_String.cmd,"HSL") == 0){
 		vrts_Json_String.hue 		= json_object_get_int(json_object_object_get(vrts_Json_String.data,"VALUE_H"));
 		vrts_Json_String.saturation = json_object_get_int(json_object_object_get(vrts_Json_String.data,"VALUE_S"));
 		vrts_Json_String.lightness 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"VALUE_L"));
+		uint16_t transition 		= json_object_get_int(json_object_object_get(jobj,"TIME"));
 		FunctionPer(HCI_CMD_GATEWAY_CMD, HSL_Set_typedef, vrts_Json_String.adr, NULL8, NULL8, NULL16, NULL16, NULL16, NULL16,\
-				vrts_Json_String.lightness, vrts_Json_String.hue, vrts_Json_String.saturation, NULL16, 19 );
+				vrts_Json_String.lightness, vrts_Json_String.hue, vrts_Json_String.saturation,  GetTransition(transition), 21 );
 		usleep(400000);
 	}
 	else if(strcmp(vrts_Json_String.cmd,"ADDGROUP") == 0){
@@ -283,7 +321,6 @@ void JsonControl(json_object *jobj,char *key){
 	else if(strcmp(vrts_Json_String.cmd,"DELSCENE") == 0){
 		check_add_or_del_scene = false;
 		vrts_Json_String.delscene 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"SCENEID"));
-
 		if(flag_check_device_unicast_id){
 			flag_check_device_unicast_id = false;
 			for(i=0; i<arraylen; i++){
@@ -305,7 +342,10 @@ void JsonControl(json_object *jobj,char *key){
 	}
 	else if(strcmp(vrts_Json_String.cmd,"CALLSCENE") == 0){
 		vrts_Json_String.sceneID 	= json_object_get_int(json_object_object_get(vrts_Json_String.data,"SCENEID"));
-		FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.sceneID, NULL16,NULL16, NULL16, NULL16, NULL16, 17);
+		uint16_t transition 		= json_object_get_int(json_object_object_get(jobj,"TIME"));
+		printf("trasition: %d\n",transition);
+		FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16, vrts_Json_String.sceneID,\
+				NULL16,NULL16, NULL16, NULL16,  GetTransition(transition), 17);
 		usleep(400000);
 		Function_Vendor(HCI_CMD_GATEWAY_CMD, CallSceneRgb_vendor_typedef, NULL16, NULL16, NULL8, NULL8, NULL8, NULL16,\
 				NULL16, NULL16,NULL16, NULL16, NULL16, vrts_Json_String.sceneID, NULL8, NULL8, NULL8, NULL8, NULL16, 23);

@@ -35,7 +35,7 @@ void Lightness_Get(uint16_t adrLightnessGet)
 	vrts_CMD_STRUCTURE.opCode[0] = LIGHTNESS_GET & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[1] = (LIGHTNESS_GET>>8) & 0xFF;
 }
-void Lightness_Set(uint16_t uniAdrSetDim, uint16_t valueLightness)
+void Lightness_Set(uint16_t uniAdrSetDim, uint16_t valueLightness,uint16_t transition)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrSetDim & 0xFF;
 	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrSetDim>>8) & 0xFF;
@@ -44,6 +44,8 @@ void Lightness_Set(uint16_t uniAdrSetDim, uint16_t valueLightness)
 	vrts_CMD_STRUCTURE.para[0] = 0;
 	vrts_CMD_STRUCTURE.para[1] = valueLightness & 0xFF;
 	vrts_CMD_STRUCTURE.para[2] = 0;
+	vrts_CMD_STRUCTURE.para[3] = transition & 0xFF;
+	vrts_CMD_STRUCTURE.para[4] = (transition >> 8) & 0xFF;
 }
 void CCT_Get(uint16_t adrCCTGet)
 {
@@ -52,7 +54,7 @@ void CCT_Get(uint16_t adrCCTGet)
 	vrts_CMD_STRUCTURE.opCode[0] = LIGHT_CTL_TEMP_GET & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[1] = (LIGHT_CTL_TEMP_GET>>8) & 0xFF;
 }
-void CCT_Set(uint16_t uniAdrSetCCT, uint16_t valueCCT)
+void CCT_Set(uint16_t uniAdrSetCCT, uint16_t valueCCT, uint16_t transition)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrSetCCT & 0xFF;
 	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrSetCCT>>8) & 0xFF;
@@ -65,6 +67,8 @@ void CCT_Set(uint16_t uniAdrSetCCT, uint16_t valueCCT)
 	{
 		vrts_CMD_STRUCTURE.para[i] = 0x00;
 	}
+	vrts_CMD_STRUCTURE.para[5] = transition & 0xFF;
+	vrts_CMD_STRUCTURE.para[6] = (transition >>8 ) & 0xFF;
 }
 void AddGroup(uint16_t uniAdrAddGroup,uint16_t adrGroup)
 {
@@ -102,7 +106,7 @@ void AddSence(uint16_t uniAdrSence, uint16_t senceID)
 	vrts_CMD_STRUCTURE.para[1] = (senceID>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[2]= vrts_CMD_STRUCTURE.para[3]= vrts_CMD_STRUCTURE.para[4]= 0;
 }
-void CallSence(uint16_t senceId)
+void CallSence(uint16_t senceId, uint16_t transition)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = 0xFF;
 	vrts_CMD_STRUCTURE.adr_dst[1] = 0xFF;
@@ -110,6 +114,9 @@ void CallSence(uint16_t senceId)
 	vrts_CMD_STRUCTURE.opCode[1] = (SCENE_RECALL>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[0] = senceId & 0xFF;
 	vrts_CMD_STRUCTURE.para[1] = (senceId>>8) & 0xFF;
+	vrts_CMD_STRUCTURE.para[2] = 0x00;
+	vrts_CMD_STRUCTURE.para[3] = transition & 0xFF;
+	vrts_CMD_STRUCTURE.para[4] = (transition >>8) & 0xFF;
 }
 void DelSence(uint16_t uniAdrDelSence, uint16_t senceId)
 {
@@ -120,7 +127,7 @@ void DelSence(uint16_t uniAdrDelSence, uint16_t senceId)
 	vrts_CMD_STRUCTURE.para[0] = senceId & 0xFF;
 	vrts_CMD_STRUCTURE.para[1] = (senceId>>8) & 0xFF;
 }
-void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff)
+void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff,uint16_t transition)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrControlOnOff & 0xFF;
 	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrControlOnOff>>8) & 0xFF;
@@ -135,7 +142,9 @@ void ControlOnOff(uint16_t uniAdrControlOnOff,uint8_t statuOnOff)
 		flag_blink = true;
 	}
 	vrts_CMD_STRUCTURE.para[1] = 0;
-}
+	vrts_CMD_STRUCTURE.para[2] = transition & 0xFF;
+	vrts_CMD_STRUCTURE.para[3] = (transition >>8) & 0xFF;
+ }
 void HSL_Get(uint16_t adrHSLGet)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = adrHSLGet & 0xFF;
@@ -143,7 +152,7 @@ void HSL_Get(uint16_t adrHSLGet)
 	vrts_CMD_STRUCTURE.opCode[0] = LIGHTOPCODE_SELECT & 0xFF;
 	vrts_CMD_STRUCTURE.opCode[1] = (LIGHTOPCODE_SELECT>>8) & 0xFF;
 }
-void HSL_Set(uint16_t uniAdrHSL, uint16_t h, uint16_t s, uint16_t l)
+void HSL_Set(uint16_t uniAdrHSL, uint16_t h, uint16_t s, uint16_t l,  uint16_t transition)
 {
 	vrts_CMD_STRUCTURE.adr_dst[0] = uniAdrHSL & 0xFF;
 	vrts_CMD_STRUCTURE.adr_dst[1] = (uniAdrHSL >>8) & 0xFF;
@@ -156,6 +165,8 @@ void HSL_Set(uint16_t uniAdrHSL, uint16_t h, uint16_t s, uint16_t l)
 	vrts_CMD_STRUCTURE.para[4] = s & 0xFF;
 	vrts_CMD_STRUCTURE.para[5] = (s>>8) & 0xFF;
 	vrts_CMD_STRUCTURE.para[6] = 0;
+	vrts_CMD_STRUCTURE.para[7] = transition & 0xFF;
+	vrts_CMD_STRUCTURE.para[8] = (transition >>8)& 0xFF;
 }
 
 /*
@@ -224,17 +235,17 @@ void FunctionPer(uint16_t cmd,\
 		DelGroup(unicastAdr, adrGroup);
 	}
 	else if(Func == ControlOnOff_typedef){
-		ControlOnOff(unicastAdr,parStatusOnOff);
+		ControlOnOff(unicastAdr,parStatusOnOff,transition_par_t);
 	}
 	else if (Func == SetTimePoll_typedef){
 		SetTimePoll(unicastAdr, parTimePoll);
 	}
 	else if (Func == CCT_Set_typedef)
 	{
-		CCT_Set(unicastAdr,parCCT);
+		CCT_Set(unicastAdr,parCCT,transition_par_t);
 	}
 	else if (Func == Lightness_Set_typedef){
-		Lightness_Set(unicastAdr, parLightness);
+		Lightness_Set(unicastAdr, parLightness,transition_par_t);
 	}
 	else if (Func == UpdateLight_typedef){
 		UpdateLight();
@@ -246,10 +257,10 @@ void FunctionPer(uint16_t cmd,\
 		DelSence(unicastAdr, parSenceId);
 	}
 	else if(Func == CallSence_typedef){
-		CallSence(parSenceId);
+		CallSence(parSenceId,transition_par_t);
 	}
 	else if(Func == HSL_Set_typedef){
-		HSL_Set(unicastAdr, parH, parS, parL);
+		HSL_Set(unicastAdr, parH, parS, parL,transition_par_t);
 	}
 	else if(Func == CCT_Get_typedef){
 		CCT_Get(unicastAdr);

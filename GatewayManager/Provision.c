@@ -27,7 +27,7 @@ uint8_t OUTMESSAGE_BindingALl[22]  = {0xe9, 0xff, 0x0b, 0x00, 0x00, 0x00, 0x60, 
 uint8_t setpro_internal[]       =   {0xe9, 0xff, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11, 0x22, 0x33, 0x44, 0x01, 0x00};
 uint8_t admit_pro_internal[]    =   {0xe9, 0xff, 0x0d, 0x01, 0x00, 0xff, 0xfb, 0xeb, 0xbf, 0xea, 0x06, 0x09, 0x00, 0x52, 0x90, 0x49, 0xf1, 0xf1, 0xbb, 0xe9, 0xeb};// trả về unicast tiếp theo của con đèn cần thêm vào
 uint8_t reset_GW[]				=	{0xe9, 0xff, 0x02};
-uint8_t device_key1[50];
+
 
 bool flag_selectmac     	= false;
 bool flag_getpro_info   	= false;
@@ -45,7 +45,74 @@ bool flag_checkHB           = false;
 bool flag_checkSaveGW		= false;
 bool flag_checkTypeDEV 		= false;
 
+uint8_t uuid_json[40] = {0};
+uint8_t deviceKey[40] = {0};
 uint16_t unicastId;
+void ConvertUuid(uint8_t *uuid, uint8_t *uuid_string)
+{
+	uint8_t temp[3];
+	uint8_t uuid_convert8[12]={0};
+	uint8_t uuid_convert4_1[9]={0};
+	uint8_t uuid_convert4_2[9]={0};
+	uint8_t uuid_convert4_3[9]={0};
+	uint8_t uuid_convert12[20]={0};
+	uint8_t *gach = "-";
+	int i;
+	for(i=0; i<4 ; i++){
+        if(uuid[i]<= 0x0f){
+            sprintf(temp,"0%x",uuid[i]);
+        }
+        else{
+		    sprintf(temp,"%2x",uuid[i]);
+        }
+        strcat(uuid_convert8,temp);
+	}
+    strcat(uuid_convert8,gach);
+    strcat(uuid_string,uuid_convert8);
+ 	for(i=4; i<6 ; i++){
+        if(uuid[i]<=0x0f){
+            sprintf(temp,"0%x",uuid[i]);
+        }
+        else{
+		    sprintf(temp,"%2x",uuid[i]);
+        }
+        strcat(uuid_convert4_1,temp);
+	}
+    strcat(uuid_convert4_1,gach);
+    strcat(uuid_string,uuid_convert4_1);
+    for(i=6; i<8 ; i++){
+        if(uuid[i]<=0x0f){
+            sprintf(temp,"0%x",uuid[i]);
+        }
+        else{
+		    sprintf(temp,"%2x",uuid[i]);
+        }
+        strcat(uuid_convert4_2,temp);
+	}
+    strcat(uuid_convert4_2,gach);
+    strcat(uuid_string,uuid_convert4_2);
+    for(i=8; i<10 ; i++){
+        if(uuid[i]<=0x0f){
+            sprintf(temp,"0%x",uuid[i]);
+        }
+        else{
+		    sprintf(temp,"%2x",uuid[i]);
+        }
+        strcat(uuid_convert4_3,temp);
+	}
+    strcat(uuid_convert4_3,gach);
+    strcat(uuid_string,uuid_convert4_3);
+    for(i=10; i<16 ; i++){
+        if(uuid[i]<=0x0f){
+            sprintf(temp,"0%x",uuid[i]);
+        }
+        else{
+		    sprintf(temp,"%2x",uuid[i]);
+        }
+        strcat(uuid_convert12,temp);
+	}
+    strcat(uuid_string,uuid_convert12);
+ }
 void ControlMessage(uint16_t lengthmessage,uint8_t *message)
 {
 	unicastId = message[8] | (message[9]<<8);
@@ -142,28 +209,34 @@ void *ProvisionThread (void *argv )
 		{
 			flag_setpro = false;
 			srand((int)time(0));
-			int random;
+			int random1,random2;
 			int i;
-			for(i=0;i<16;i++)
-			{
-				random=rand()%256;
-				setpro_internal[i+3]=random;
+			for(i=0;i<16;i++){
+				random1=rand()%256;
+				random2=rand()%256;
+				setpro_internal[i+3] = random1;
+				admit_pro_internal[i+5] = random2;
 			}
 			slog_print(SLOG_INFO, 1, "<provision>SETPRO....");
 			ControlMessage(28, setpro_internal);
 			slog_print(SLOG_INFO, 1, "<provision>ADMITPRO...");
 			ControlMessage(21, admit_pro_internal);
 			/*add device key to file*/
-			sprintf(device_key1,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",admit_pro_internal[5],admit_pro_internal[6],admit_pro_internal[7],\
-					admit_pro_internal[8],admit_pro_internal[9],admit_pro_internal[10],admit_pro_internal[11],admit_pro_internal[12],admit_pro_internal[13],\
-					admit_pro_internal[14],admit_pro_internal[15],admit_pro_internal[16],admit_pro_internal[17], admit_pro_internal[18],\
-					admit_pro_internal[19],admit_pro_internal[20]);
+//			sprintf(device_key1,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",admit_pro_internal[5],admit_pro_internal[6],admit_pro_internal[7],\
+//					admit_pro_internal[8],admit_pro_internal[9],admit_pro_internal[10],admit_pro_internal[11],admit_pro_internal[12],admit_pro_internal[13],\
+//					admit_pro_internal[14],admit_pro_internal[15],admit_pro_internal[16],admit_pro_internal[17], admit_pro_internal[18],\
+//					admit_pro_internal[19],admit_pro_internal[20]);
+			uint8_t temp[17];
+			for(i=0;i<16;i++){
+				temp[i] = admit_pro_internal[i+5];
+			}
+			ConvertUuid(temp, deviceKey);
 			FILE *file=fopen("/root/device_key.txt","w");
 			if(file == NULL){
 				printf("Error!");
 				exit(1);
 			}
-			fprintf(file,"%s",device_key1);
+			fprintf(file,"%s",deviceKey);
 			fclose(file);
 			/**/
 			//usleep(100000);

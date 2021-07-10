@@ -27,10 +27,12 @@ static bool					vrb_GWIF_CheckNow = false;
 static bool					vrb_GWIF_RestartMessage = true;
 static bool 				message_Update = false;
 
-uint8_t uuid[50]="";
-uint8_t device_key[50]="";
-uint8_t app_key[50]="";
-uint8_t net_key[50]="";
+uint8_t uuid[50]			={0};
+uint8_t deviceKey_json[50]	={0};
+uint8_t appkey[50]			={0};
+uint8_t netkey[50]			={0};
+uint8_t netkey_json[50]		={0};
+uint8_t appkey_json[50]		={0};
 bool checkcallscene = false;
 uint16_t sceneForCCt;
 
@@ -204,13 +206,20 @@ void GWIF_ProcessData (void)
 				for(i=0; i<6; i++){
 					OUTMESSAGE_MACSelect[i+3]=vrts_GWIF_IncomeMessage->Message[i+1];
 				}
-				sprintf(uuid,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],\
-						vrts_GWIF_IncomeMessage->Message[12],vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],\
-						vrts_GWIF_IncomeMessage->Message[15],vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17],\
-						vrts_GWIF_IncomeMessage->Message[18],vrts_GWIF_IncomeMessage->Message[19],vrts_GWIF_IncomeMessage->Message[20],\
-						vrts_GWIF_IncomeMessage->Message[21],vrts_GWIF_IncomeMessage->Message[22],vrts_GWIF_IncomeMessage->Message[23],\
-						vrts_GWIF_IncomeMessage->Message[24],vrts_GWIF_IncomeMessage->Message[25]);
-
+//				sprintf(uuid,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],\
+//						vrts_GWIF_IncomeMessage->Message[12],vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],\
+//						vrts_GWIF_IncomeMessage->Message[15],vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17],\
+//						vrts_GWIF_IncomeMessage->Message[18],vrts_GWIF_IncomeMessage->Message[19],vrts_GWIF_IncomeMessage->Message[20],\
+//						vrts_GWIF_IncomeMessage->Message[21],vrts_GWIF_IncomeMessage->Message[22],vrts_GWIF_IncomeMessage->Message[23],\
+//						vrts_GWIF_IncomeMessage->Message[24],vrts_GWIF_IncomeMessage->Message[25]);
+				int i;
+				for(i=0;i<16;i++){
+					uuid[i] = vrts_GWIF_IncomeMessage->Message[i+10];
+				}
+				for(i=0;i<50;i++){
+					uuid_json[i] = NULL;
+				}
+				ConvertUuid(uuid, uuid_json);
 				flag_selectmac=true;
 				flag_check_select_mac= false;
 			}
@@ -250,12 +259,20 @@ void GWIF_ProcessData (void)
 					}
 					adr_heartbeat= OUTMESSAGE_Provision[26] | (OUTMESSAGE_Provision[27]<<8);
 				}
-				sprintf(net_key,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[2],vrts_GWIF_IncomeMessage->Message[3],\
-										vrts_GWIF_IncomeMessage->Message[4],vrts_GWIF_IncomeMessage->Message[5],vrts_GWIF_IncomeMessage->Message[6],\
-										vrts_GWIF_IncomeMessage->Message[7],vrts_GWIF_IncomeMessage->Message[8],vrts_GWIF_IncomeMessage->Message[9],\
-										vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],vrts_GWIF_IncomeMessage->Message[12],\
-										vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],vrts_GWIF_IncomeMessage->Message[15],\
-										vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17]);
+//				sprintf(net_key,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[2],vrts_GWIF_IncomeMessage->Message[3],\
+//										vrts_GWIF_IncomeMessage->Message[4],vrts_GWIF_IncomeMessage->Message[5],vrts_GWIF_IncomeMessage->Message[6],\
+//										vrts_GWIF_IncomeMessage->Message[7],vrts_GWIF_IncomeMessage->Message[8],vrts_GWIF_IncomeMessage->Message[9],\
+//										vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],vrts_GWIF_IncomeMessage->Message[12],\
+//										vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],vrts_GWIF_IncomeMessage->Message[15],\
+//										vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17]);
+				int i;
+				for(i=0;i<16;i++){
+					netkey[i] = vrts_GWIF_IncomeMessage->Message[i+2];
+				}
+				for(i=0;i<50;i++){
+					netkey_json[i] = NULL;
+				}
+				ConvertUuid(netkey, netkey_json);
 
 				flag_getpro_info = true;
 			}
@@ -267,12 +284,20 @@ void GWIF_ProcessData (void)
 			}
 			/* app key*/
 			if((vrui_GWIF_LengthMeassge == 27) && (vrts_GWIF_IncomeMessage->Message[0] == 0xb5)){
-				sprintf(app_key,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],\
-						vrts_GWIF_IncomeMessage->Message[12],vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],\
-						vrts_GWIF_IncomeMessage->Message[15],vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17],\
-						vrts_GWIF_IncomeMessage->Message[18],vrts_GWIF_IncomeMessage->Message[19],vrts_GWIF_IncomeMessage->Message[20],\
-						vrts_GWIF_IncomeMessage->Message[21],vrts_GWIF_IncomeMessage->Message[22],vrts_GWIF_IncomeMessage->Message[23],\
-						vrts_GWIF_IncomeMessage->Message[24],vrts_GWIF_IncomeMessage->Message[25]);
+//				sprintf(app_key,"%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x",vrts_GWIF_IncomeMessage->Message[10],vrts_GWIF_IncomeMessage->Message[11],\
+//						vrts_GWIF_IncomeMessage->Message[12],vrts_GWIF_IncomeMessage->Message[13],vrts_GWIF_IncomeMessage->Message[14],\
+//						vrts_GWIF_IncomeMessage->Message[15],vrts_GWIF_IncomeMessage->Message[16],vrts_GWIF_IncomeMessage->Message[17],\
+//						vrts_GWIF_IncomeMessage->Message[18],vrts_GWIF_IncomeMessage->Message[19],vrts_GWIF_IncomeMessage->Message[20],\
+//						vrts_GWIF_IncomeMessage->Message[21],vrts_GWIF_IncomeMessage->Message[22],vrts_GWIF_IncomeMessage->Message[23],\
+//						vrts_GWIF_IncomeMessage->Message[24],vrts_GWIF_IncomeMessage->Message[25]);
+				int i;
+				for(i=0;i<16;i++){
+					appkey[i] = vrts_GWIF_IncomeMessage->Message[i+10];
+				}
+				for(i=0;i<50;i++){
+					appkey_json[i] = NULL;
+				}
+				ConvertUuid(appkey, appkey_json);
 			}
 			if(vrts_GWIF_IncomeMessage->Message[0] == HCI_GATEWAY_CMD_KEY_BIND_EVT && vrts_GWIF_IncomeMessage->Message[1] == HCI_GATEWAY_CMD_BIND_SUSCESS){
 				slog_info("<provision> success");
@@ -309,7 +334,7 @@ void GWIF_ProcessData (void)
 				uint16_t headerSensor = vrts_GWIF_IncomeMessage->Message[6] | (vrts_GWIF_IncomeMessage->Message[7]<<8);
 
 				json_component jsonAdr = {"DEVICE_UNICAST_ID",adr,json_type_int};
-				json_component cmd_Sensor_Json = {"CMD","SENSOR_VALUE",json_type_string};
+				//json_component cmd_Sensor_Json = {"CMD","SENSOR_VALUE",json_type_string};
 				if((headerSensor == REMOTE_MODULE_DC_TYPE) || (headerSensor == REMOTE_MODULE_AC_TYPE)){
 					vrts_Remote_Rsp = (remotersp *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					uint16_t pscenedc = (vrts_Remote_Rsp->senceID[0]) |(vrts_Remote_Rsp->senceID[1]<<8);
@@ -333,11 +358,12 @@ void GWIF_ProcessData (void)
 					else if(vrts_Remote_Rsp->buttonID == 6){
 						buttonId_String = "BUTTON_6";
 					}
+					json_component cmd_remote = {"CMD","REMOTE",json_type_string};
 					json_component button = {"BUTTON_VALUE", buttonId_String, json_type_string};
 					json_component mode = {"MODE_VALUE", vrts_Remote_Rsp->modeID, json_type_int};
 					json_object *data_Remote = create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push, &jsonAdr, &button, &mode);
 					json_component data_Remote_Json = {"DATA",data_Remote,json_type_object};
-					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Sensor_Json, &data_Remote_Json);
+					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_remote, &data_Remote_Json);
 					if(pscenedc!=0){
 						/*call scene normal*/
 //						FunctionPer(HCI_CMD_GATEWAY_CMD, CallSence_typedef, NULL8, NULL8, NULL8, NULL16, NULL16,pscenedc, NULL16,NULL16, NULL16, NULL16, 17);
@@ -399,20 +425,21 @@ void GWIF_ProcessData (void)
 				else if (headerSensor == POWER_TYPE){
 					vrts_Battery_Rsp = (batteryRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					uint16_t power = ProcessBat(vrts_Battery_Rsp);
-
+					json_component cmd_Power = {"CMD","POWER_STATUS",json_type_string};
 					json_component jsonPower = {"POWER_VALUE",power,json_type_int};
 					json_object *data_Power = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push,&jsonAdr, &jsonPower);
 					json_component data_Power_Json = {"DATA",data_Power,json_type_object};
-					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Sensor_Json, &data_Power_Json);
+					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Power, &data_Power_Json);
 				}
 				else if (headerSensor == LIGHT_SENSOR_MODULE_TYPE){
 					vrts_LighSensor_Rsp = (lightsensorRsp *)(&vrts_GWIF_IncomeMessage->Message[6]);
 					ProcessLightSensor(vrts_LighSensor_Rsp);
 
+					json_component cmd_Light = {"CMD","LIGHT_SENSOR",json_type_string};
 					json_component jsonLux = {"LUX_VALUE",value_Lux,json_type_int};
 					json_object *data_Lux = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr, &jsonLux);
 					json_component data_Lux_Json = {"DATA",data_Lux,json_type_object};
-					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Sensor_Json, &data_Lux_Json);
+					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Light, &data_Lux_Json);
 					uint16_t rspSceneSensor = vrts_LighSensor_Rsp->future[0] | vrts_LighSensor_Rsp->future[1]<<8;
 					if(rspSceneSensor != 0){
 						/*call scene normal*/
@@ -433,10 +460,11 @@ void GWIF_ProcessData (void)
 					else if(motion == 0){
 						jsonMotion = 0;
 					}
+					json_component cmd_Pir = {"CMD","PIR_SENSOR",json_type_string};
 					json_component jsonPir = {"PIR_VALUE",jsonMotion,json_type_int};
 					json_object *data_Pir = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr, &jsonPir);
 					json_component data_Pir_Json = {"DATA",data_Pir,json_type_object};
-					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Sensor_Json, &data_Pir_Json);
+					create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd_Pir, &data_Pir_Json);
 					uint16_t rspSceneSensor = vrts_PirSensor_Rsp->future[0] | vrts_PirSensor_Rsp->future[1]<<8;
 					if(rspSceneSensor != 0){
 						/*call scene normal*/
@@ -485,21 +513,22 @@ void GWIF_ProcessData (void)
 					uint8_t temp_Value_Interger = temp_Value_Uint16_t / 10;
 					uint8_t hum_Value_Interger 	= hum_Value_Uint16_t / 10;
 
+					json_component cmd_TemHum = {"CMD","TEMPERATURE_HUMIDITY",json_type_string};
 					json_component hum_Json = {"HUMIDITY_VALUE", hum_Value_Interger, json_type_int};
 					json_object *data_Hum = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr, &hum_Json);
 					json_component data_Hum_Json = {"DATA",data_Hum,json_type_object};
-					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Hum_Json);
+					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_TemHum, &data_Hum_Json);
 					if(!check_temp){
 						json_component temp_Json = {"TEMPERATURE_VALUE", temp_Value_Interger, json_type_int};
 						json_object *data_TEMP = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr, &temp_Json);
 						json_component data_TEMP_Json = {"DATA",data_TEMP,json_type_object};
-						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_TEMP_Json);
+						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_TemHum, &data_TEMP_Json);
 					}
 					else {
 						json_component temp_Json = {"TEMPERATURE_VALUE", (-1)*temp_Value_Interger, json_type_int};
 						json_object *data_TEMP = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr,&temp_Json);
 						json_component data_TEMP_Json = {"DATA",data_TEMP,json_type_object};
-						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_TEMP_Json);
+						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_TemHum, &data_TEMP_Json);
 					}
 					Function_Vendor(HCI_CMD_GATEWAY_CMD, SendTempHumForScreenT_vendor_typedef, 65535, NULL16, NULL8, NULL8, NULL8, NULL16, NULL16, NULL16, temp_Value_original,\
 							hum_Value_Uint16_t, NULL16, NULL16, NULL8, NULL8, NULL8, NULL8, NULL16, 23);
@@ -508,32 +537,36 @@ void GWIF_ProcessData (void)
 					uint8_t hang 					= vrts_GWIF_IncomeMessage->Message[8];
 					uint8_t door 					= vrts_GWIF_IncomeMessage->Message[9];
 					uint16_t sceneDoorSensor 		= vrts_GWIF_IncomeMessage->Message[10] | (vrts_GWIF_IncomeMessage->Message[11]<<8);
+					json_component cmd_Door 		= {"CMD","DOOR_SENSOR",json_type_string};
 					json_component hang_Json 		= {"HANG_VALUE",hang,json_type_int};
 					json_component door_Json 		= {"DOOR_VALUE",door,json_type_int};
 					json_object *door_object 		= create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push, &jsonAdr, &hang_Json, &door_Json);
 					json_component data_Door_Json 	= {"DATA",door_object,json_type_object};
-					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Door_Json);
+					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Door, &data_Door_Json);
 				}
 				else if(headerSensor == SMOKE_SENSOR_MODULE_TYPE){
 					uint8_t smoke 					= vrts_GWIF_IncomeMessage->Message[8];
+					json_component cmd_Smoke 		= {"CMD","SMOKE_SENSOR",json_type_string};
 					json_component smoke_Json 		= {"SMOKE_VALUE",smoke,json_type_int};
 					json_object * data_Smoke 		= create_json_obj_from(add_component_to_obj, 2, mqtt_push, &jsonAdr, &smoke_Json);
 					json_component data_Smoke_Json 	= {"DATA",data_Smoke,json_type_object};
-					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Smoke_Json);
+					create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Smoke, &data_Smoke_Json);
 				}
 				else if(headerSensor == SMOKE_SENSOR_LOW_BATTERY){
 					uint8_t power 					= vrts_GWIF_IncomeMessage->Message[8];
 					if(power){
+						json_component cmd_Smoke 		= {"CMD","SMOKE_SENSOR",json_type_string};
 						json_component smoke_low_batery = {"SMOKE_POWER","LOW_BATTERY",json_type_string};
 						json_object *data_Smoke         = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr,&smoke_low_batery);
 						json_component data_Smoke_Json	= {"DATA",data_Smoke,json_type_object};
-						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Smoke_Json);
+						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Smoke, &data_Smoke_Json);
 					}
 					else {
+						json_component cmd_Smoke 		= {"CMD","SMOKE_SENSOR",json_type_string};
 						json_component smoke_low_batery = {"SMOKE_POWER","HIGH_BATTERY",json_type_string};
 						json_object *data_Smoke         = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &jsonAdr,&smoke_low_batery);
 						json_component data_Smoke_Json	= {"DATA",data_Smoke,json_type_object};
-						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Sensor_Json, &data_Smoke_Json);
+						create_json_obj_from(add_component_to_obj, 2, mqtt_push, &cmd_Smoke, &data_Smoke_Json);
 					}
 
 				}
@@ -729,23 +762,21 @@ void GWIF_ProcessData (void)
 
 							/*read device key*/
 							FILE * file;
-							if ((file = fopen("/root/device_key.txt","r")) == NULL){
-								   printf("Error! opening file");
-								   exit(1);
+							if ((file = fopen("/root/device_key.txt","r")) != NULL){
+									fscanf(file,"%[^\n]",deviceKey_json);
+									fclose(file);
+									/**/
+									json_component cmd = {"CMD","TYPE_DEVICE",json_type_string};
+									json_component json_id = {"DEVICE_ID",uuid_json,json_type_string};
+									json_component json_device_key = {"DEVICE_KEY",deviceKey_json,json_type_string};
+									json_component json_net_key = {"NET_KEY",netkey_json,json_type_string};
+									json_component json_app_key = {"APP_KEY",appkey_json,json_type_string};
+									json_component json_type_id = {"DEVICE_TYPE_ID",TypeConvertID(jsonType,jsonAttrubute,jsonApplication),json_type_int};
+									json_object *data = create_json_obj_from(add_component_to_obj, 6,mqtt_dont_push, &device_unicast_id_json, &json_id, &json_device_key, &json_net_key, &json_app_key, &json_type_id);
+									json_component jsondata = {"DATA",data,json_type_object};
+									create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &jsondata);
 							}
-							fscanf(file,"%[^\n]",device_key);
-							fclose(file);
-
-							/**/
-							json_component cmd = {"CMD","TYPE_DEVICE",json_type_string};
-							json_component json_id = {"DEVICE_ID",uuid,json_type_string};
-							json_component json_device_key = {"DEVICE_KEY",device_key,json_type_string};
-							json_component json_net_key = {"NET_KEY",net_key,json_type_string};
-							json_component json_app_key = {"APP_KEY",app_key,json_type_string};
-							json_component json_type_id = {"DEVICE_TYPE_ID",TypeConvertID(jsonType,jsonAttrubute,jsonApplication),json_type_int};
-							json_object *data = create_json_obj_from(add_component_to_obj, 6,mqtt_dont_push, &device_unicast_id_json, &json_id, &json_device_key, &json_net_key, &json_app_key, &json_type_id);
-							json_component jsondata = {"DATA",data,json_type_object};
-							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &jsondata);
+							else printf("Error! opening file");
 							if(TypeConvertID(jsonType, jsonAttrubute, jsonApplication) == 23003){
 								Function_Vendor(HCI_CMD_GATEWAY_CMD, SendTimeForScreenT_vendor_typedef, 65535, NULL16, NULL8, NULL8, NULL8, NULL16, NULL16, \
 										NULL16, NULL16, NULL16, NULL16, NULL16, NULL8, dataTimeInternet[0], dataTimeInternet[1], NULL8, NULL16, 23);
@@ -829,7 +860,7 @@ void GWIF_ProcessData (void)
 						break;
 					case HEADER_SCENE_DEL:
 						if(1){
-							json_component cmd = {"CMD","DELSCENE_RGB", json_type_string};
+							json_component cmd = {"CMD","DELSCENE", json_type_string};
 							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &sceneid_Json);
 							json_component data_Json = {"DATA", data_object, json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &data_Json);
@@ -837,15 +868,17 @@ void GWIF_ProcessData (void)
 						break;
 					case HEADER_SCENE_SET:
 						if(1){
-							json_component cmd = {"CMD", "ADDSCENE_RGB", json_type_string};
-							json_object *data_object = create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push, &device_unicast_id_json, &srgbid_Json, &sceneid_Json);
+//							json_component cmd = {"CMD", "ADDSCENE_RGB", json_type_string};
+//							json_object *data_object = create_json_obj_from(add_component_to_obj, 3, mqtt_dont_push, &device_unicast_id_json, &srgbid_Json, &sceneid_Json);
+							json_component cmd = {"CMD", "ADDSCENE", json_type_string};
+							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &sceneid_Json);
 							json_component data_Json = {"DATA",data_object, json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &data_Json);
 						}
 						break;
 					case HEADER_SCENE_CALL_SCENE_RGB:
 						if(1){
-							json_component cmd = {"CMD","CALLSCENE_RGB", json_type_string};
+							json_component cmd = {"CMD","CALLSCENE", json_type_string};
 							json_object *data_object = create_json_obj_from(add_component_to_obj, 2, mqtt_dont_push, &device_unicast_id_json, &sceneid_Json);
 							json_component data_Json = {"DATA",data_object, json_type_object};
 							create_json_obj_from(add_component_to_obj, 2,mqtt_push, &cmd, &data_Json);

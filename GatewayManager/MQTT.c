@@ -74,7 +74,7 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
 				struct json_object * jobj = json_tokener_parse(head->message);
 				Json_Parse(jobj);
 				timeSendNode++;
-				if(timeSendNode == 3){
+				if(timeSendNode == 1){
 					delHead = true;
 					timeSendNode = 0;
 					hasRsp = true;
